@@ -32,8 +32,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Camera camera{ Camera::Type::Othographic };
 
 	Texture2D tex;
-	tex.LoadTexture("./Resources/uvChecker.png");
-	tex.scale = tex.GetTexSize();
+	tex.LoadTexture("./Resources/white2x2.png");
+	tex.scale *= 512.0f;
 
 	/// 
 	/// メインループ
