@@ -41,7 +41,7 @@ void ErrorCheck::ErrorTextBox(const std::string& text, const std::string& boxNam
 }
 
 void ErrorCheck::ErrorLog(const std::string& text, const std::string& boxName) {
-	std::filesystem::path directoryPath = "./Log/";
+	std::filesystem::path directoryPath = "./ExecutionLog/";
 	if (!std::filesystem::exists(directoryPath)) {
 		std::filesystem::create_directory(directoryPath);
 	}
