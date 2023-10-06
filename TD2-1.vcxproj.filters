@@ -384,9 +384,6 @@
     <ClInclude Include="Engine\ShaderResource\ShaderResourceHeap.h">
       <Filter>Engine\ShaderResource</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalVariables\VariantItem.h">
-      <Filter>GlobalVariables</Filter>
-    </ClInclude>
     <ClInclude Include="MeshManager\MeshManager.h">
       <Filter>MeshManager</Filter>
     </ClInclude>
