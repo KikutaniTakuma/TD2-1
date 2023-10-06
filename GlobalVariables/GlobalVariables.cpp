@@ -27,6 +27,11 @@ void GlobalVariables::SetValue(const std::string& groupName, const std::string& 
 	Item item = value;
 	gruop[key] = value;
 }
+void GlobalVariables::SetValue(const std::string& groupName, const std::string& key, const Vector2& value) {
+	auto& gruop = datas[groupName];
+	Item item = value;
+	gruop[key] = value;
+}
 void GlobalVariables::SetValue(const std::string& groupName, const std::string& key, const Vector3& value) {
 	auto& gruop = datas[groupName];
 	Item item = value;
@@ -39,6 +44,7 @@ void GlobalVariables::SetValue(const std::string& groupName, const std::string& 
 }
 
 void GlobalVariables::Update() {
+#ifdef _DEBUG
 	if (!ImGui::Begin(" Global Variables", nullptr, ImGuiWindowFlags_MenuBar)) {
 		ImGui::End();
 		return;
@@ -68,6 +74,10 @@ void GlobalVariables::Update() {
 				float* ptr = std::get_if<float>(&item);
 				ImGui::SliderFloat(itemName.c_str(), ptr, -10.0f, 10.0f);
 			}
+			else if (std::holds_alternative<Vector2>(item)) {
+				Vector2* ptr = std::get_if<Vector2>(&item);
+				ImGui::SliderFloat2(itemName.c_str(), &ptr->x, -10.0f, 10.0f);
+			}
 			else if (std::holds_alternative<Vector3>(item)) {
 				Vector3* ptr = std::get_if<Vector3>(&item);
 				ImGui::SliderFloat3(itemName.c_str(), &ptr->x, -10.0f, 10.0f);
@@ -87,6 +97,8 @@ void GlobalVariables::Update() {
 
 	ImGui::EndMenuBar();
 	ImGui::End();
+
+#endif // _DEBUG
 }
 
 void GlobalVariables::SaveFile(const std::string& groupName) {
@@ -109,6 +121,10 @@ void GlobalVariables::SaveFile(const std::string& groupName) {
 		}
 		else if (std::holds_alternative<float>(item)) {
 			root[groupName][itemName] = std::get<float>(item);
+		}
+		else if (std::holds_alternative<Vector2>(item)) {
+			auto tmp = std::get<Vector2>(item);
+			root[groupName][itemName] = nlohmann::json::array({ tmp.x, tmp.y });
 		}
 		else if (std::holds_alternative<Vector3>(item)) {
 			auto tmp = std::get<Vector3>(item);
@@ -198,6 +214,10 @@ void GlobalVariables::LoadFile(const std::string& groupName) {
 			float value = itemItr->get<float>();
 			SetValue(groupName, itemName, value);
 		}
+		else if (itemItr->is_array() && itemItr->size() == 2) {
+			Vector2 value = { itemItr->at(0),itemItr->at(1) };
+			SetValue(groupName, itemName, value);
+		}
 		else if (itemItr->is_array() && itemItr->size() == 3) {
 			Vector3 value = { itemItr->at(0),itemItr->at(1),itemItr->at(2) };
 			SetValue(groupName, itemName, value);
@@ -219,6 +239,15 @@ void GlobalVariables::AddItem(const std::string& groupName, const std::string& k
 	}
 }
 void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, float value) {
+	auto& gruop = datas[groupName];
+	auto itemItr = gruop.find(key);
+	gruop[key] = value;
+	if (itemItr == gruop.end()) {
+		Item item = value;
+		gruop[key] = value;
+	}
+}
+void GlobalVariables::AddItem(const std::string& groupName, const std::string& key, const Vector2& value) {
 	auto& gruop = datas[groupName];
 	auto itemItr = gruop.find(key);
 	gruop[key] = value;
@@ -274,6 +303,22 @@ float GlobalVariables::GetFloatValue(const std::string& groupName, const std::st
 	else {
 		assert(!"GlobalVariables::GetFloatValue() errar Don't have float");
 		return 0.0f;
+	}
+}
+Vector2 GlobalVariables::GetVector2Value(const std::string& groupName, const std::string& key) const {
+	auto dataItr = datas.find(groupName);
+	assert(dataItr != datas.end());
+	const Group& group = dataItr->second;
+	auto itemItr = group.find(key);
+	assert(itemItr != group.end());
+	const Item& item = itemItr->second;
+	if (std::holds_alternative<Vector2>(item)) {
+		return std::get<Vector2>(item);
+	}
+	else {
+		assert(!"GlobalVariables::GetVector2Value() errar Don't have Vector2");
+
+		return Vector2();
 	}
 }
 Vector3 GlobalVariables::GetVector3Value(const std::string& groupName, const std::string& key) const {
