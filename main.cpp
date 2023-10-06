@@ -32,7 +32,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Camera camera{ Camera::Type::Othographic };
 
 	Texture2D tex;
-	tex.LoadTexture("./Resources/white2x2.png");
+	tex.LoadTexture("./Resources/uvChecker.png");
 	tex.scale *= 512.0f;
 
 	/// 
@@ -68,7 +68,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		camera.Update();
 
-		tex.Draw(camera.GetViewOthographics());
+		tex.Draw(camera.GetViewOthographics(), Pipeline::Normal, false);
 
 		///
 		/// 描画処理ここまで
