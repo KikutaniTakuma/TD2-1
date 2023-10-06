@@ -140,6 +140,24 @@
     <ClCompile Include="Utils\Easeing\Easeing.cpp">
       <Filter>Utils\Easeing</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameScene\GameScene.cpp">
+      <Filter>GameScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\Play\Play.cpp">
+      <Filter>GameScene\Play</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\Result\Result.cpp">
+      <Filter>GameScene\Result</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameScene\Title\Title.cpp">
+      <Filter>GameScene\Title</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Player\Player.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Enemy\Enemy.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -267,6 +285,24 @@
     </Filter>
     <Filter Include="Utils\Easeing">
       <UniqueIdentifier>{f16e45ab-4143-42ad-8fd5-3f82c6326404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameScene">
+      <UniqueIdentifier>{464a587f-01eb-4ac8-ac12-3035923ae6b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameScene\Play">
+      <UniqueIdentifier>{38300dba-173b-4714-a611-7c1adaaceede}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameScene\Result">
+      <UniqueIdentifier>{2265f3e9-386f-4c67-af9f-6e9bcb5f6ada}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameScene\Title">
+      <UniqueIdentifier>{42afc486-6d21-48b3-9595-44db9549c226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{8b46523d-9372-4bd3-931b-d24c10f840f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemy">
+      <UniqueIdentifier>{b1a4b935-b2eb-4b83-be0f-e00e485561cc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -419,6 +455,24 @@
     </ClInclude>
     <ClInclude Include="Utils\Easeing\Easeing.h">
       <Filter>Utils\Easeing</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\GameScene.h">
+      <Filter>GameScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\Play\Play.h">
+      <Filter>GameScene\Play</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\Result\Result.h">
+      <Filter>GameScene\Result</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameScene\Title\Title.h">
+      <Filter>GameScene\Title</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Player\Player.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Enemy\Enemy.h">
+      <Filter>Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
