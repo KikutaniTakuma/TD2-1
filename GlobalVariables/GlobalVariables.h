@@ -2,11 +2,12 @@
 #include <unordered_map>
 #include <variant>
 #include <string>
+#include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector3.h"
 
 class GlobalVariables {
 public:
-	using Item = std::variant<int32_t, float, Vector3, std::string>;
+	using Item = std::variant<int32_t, float, Vector2, Vector3, std::string>;
 	using Group = std::unordered_map<std::string, Item>;
 
 public:
@@ -24,6 +25,7 @@ public:
 
 	void SetValue(const std::string& groupName, const std::string& key, int32_t value);
 	void SetValue(const std::string& groupName, const std::string& key, float value);
+	void SetValue(const std::string& groupName, const std::string& key, const Vector2& value);
 	void SetValue(const std::string& groupName, const std::string& key, const Vector3& value);
 	void SetValue(const std::string& groupName, const std::string& key, const std::string& value);
 
@@ -35,11 +37,13 @@ public:
 
 	void AddItem(const std::string& groupName, const std::string& key, int32_t value);
 	void AddItem(const std::string& groupName, const std::string& key, float value);
+	void AddItem(const std::string& groupName, const std::string& key, const Vector2& value);
 	void AddItem(const std::string& groupName, const std::string& key, const Vector3& value);
 	void AddItem(const std::string& groupName, const std::string& key, const std::string& value);
 
 	int32_t GetIntValue(const std::string& groupName, const std::string& key) const;
 	float GetFloatValue(const std::string& groupName, const std::string& key)const;
+	Vector2 GetVector2Value(const std::string& groupName, const std::string& key) const;
 	Vector3 GetVector3Value(const std::string& groupName, const std::string& key) const;
 	std::string GetStringValue(const std::string& groupName, const std::string& key) const;
 
