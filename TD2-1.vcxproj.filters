@@ -158,6 +158,9 @@
     <ClCompile Include="Game\Enemy\Enemy.cpp">
       <Filter>Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Layer\Layer.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -304,6 +307,9 @@
     <Filter Include="Enemy">
       <UniqueIdentifier>{b1a4b935-b2eb-4b83-be0f-e00e485561cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Layer">
+      <UniqueIdentifier>{2cbedc8a-b935-4f46-aa39-39ebd5333276}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h">
@@ -420,9 +426,6 @@
     <ClInclude Include="Engine\ShaderResource\ShaderResourceHeap.h">
       <Filter>Engine\ShaderResource</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalVariables\VariantItem.h">
-      <Filter>GlobalVariables</Filter>
-    </ClInclude>
     <ClInclude Include="MeshManager\MeshManager.h">
       <Filter>MeshManager</Filter>
     </ClInclude>
@@ -473,6 +476,9 @@
     </ClInclude>
     <ClInclude Include="Game\Enemy\Enemy.h">
       <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer\Layer.h">
+      <Filter>Layer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

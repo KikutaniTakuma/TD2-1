@@ -23,19 +23,15 @@ public:
 	void Update();
 
 	/// <summary>
-	/// 3DモデルのDraw仮
-	/// </summary>
-	/// <param name="viewProjection">カメラのマトリックス</param>
-	/// <param name="blend">ブレンドモード</param>
-	/// <param name="isDepth">深度バッファの有効か否か(trueなら有効)</param>
-	void Draw(const Mat4x4& viewProjection, Pipeline::Blend blend, bool isDepth);
+/// 3DモデルのDraw仮
+/// </summary>
+/// <param name="viewProjection">カメラのマトリックス</param>
+	void Draw(const Mat4x4& viewProjection);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
-	/// <param name="blend">ブレンドモード</param>
-	/// <param name="isDepth">深度バッファの有効か否か(trueなら有効)</param>
-	void Draw2D(const Mat4x4& viewProjection, Pipeline::Blend blend, bool isDepth);
+	void Draw2D(const Mat4x4& viewProjection);
 
 };

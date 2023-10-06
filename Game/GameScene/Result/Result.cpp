@@ -14,16 +14,9 @@ void Result::Update() {
 
 }
 
-//void Result::Draw(const Mat4x4& viewProjection, Pipeline::Blend blend, bool isDepth) {
-//
-//
-//
-//
-//
-//}
-//
-//void Result::Draw2D(const Mat4x4& viewProjection, Pipeline::Blend blend, bool isDepth) {
-//
-//}
+void Result::Draw() {
+
+}
+
 
 

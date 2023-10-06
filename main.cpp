@@ -11,6 +11,8 @@
 #include "Utils/Camera/Camera.h"
 #include "Drawers/Texture2D/Texture2D.h"
 
+#include "Game/GameScene/GameScene.h"
+
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ライブラリ初期化
@@ -28,6 +30,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	static auto* const frameInfo = FrameInfo::GetInstance();
 
 	auto input = Input::GetInstance();
+
+	GameScene* gameScene = GameScene::GetInstance();
+	gameScene->Initialize();
 
 	Camera camera{ Camera::Type::Othographic };
 
@@ -58,6 +63,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 
 		tex.Update();
+		gameScene->Update();
 
 		///
 		/// 更新処理ここまで
@@ -68,7 +74,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		camera.Update();
 
-		tex.Draw(camera.GetViewOthographics(), Pipeline::Normal, false);
+		//tex.Draw(camera.GetViewOthographics(), Pipeline::Normal, false);
+
+		gameScene->Draw();
 
 		///
 		/// 描画処理ここまで

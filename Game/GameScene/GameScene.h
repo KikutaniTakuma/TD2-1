@@ -33,14 +33,13 @@ public:
 	void Update();
 
 	/// <summary>
-	/// 3DモデルのDraw仮
+	/// 描画
 	/// </summary>
 	void Draw();
 
-	/// <summary>
-	/// 2DテクスチャのDraw
-	/// </summary>
-	void Draw2D();
+public:
+
+	void SceneRequest(Scene scene) { sceneRequest_ = scene; }
 
 private:
 	GameScene() = default;
@@ -50,13 +49,16 @@ private:
 
 private:
 
-	// タイトルシーンインスタンス
+	// タイトルシーン
 	std::unique_ptr<Title> title_;
-	// プレイシーンインスタンス
+	// プレイシーン
 	std::unique_ptr<Play> play_;
-	// リザルトシーンインスタンス
+	// リザルトシーン
 	std::unique_ptr<Result> result_;
 
-
+	// 現在のシーン。今はプレイ確認用のためプレイにしている。
+	Scene scene_ = Scene::kPlay;
+	// シーンのリクエスト
+	std::optional<Scene> sceneRequest_ = std::nullopt;
 
 };

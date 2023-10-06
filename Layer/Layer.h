@@ -2,15 +2,12 @@
 
 #include "Utils/Math/Mat4x4.h"
 #include "Drawers/Texture2D/Texture2D.h"
-#include "Input/Input.h"
 
-#include "GlobalVariables/GlobalVariables.h"
-
-class Player
+class Layer
 {
 public:
-	Player();
-	~Player() = default;
+	Layer();
+	~Layer() = default;
 
 	/// <summary>
 	/// 初期化
@@ -36,37 +33,14 @@ public:
 
 private:
 
-	void SetGlobalVariable();
-
-	void ApplyGlobalVariable();
-	
-private:
-
 	// プレイヤーのテクスチャ
 	Texture2D tex_;
 
-	// 入力状況
-	Input* input_ = nullptr;
+	// HP
+	int hitPoint_;
 
-	// グローバル変数
-	std::unique_ptr<GlobalVariables> globalVariables_;
+	// HPの最大値
+	int kMaxHitPoint_;
 
-	// グローバル変数のグループネーム
-	const char* groupName_ = "Player";
-
-	// 速度
-	//Vector3 velocity_ = {};
-
-	// ジャンプ時の初速
-	float kFlyInitialVelocity_ = 30.0f;
-
-	// 移動スピード
-	float kMoveSpeed_ = 5.0f;
-
-	// 重力加速度
-	float kGravity_ = -9.8f;
-
-	// 空中にいるか
-	bool isFly = false;
 
 };
