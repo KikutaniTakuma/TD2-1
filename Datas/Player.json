@@ -1,0 +1,7 @@
+{
+    "Player": {
+        "kJampInitialVelocity": 10.0,
+        "kGravity": -9.800000190734863,
+        "kMoveSpeed": 300.0
+    }
+}

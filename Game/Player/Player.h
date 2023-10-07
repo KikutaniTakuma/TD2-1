@@ -9,6 +9,7 @@
 class Player
 {
 public:
+
 	Player();
 	~Player() = default;
 
@@ -34,10 +35,34 @@ public:
 	/// <param name="viewProjection">カメラのマトリックス</param>
 	void Draw2D(const Mat4x4& viewProjection);
 
+public:
+
+	/// <summary>
+	/// テクスチャの参照。あたり判定用。
+	/// </summary>
+	const Texture2D& GetTex() { return tex_; }
+
+	/// <summary>
+	/// 速度の参照。あたり判定用。
+	/// </summary>
+	const Vector3& GetVelocity() { return velocity_; }
+
+	/// <summary>
+	/// エネミーを踏んだかどうか
+	/// </summary>
+	/// <param name="step">踏んでたらtrue,踏まれてたらfalse</param>
+	void EnemyStep(bool step);
+
 private:
 
+	/// <summary>
+	/// jsonファイルへの書き込み
+	/// </summary>
 	void SetGlobalVariable();
 
+	/// <summary>
+	/// jsonファイルからの呼び出し
+	/// </summary>
 	void ApplyGlobalVariable();
 	
 private:
@@ -55,18 +80,23 @@ private:
 	const char* groupName_ = "Player";
 
 	// 速度
-	//Vector3 velocity_ = {};
+	Vector3 velocity_ = {};
 
 	// ジャンプ時の初速
-	float kFlyInitialVelocity_ = 30.0f;
+	float kJampInitialVelocity_;
 
 	// 移動スピード
-	float kMoveSpeed_ = 5.0f;
+	float kMoveSpeed_;
 
 	// 重力加速度
-	float kGravity_ = -9.8f;
+	float kGravity_ ;
 
 	// 空中にいるか
-	bool isFly = false;
+	bool isFly_;
 
+	// 敵を踏んだか
+	bool isStep_;
+
+	// 敵に踏まれたか
+	bool isSteped_;
 };

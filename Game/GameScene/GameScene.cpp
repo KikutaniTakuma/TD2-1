@@ -53,6 +53,8 @@ void GameScene::Update() {
 		default:
 			break;
 		}
+
+		sceneRequest_ = std::nullopt;
 	}
 
 	switch (scene_)
