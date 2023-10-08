@@ -39,6 +39,18 @@ void Play::EnemeiesClear() {
 	});
 }
 
+void Play::DeleteShockWave() {
+
+	shockWaves_.remove_if([](std::shared_ptr<ShockWave> shockWave) {
+		if (shockWave->GetDeleteFlag()) {
+			shockWave->Finalize();
+			shockWave.reset();
+			return true;
+		}
+		return false;
+	});
+}
+
 void Play::Collision() {
 
 	const Texture2D* playerTex = player_->GetTex();
@@ -64,10 +76,20 @@ void Play::Collision() {
 					// 敵に踏まれた時
 					player_->EnemyStep(false);
 				}
-				break;
 			}
 		}
-		
+		else if (enemy->GetStatus() == Enemy::Status::kFaint && shockWaves_.size() != 0) {
+			for (std::shared_ptr<ShockWave> shockWave : shockWaves_) {
+				const std::list<std::shared_ptr<Texture2D>>& shockWaveTextures = shockWave->GetTextures();
+
+				for (std::shared_ptr<Texture2D> shockWaveTex : shockWaveTextures) {
+
+					if (shockWaveTex->Colision(*enemyTex)) {
+						enemy->StatusRequest(Enemy::Status::kDeath);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -84,6 +106,9 @@ void Play::Update() {
 	for (std::shared_ptr<ShockWave> shockWave : shockWaves_) {
 		shockWave->Update();
 	}
+
+	// これと押すとメモリリーク起きる
+	// DeleteShockWave();
 
 	Collision();
 

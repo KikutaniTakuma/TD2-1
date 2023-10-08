@@ -23,6 +23,8 @@ Player::Player() {
 
 	// 重力加速度
 	kGravity_ = -9.8f;
+
+
 }
 
 void Player::SetGlobalVariable() {
@@ -32,6 +34,7 @@ void Player::SetGlobalVariable() {
 	globalVariables_->AddItem(groupName_, "kJampInitialVelocity", kJampInitialVelocity_);
 	globalVariables_->AddItem(groupName_, "kMoveSpeed", kMoveSpeed_);
 	globalVariables_->AddItem(groupName_, "kGravity", kGravity_);
+	globalVariables_->AddItem(groupName_, "kHipDropSpeed", kHipDropSpeed_);
 
 	globalVariables_->LoadFile(groupName_);
 	ApplyGlobalVariable();
@@ -42,6 +45,7 @@ void Player::ApplyGlobalVariable() {
 	kJampInitialVelocity_ = globalVariables_->GetFloatValue(groupName_, "kJampInitialVelocity");
 	kMoveSpeed_ = globalVariables_->GetFloatValue(groupName_, "kMoveSpeed");
 	kGravity_ = globalVariables_->GetFloatValue(groupName_, "kGravity");
+	kHipDropSpeed_ = globalVariables_->GetFloatValue(groupName_, "kHipDropSpeed");
 
 }
 
@@ -190,7 +194,7 @@ void Player::HipDropInitialize() {
 
 void Player::HipDropUpdate() {
 
-	velocity_.y += kGravity_ * FrameInfo::GetInstance()->GetDelta();
+	velocity_.y += kHipDropSpeed_ * FrameInfo::GetInstance()->GetDelta();
 	tex_->pos += velocity_;
 
 	if (tex_->pos.y <= 0.0f) {

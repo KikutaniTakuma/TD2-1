@@ -33,6 +33,11 @@ public:
 	void Update();
 
 	/// <summary>
+	/// 最期
+	/// </summary>
+	void Finalize();
+
+	/// <summary>
 	/// 3DモデルのDraw仮
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
@@ -50,7 +55,13 @@ public:
 	/// テクスチャの参照。あたり判定用。
 	/// </summary>
 	/// <returns>テクスチャのlist配列</returns>
-	const std::list<std::shared_ptr<Texture2D>> GetTextures() { return textures_; }
+	const std::list<std::shared_ptr<Texture2D>>& GetTextures() { return textures_; }
+
+	/// <summary>
+	/// 消すかどうかのフラグを取得
+	/// </summary>
+	/// <returns>trueなら消す</returns>
+	bool GetDeleteFlag() const { return isDelete_; }
 
 	/// <summary>
 	/// 静的メンバ定数のImGui用
@@ -91,11 +102,18 @@ private:
 	// 移動スピード
 	static float kSpeed_;
 
-	
+	// 消えるまでのフレーム数
+	static int kDeleteFrame_;
 
 private:
 
 	// テクスチャ
 	std::list<std::shared_ptr<Texture2D>> textures_;
+
+	// 消えるまでのカウント
+	int deleteCount_;
+
+	// 消すかどうかのフラグ
+	bool isDelete_;
 
 };

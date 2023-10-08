@@ -173,6 +173,9 @@ private:
 	// 重力加速度
 	float kGravity_ ;
 
+	// ヒップドロップ中の加速度
+	float kHipDropSpeed_;
+
 	// 空中にいるか
 	bool isFly_;
 

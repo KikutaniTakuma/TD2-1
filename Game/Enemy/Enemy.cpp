@@ -134,7 +134,7 @@ void Enemy::FaintInitialize() {
 void Enemy::FaintUpdate() {
 
 	// 仮で落ちたら初期値に戻るようにしている
-	statusRequest_ = Status::kNormal;
+	//statusRequest_ = Status::kNormal;
 
 }
 
@@ -144,6 +144,7 @@ void Enemy::DeathInitialize() {
 
 void Enemy::DeathUpdate() {
 
+	statusRequest_ = Status::kNormal;
 }
 
 //void Enemy::Draw(const Mat4x4& viewProjection) {

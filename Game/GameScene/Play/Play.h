@@ -53,6 +53,11 @@ private:
 	void EnemeiesClear();
 
 	/// <summary>
+	/// 衝撃波の削除
+	/// </summary>
+	void DeleteShockWave();
+
+	/// <summary>
 	/// プレイヤーとエネミーの当たり判定
 	/// </summary>
 	void Collision();

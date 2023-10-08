@@ -10,11 +10,11 @@ float ShockWave::kSize_[static_cast<uint16_t>(Size::kNum)];
 
 float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kNum)];
 
+int ShockWave::kDeleteFrame_ = 300;
+
 const char* ShockWave::groupName_ = "StaticShockWave";
 
 ShockWave::ShockWave(const Vector3& pos, float highest) {
-
-	globalVariables_ = std::make_unique<GlobalVariables>();
 
 	SetGlobalVariable();
 
@@ -36,6 +36,17 @@ ShockWave::ShockWave(const Vector3& pos, float highest) {
 		tex->Update();
 	}
 
+	deleteCount_ = 0;
+	isDelete_ = false;
+
+}
+
+void ShockWave::Finalize() {
+
+	textures_.remove_if([](std::shared_ptr<Texture2D> tex) {
+		tex.reset();
+		return true;
+	});
 }
 
 void ShockWave::SetGlobalVariable() {
@@ -52,6 +63,8 @@ void ShockWave::SetGlobalVariable() {
 	globalVariables_->AddItem(groupName_, "kHighCriteriaMiddle", kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)]);
 	globalVariables_->AddItem(groupName_, "kHighCriteriaMajor", kHighCriteria_[static_cast<uint16_t>(Size::kMajor)]);
 
+	globalVariables_->AddItem(groupName_, "kDeleteFrame", kDeleteFrame_);
+
 	globalVariables_->LoadFile(groupName_);
 	ApplyGlobalVariable();
 }
@@ -59,6 +72,8 @@ void ShockWave::SetGlobalVariable() {
 void ShockWave::ApplyGlobalVariable() {
 
 	kSpeed_ = globalVariables_->GetFloatValue(groupName_, "kSpeed");
+
+	kDeleteFrame_ = globalVariables_->GetIntValue(groupName_, "kDeleteFrame");
 
 	kSize_[static_cast<uint16_t>(Size::kSmall)] = globalVariables_->GetFloatValue(groupName_, "kSizeSmall");
 	kSize_[static_cast<uint16_t>(Size::kMiddle)] = globalVariables_->GetFloatValue(groupName_, "kSizeMiddle");
@@ -73,6 +88,12 @@ void ShockWave::ApplyGlobalVariable() {
 void ShockWave::Update() {
 
 	ApplyGlobalVariable();
+
+	deleteCount_++;
+
+	if (deleteCount_ == kDeleteFrame_) {
+		isDelete_ = true;
+	}
 
 	// 左右方向に動かす
 	int i = 0;
