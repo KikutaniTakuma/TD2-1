@@ -10,13 +10,14 @@ const char* Enemy::groupName_ = "StaticEnemy";
 
 Enemy::Enemy(const Vector3& pos, float scale) {
 
-	tex_.LoadTexture("./Resources/uvChecker.png");
+	tex_ = std::make_shared<Texture2D>();
+	tex_->LoadTexture("./Resources/uvChecker.png");
 
 	firstPos_ = pos;
 	velocity_ = {};
 
-	tex_.pos = pos;
-	tex_.scale *= scale;
+	tex_->pos = pos;
+	tex_->scale *= scale;
 
 	status_ = Status::kNormal;
 
@@ -24,7 +25,7 @@ Enemy::Enemy(const Vector3& pos, float scale) {
 	
 	SetGlobalVariable();
 
-	tex_.Update();
+	tex_->Update();
 }
 
 void Enemy::SetGlobalVariable() {
@@ -51,7 +52,6 @@ void Enemy::ApplyGlobalVariable() {
 
 void Enemy::Update() {
 
-	globalVariables_->Update();
 	ApplyGlobalVariable();
 
 	if (statusRequest_) {
@@ -96,12 +96,12 @@ void Enemy::Update() {
 		break;
 	}
 
-	tex_.Update();
+	tex_->Update();
 }
 
 void Enemy::NormalInitialize() {
 
-	tex_.pos = firstPos_;
+	tex_->pos = firstPos_;
 
 }
 
@@ -117,10 +117,10 @@ void Enemy::FallingUpdate() {
 
 	velocity_.y += kFallingSpeed_ * FrameInfo::GetInstance()->GetDelta();
 
-	tex_.pos += velocity_;
+	tex_->pos += velocity_;
 
-	if (tex_.pos.y <= 0.0f) {
-		tex_.pos.y = 0.0f;
+	if (tex_->pos.y <= 0.0f) {
+		tex_->pos.y = 0.0f;
 		velocity_.y = 0.0f;
 		
 		statusRequest_ = Status::kFaint;
@@ -152,5 +152,5 @@ void Enemy::DeathUpdate() {
 
 void Enemy::Draw2D(const Mat4x4& viewProjection) {
 
-	tex_.Draw(viewProjection, Pipeline::Normal, false);
+	tex_->Draw(viewProjection, Pipeline::Normal, false);
 }

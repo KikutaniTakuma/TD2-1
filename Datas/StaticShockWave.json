@@ -1,0 +1,11 @@
+{
+    "StaticShockWave": {
+        "kHighCriteriaMajor": 350.0,
+        "kHighCriteriaMiddle": 200.0,
+        "kHighCriteriaSmall": 100.0,
+        "kSizeMajor": 150.0,
+        "kSizeMiddle": 100.0,
+        "kSizeSmall": 50.0,
+        "kSpeed": 100.0
+    }
+}

@@ -161,6 +161,9 @@
     <ClCompile Include="Layer\Layer.cpp">
       <Filter>Layer</Filter>
     </ClCompile>
+    <ClCompile Include="Game\ShockWave\ShockWave.cpp">
+      <Filter>ShockWave</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -309,6 +312,9 @@
     </Filter>
     <Filter Include="Layer">
       <UniqueIdentifier>{2cbedc8a-b935-4f46-aa39-39ebd5333276}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShockWave">
+      <UniqueIdentifier>{a5fcea7c-bf98-404c-bade-1143afafa2cb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -479,6 +485,9 @@
     </ClInclude>
     <ClInclude Include="Layer\Layer.h">
       <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\ShockWave\ShockWave.h">
+      <Filter>ShockWave</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

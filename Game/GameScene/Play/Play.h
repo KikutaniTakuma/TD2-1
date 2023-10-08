@@ -8,6 +8,7 @@
 
 #include "Game/Player/Player.h"
 #include "Game/Enemy/Enemy.h"
+#include "Game/ShockWave/ShockWave.h"
 
 class Play
 {
@@ -29,6 +30,15 @@ public:
 	/// 描画
 	/// </summary>
 	void Draw();
+
+public:
+
+	/// <summary>
+	/// 衝撃波の作成
+	/// </summary>
+	/// <param name="highest">プレイヤーの座標</param>
+	/// <param name="highest">プレイヤーの最大の高さ</param>
+	void CreatShockWave(const Vector3& pos, float highest);
 
 private:
 
@@ -55,5 +65,7 @@ private:
 	std::unique_ptr<Player> player_;
 
 	std::list<std::shared_ptr<Enemy>> enemies_;
+
+	std::list<std::shared_ptr<ShockWave>> shockWaves_;
 
 };

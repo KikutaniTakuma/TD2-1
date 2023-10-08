@@ -57,9 +57,21 @@ public:
 	void StatusRequest(Status status) { status_ = status; }
 
 	/// <summary>
+	/// 今の状態の確認。あたり判定のフラグに使用。
+	/// </summary>
+	/// <returns>状態</returns>
+	Status GetStatus() { return status_; }
+
+	/// <summary>
 	/// テクスチャの参照。あたり判定用。
 	/// </summary>
-	const Texture2D& GetTex() { return tex_; }
+	/// <returns>テクスチャのポインタ</returns>
+	const Texture2D* GetTex() { return tex_.get(); }
+
+	/// <summary>
+	/// 静的メンバ定数のImGui用
+	/// </summary>
+	static void GlobalVariablesUpdate(){ globalVariables_->Update(); }
 
 private:
 
@@ -123,7 +135,7 @@ private:
 private:
 
 	// Enemyのテクスチャ
-	Texture2D tex_;
+	std::shared_ptr<Texture2D> tex_;
 
 	// 初期座標の保存用。倒した敵を生成するのに使うイメージ。
 	Vector3 firstPos_;
