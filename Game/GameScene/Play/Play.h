@@ -126,6 +126,8 @@ private:
 	// フラグ用
 	int preMaxStageNum_;
 
+	bool isFile_;
+
 	// フラグ用
 	std::vector<int> preEnemyNums_;
 

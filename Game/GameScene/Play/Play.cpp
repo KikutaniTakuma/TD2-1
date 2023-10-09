@@ -1,6 +1,8 @@
 #include "Play.h"
 
 #include "externals/imgui/imgui.h"
+#include <filesystem>
+#include <fstream>
 
 Play::Play() {
 
@@ -18,6 +20,8 @@ Play::Play() {
 
 	preEnemyNums_ = enemyNums_;
 	preMaxStageNum_ = kMaxStageNum_;
+
+	isFile_ = true;
 
 	globalVariables_ = std::make_unique<GlobalVariables>();
 
@@ -43,6 +47,8 @@ void Play::InitializeGlobalVariable() {
 	kMaxStageNum_ = globalVariables_->GetIntValue("Game", "kMaxStageNum");
 
 	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
+
+		isFile_ = true;
 
 		//const char stage = (char)stageNum;
 
@@ -136,10 +142,13 @@ void Play::ApplyGlobalVariable() {
 			enemyNums_.push_back(1);
 		}
 
-		//if (enemyNums_[stageNum] != preEnemyNums_[stageNum]) {
-		//	globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
-		//}
-		globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
+		if (preMaxStageNum_ < kMaxStageNum_) {
+			globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
+		}
+		else if (enemyNums_[stageNum] != preEnemyNums_[stageNum]) {
+			globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
+		}
+		//globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
 		enemyNums_[stageNum] = globalVariables_->GetIntValue(g, "EnemyNum");
 
 		if (enemyPoses_.size() <= stageNum) {
@@ -156,10 +165,13 @@ void Play::ApplyGlobalVariable() {
 
 			std::string i = std::string(enemyGruoopName_) + enemy + std::string(enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)]);
 
-			/*if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+			if (preMaxStageNum_ < kMaxStageNum_) {
 				globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
-			}*/
-			globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
+			}
+			else if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+				globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
+			}
+			//globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 			enemyPoses_[stageNum][enemyNum] = globalVariables_->GetVector3Value(g, i);
 		}
 	}
@@ -224,8 +236,15 @@ void Play::Collision() {
 	const Texture2D* playerTex = player_->GetTex();
 	const Vector3& playerVelocity = player_->GetVelocity();
 
+	int i = 0;
+
 	for (std::shared_ptr<Enemy> enemy : enemies_) {
 		
+		if (enemyNums_[stageNum_] == i) {
+			break;
+		}
+		i++;
+
 		const Texture2D* enemyTex = enemy->GetTex();
 		
 		// エネミーが通常時の時、プレイヤーが通常時ヒップドロップ時の時のみ
