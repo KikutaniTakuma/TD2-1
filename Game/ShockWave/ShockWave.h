@@ -14,7 +14,7 @@ public:
 		kSmall, // 小
 		kMiddle, // 中
 		kMajor, // 大
-		kNum, // 要素数を取り出すよう
+		kEnd, // 末尾。要素数を取り出すよう
 	};
 
 	/// <param name="pos">プレイヤーの座標</param>
@@ -83,7 +83,7 @@ private:
 public:
 
 	// 高さの基準
-	static float kHighCriteria_[static_cast<uint16_t>(Size::kNum)];
+	static float kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
 
 private:
 
@@ -97,7 +97,7 @@ private:
 	static const char* groupName_;
 
 	// サイズ(スケール)
-	static float kSize_[static_cast<uint16_t>(Size::kNum)];
+	static float kSize_[static_cast<uint16_t>(Size::kEnd)];
 
 	// 移動スピード
 	static float kSpeed_;

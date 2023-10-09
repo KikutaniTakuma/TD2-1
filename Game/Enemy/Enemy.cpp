@@ -44,6 +44,11 @@ void Enemy::ApplyGlobalVariable() {
 
 }
 
+void Enemy::SetParametar(const Vector3& pos) {
+
+	firstPos_ = pos;
+}
+
 
 
 //void Enemy::Initialize() {
@@ -106,6 +111,11 @@ void Enemy::NormalInitialize() {
 }
 
 void Enemy::NormalUpdate() {
+
+#ifdef _DEBUG
+	tex_->pos = firstPos_;
+
+#endif // _DEBUG
 
 }
 

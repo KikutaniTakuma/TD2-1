@@ -23,7 +23,7 @@ public:
 	/// </summary>
 	/// <param name="pos">初期座標</param>
 	/// /// <param name="scale">スケール</param>
-	Enemy(const Vector3& pos, float scale);
+	Enemy(const Vector3& pos, float scale = 40.0f);
 	~Enemy() = default;
 	
 
@@ -72,6 +72,11 @@ public:
 	/// 静的メンバ定数のImGui用
 	/// </summary>
 	static void GlobalVariablesUpdate(){ globalVariables_->Update(); }
+
+	/// <summary>
+	/// 初期座標などのパラメーターをいれる
+	/// </summary>
+	void SetParametar(const Vector3& pos);
 
 private:
 

@@ -1,5 +1,7 @@
 #include "Play.h"
 
+#include "externals/imgui/imgui.h"
+
 Play::Play() {
 
 	camera2D_ = std::make_unique<Camera>(Camera::Type::Othographic);
@@ -7,6 +9,21 @@ Play::Play() {
 
 	player_ = std::make_unique<Player>();
 	player_->SetPlayScene(this);
+
+	stageNum_ = 0;
+
+	kMaxStageNum_ = 1;
+
+	enemyNums_.push_back(1);
+
+	preEnemyNums_ = enemyNums_;
+	preMaxStageNum_ = kMaxStageNum_;
+
+	globalVariables_ = std::make_unique<GlobalVariables>();
+
+	SetGlobalVariable();
+
+	InitializeGlobalVariable();
 }
 
 void Play::Initialize() {
@@ -19,16 +36,154 @@ void Play::Initialize() {
 
 }
 
+void Play::InitializeGlobalVariable() {
+
+	globalVariables_->LoadFile("Game");
+
+	kMaxStageNum_ = globalVariables_->GetIntValue("Game", "kMaxStageNum");
+
+	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
+
+		//const char stage = (char)stageNum;
+
+		std::string stage = std::to_string(stageNum);
+
+		std::string g = std::string(stageGruopName_) + stage;
+
+		globalVariables_->LoadFile(g);
+
+		if (enemyNums_.size() <= stageNum) {
+			enemyNums_.push_back(1);
+		}
+
+		//globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
+		enemyNums_[stageNum] = globalVariables_->GetIntValue(g, "EnemyNum");
+
+		if (enemyPoses_.size() <= stageNum) {
+			enemyPoses_.push_back(std::vector<Vector3>());
+		}
+
+		for (int enemyNum = 0; enemyNum < enemyNums_[stageNum]; enemyNum++) {
+
+			if (enemyPoses_[stageNum].size() <= enemyNum) {
+				enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
+			}
+
+			std::string enemy = std::to_string(enemyNum);
+
+			std::string i = std::string(enemyGruoopName_) + enemy + std::string(enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)]);
+
+			//globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
+			enemyPoses_[stageNum][enemyNum] = globalVariables_->GetVector3Value(g, i);
+		}
+	}
+
+}
+
+void Play::SetGlobalVariable() {
+
+	globalVariables_->CreateGroup("Game");
+
+	globalVariables_->AddItem("Game", "kMaxStageNum", kMaxStageNum_);
+
+	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
+
+		std::string stage = std::to_string(stageNum);
+
+		std::string g = std::string(stageGruopName_) + stage;
+
+		globalVariables_->CreateGroup(g);
+
+		if (enemyNums_.size() <= stageNum) {
+			enemyNums_.push_back(1);
+		}
+
+		globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
+
+		if (enemyPoses_.size() <= stageNum) {
+			enemyPoses_.push_back(std::vector<Vector3>());
+		}
+
+		for (int enemyNum = 0; enemyNum < enemyNums_[stageNum]; enemyNum++) {
+
+			if (enemyPoses_[stageNum].size() <= enemyNum) {
+				enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
+			}
+
+			std::string enemy = std::to_string(enemyNum);
+
+			std::string i = std::string(enemyGruoopName_) + enemy + std::string(enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)]);
+
+			globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
+		}
+	}
+
+	//globalVariables_->LoadFile(groupName_);m
+	ApplyGlobalVariable();
+}
+
+void Play::ApplyGlobalVariable() {
+
+	kMaxStageNum_= globalVariables_->GetIntValue("Game", "kMaxStageNum");
+
+	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
+
+		std::string stage = std::to_string(stageNum);
+
+		std::string g = std::string(stageGruopName_) + stage;
+
+		if (enemyNums_.size() <= stageNum) {
+			enemyNums_.push_back(1);
+		}
+
+		//if (enemyNums_[stageNum] != preEnemyNums_[stageNum]) {
+		//	globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
+		//}
+		globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
+		enemyNums_[stageNum] = globalVariables_->GetIntValue(g, "EnemyNum");
+
+		if (enemyPoses_.size() <= stageNum) {
+			enemyPoses_.push_back(std::vector<Vector3>());
+		}
+
+		for (int enemyNum = 0; enemyNum < enemyNums_[stageNum]; enemyNum++) {
+
+			if (enemyPoses_[stageNum].size() <= enemyNum) {
+				enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
+			}
+
+			std::string enemy = std::to_string(enemyNum);
+
+			std::string i = std::string(enemyGruoopName_) + enemy + std::string(enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)]);
+
+			/*if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+				globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
+			}*/
+			globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
+			enemyPoses_[stageNum][enemyNum] = globalVariables_->GetVector3Value(g, i);
+		}
+	}
+
+}
+
 void Play::CreatShockWave(const Vector3& pos, float highest) {
 	shockWaves_.push_back(std::make_shared<ShockWave>(pos, highest));
 }
 
 void Play::EnemyGeneration() {
 
-	enemies_.push_back(std::make_shared<Enemy>(Vector3(100.0f, 100.0f, 0.0f), 40.0f));
+	if (enemies_.size() < enemyNums_[stageNum_]) {
 
-	enemies_.push_back(std::make_shared<Enemy>(Vector3(-80.0f, 160.0f, 0.0f), 40.0f));
+		int size = static_cast<int>(enemies_.size());
 
+		for (int num = 0; num < enemyNums_[stageNum_]; num++) {
+			if (num >= size) {
+
+				enemies_.push_back(std::make_shared<Enemy>(enemyPoses_[stageNum_][num]));
+
+			}
+		}
+	}
 }
 
 void Play::EnemeiesClear() {
@@ -37,6 +192,19 @@ void Play::EnemeiesClear() {
 		enemy.reset();
 		return true;
 	});
+}
+
+void Play::SetEnemyParametar() {
+
+	int i = 0;
+
+	for (std::shared_ptr<Enemy> enemy : enemies_) {
+		if (enemyNums_[stageNum_] == i) {
+			break;
+		}
+		enemy->SetParametar(enemyPoses_[stageNum_][i]);
+		i++;
+	}
 }
 
 void Play::DeleteShockWave() {
@@ -96,12 +264,44 @@ void Play::Collision() {
 
 void Play::Update() {
 
+#ifdef _DEBUG
+
+	preEnemyNums_ = enemyNums_;
+	preMaxStageNum_ = kMaxStageNum_;
+
+	ImGui::Begin("PlayScene");
+	ImGui::SliderInt("NowStage 0 = 1stage", &stageNum_, 0, kMaxStageNum_ - 1);
+	ImGui::End();
+
+	globalVariables_->Update();
+
+	//SetGlobalVariable();
 	Enemy::GlobalVariablesUpdate();
 	ShockWave::GlobalVariablesUpdate();
 
+#endif // _DEBUG
+
+	ApplyGlobalVariable();
+
+	if (kMaxStageNum_ <= 0) {
+		kMaxStageNum_ = 1;
+	}
+
+#ifdef _DEBUG
+	EnemyGeneration();
+	SetEnemyParametar();
+
+#endif // _DEBUG
 	player_->Update();
+
+	int i = 0;
+
 	for (std::shared_ptr<Enemy> enemy : enemies_) {
+		if (enemyNums_[stageNum_] == i) {
+			break;
+		}
 		enemy->Update();
+		i++;
 	}
 	for (std::shared_ptr<ShockWave> shockWave : shockWaves_) {
 		shockWave->Update();
@@ -118,8 +318,14 @@ void Play::Update() {
 
 void Play::Draw() {
 
+	int i = 0;
+
 	for (std::shared_ptr<Enemy> enemy : enemies_) {
+		if (enemyNums_[stageNum_] == i) {
+			break;
+		}
 		enemy->Draw2D(camera2D_->GetViewOthographics());
+		i++;
 	}
 	for (std::shared_ptr<ShockWave> shockWave : shockWaves_) {
 		shockWave->Draw2D(camera2D_->GetViewOthographics());

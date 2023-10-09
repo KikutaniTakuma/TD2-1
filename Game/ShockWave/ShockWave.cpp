@@ -6,9 +6,9 @@ std::unique_ptr<GlobalVariables> ShockWave::globalVariables_ = std::make_unique<
 
 float ShockWave::kSpeed_ = 50.0f;
 
-float ShockWave::kSize_[static_cast<uint16_t>(Size::kNum)];
+float ShockWave::kSize_[static_cast<uint16_t>(Size::kEnd)];
 
-float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kNum)];
+float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
 
 int ShockWave::kDeleteFrame_ = 300;
 
