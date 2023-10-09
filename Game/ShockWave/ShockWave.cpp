@@ -19,9 +19,9 @@ ShockWave::ShockWave(const Vector3& pos, float highest) {
 	SetGlobalVariable();
 
 	for (int i = 0; i < kWaveNum_; i++) {
-		textures_.push_back(std::make_shared<Texture2D>());
+		textures_.push_back(std::make_unique<Texture2D>());
 	}
-	for (std::shared_ptr<Texture2D> tex : textures_) {
+	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		tex->LoadTexture("./Resources/uvChecker.png");
 		tex->pos = pos;
 		if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kSmall)] && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)]) {
@@ -41,12 +41,13 @@ ShockWave::ShockWave(const Vector3& pos, float highest) {
 
 }
 
+ShockWave::~ShockWave() {
+	textures_.clear();
+}
+
 void ShockWave::Finalize() {
 
-	textures_.remove_if([](std::shared_ptr<Texture2D> tex) {
-		tex.reset();
-		return true;
-	});
+	textures_.clear();
 }
 
 void ShockWave::SetGlobalVariable() {
@@ -92,12 +93,13 @@ void ShockWave::Update() {
 	deleteCount_++;
 
 	if (deleteCount_ == kDeleteFrame_) {
+		textures_.clear();
 		isDelete_ = true;
 	}
 
 	// 左右方向に動かす
 	int i = 0;
-	for (std::shared_ptr<Texture2D> tex : textures_) {
+	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		if (i == 0) {
 			tex->pos.x += kSpeed_ * FrameInfo::GetInstance()->GetDelta();
 		}
@@ -107,7 +109,7 @@ void ShockWave::Update() {
 		i++;
 	}
 
-	for (std::shared_ptr<Texture2D> tex : textures_) {
+	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		tex->Update();
 	}
 }
@@ -118,7 +120,7 @@ void ShockWave::Update() {
 
 void ShockWave::Draw2D(const Mat4x4& viewProjection) {
 
-	for (std::shared_ptr<Texture2D> tex : textures_) {
+	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		tex->Draw(viewProjection, Pipeline::Normal, false);
 	}
 }

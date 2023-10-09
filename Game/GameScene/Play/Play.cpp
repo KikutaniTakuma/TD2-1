@@ -179,7 +179,7 @@ void Play::ApplyGlobalVariable() {
 }
 
 void Play::CreatShockWave(const Vector3& pos, float highest) {
-	shockWaves_.push_back(std::make_shared<ShockWave>(pos, highest));
+	shockWaves_.push_back(std::make_unique<ShockWave>(pos, highest));
 }
 
 void Play::EnemyGeneration() {
@@ -191,7 +191,7 @@ void Play::EnemyGeneration() {
 		for (int num = 0; num < enemyNums_[stageNum_]; num++) {
 			if (num >= size) {
 
-				enemies_.push_back(std::make_shared<Enemy>(enemyPoses_[stageNum_][num]));
+				enemies_.push_back(std::make_unique<Enemy>(enemyPoses_[stageNum_][num]));
 
 			}
 		}
@@ -200,17 +200,14 @@ void Play::EnemyGeneration() {
 
 void Play::EnemeiesClear() {
 
-	enemies_.remove_if([](std::shared_ptr<Enemy> enemy) {
-		enemy.reset();
-		return true;
-	});
+	enemies_.clear();
 }
 
 void Play::SetEnemyParametar() {
 
 	int i = 0;
 
-	for (std::shared_ptr<Enemy> enemy : enemies_) {
+	for (std::unique_ptr<Enemy>& enemy : enemies_) {
 		if (enemyNums_[stageNum_] == i) {
 			break;
 		}
@@ -220,14 +217,8 @@ void Play::SetEnemyParametar() {
 }
 
 void Play::DeleteShockWave() {
-
-	shockWaves_.remove_if([](std::shared_ptr<ShockWave> shockWave) {
-		if (shockWave->GetDeleteFlag()) {
-			shockWave->Finalize();
-			shockWave.reset();
-			return true;
-		}
-		return false;
+	shockWaves_.remove_if([](const std::unique_ptr<ShockWave>& shockWave) {
+		return shockWave->GetDeleteFlag();
 	});
 }
 
@@ -238,7 +229,7 @@ void Play::Collision() {
 
 	int i = 0;
 
-	for (std::shared_ptr<Enemy> enemy : enemies_) {
+	for (std::unique_ptr<Enemy>& enemy : enemies_) {
 		
 		if (enemyNums_[stageNum_] == i) {
 			break;
@@ -266,10 +257,10 @@ void Play::Collision() {
 			}
 		}
 		else if (enemy->GetStatus() == Enemy::Status::kFaint && shockWaves_.size() != 0) {
-			for (std::shared_ptr<ShockWave> shockWave : shockWaves_) {
-				const std::list<std::shared_ptr<Texture2D>>& shockWaveTextures = shockWave->GetTextures();
+			for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
+				const std::list<std::unique_ptr<Texture2D>>& shockWaveTextures = shockWave->GetTextures();
 
-				for (std::shared_ptr<Texture2D> shockWaveTex : shockWaveTextures) {
+				for (const std::unique_ptr<Texture2D>& shockWaveTex : shockWaveTextures) {
 
 					if (shockWaveTex->Colision(*enemyTex)) {
 						enemy->StatusRequest(Enemy::Status::kDeath);
@@ -315,19 +306,19 @@ void Play::Update() {
 
 	int i = 0;
 
-	for (std::shared_ptr<Enemy> enemy : enemies_) {
+	for (std::unique_ptr<Enemy>& enemy : enemies_) {
 		if (enemyNums_[stageNum_] == i) {
 			break;
 		}
 		enemy->Update();
 		i++;
 	}
-	for (std::shared_ptr<ShockWave> shockWave : shockWaves_) {
+	for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
 		shockWave->Update();
 	}
 
 	// これと押すとメモリリーク起きる
-	// DeleteShockWave();
+	DeleteShockWave();
 
 	Collision();
 
@@ -339,14 +330,14 @@ void Play::Draw() {
 
 	int i = 0;
 
-	for (std::shared_ptr<Enemy> enemy : enemies_) {
+	for (std::unique_ptr<Enemy>& enemy : enemies_) {
 		if (enemyNums_[stageNum_] == i) {
 			break;
 		}
 		enemy->Draw2D(camera2D_->GetViewOthographics());
 		i++;
 	}
-	for (std::shared_ptr<ShockWave> shockWave : shockWaves_) {
+	for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
 		shockWave->Draw2D(camera2D_->GetViewOthographics());
 	}
 

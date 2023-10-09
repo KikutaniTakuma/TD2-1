@@ -20,7 +20,7 @@ public:
 	/// <param name="pos">プレイヤーの座標</param>
 	/// <param name="highest">プレイヤーの最大の高さ</param>
 	ShockWave(const Vector3& pos, float highest);
-	~ShockWave() = default;
+	~ShockWave();
 
 	/// <summary>
 	/// 初期化
@@ -55,7 +55,7 @@ public:
 	/// テクスチャの参照。あたり判定用。
 	/// </summary>
 	/// <returns>テクスチャのlist配列</returns>
-	const std::list<std::shared_ptr<Texture2D>>& GetTextures() { return textures_; }
+	const std::list<std::unique_ptr<Texture2D>>& GetTextures() { return textures_; }
 
 	/// <summary>
 	/// 消すかどうかのフラグを取得
@@ -108,7 +108,7 @@ private:
 private:
 
 	// テクスチャ
-	std::list<std::shared_ptr<Texture2D>> textures_;
+	std::list<std::unique_ptr<Texture2D>> textures_;
 
 	// 消えるまでのカウント
 	int deleteCount_;

@@ -111,11 +111,11 @@ private:
 
 	std::unique_ptr<Player> player_;
 
-	std::list<std::shared_ptr<Enemy>> enemies_;
+	std::list<std::unique_ptr<Enemy>> enemies_;
 
 	std::vector<int> enemyNums_;
 
-	std::list<std::shared_ptr<ShockWave>> shockWaves_;
+	std::list<std::unique_ptr<ShockWave>> shockWaves_;
 
 	// 今のステージ。０が1ステージ目
 	int stageNum_;

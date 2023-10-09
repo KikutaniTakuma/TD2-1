@@ -32,7 +32,10 @@ public:
 	}
 
 	inline ~ConstBuffer() noexcept {
-		bufferResource->Release();
+		if(bufferResource){
+			bufferResource->Release();
+			bufferResource.Reset();
+		}
 	}
 
 	inline ConstBuffer(const ConstBuffer& right) noexcept :

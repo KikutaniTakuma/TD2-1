@@ -109,7 +109,7 @@ Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
 Texture2D::~Texture2D() {
 	if (vertexResource) {
 		vertexResource->Release();
-		indexResource.Reset();
+		vertexResource.Reset();
 	}
 }
 
