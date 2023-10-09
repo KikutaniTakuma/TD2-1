@@ -242,7 +242,7 @@ void Play::Collision() {
 		if (enemy->GetStatus() == Enemy::Status::kNormal && 
 			(player_->GetStatus() == Player::Status::kNormal || player_->GetStatus() == Player::Status::kHipDrop)) {
 
-			if (playerTex->Colision(*enemyTex)) {
+			if (playerTex->Collision(*enemyTex)) {
 
 				// 雑だけど速度が0以下でプレイヤーが踏んでる判定にしている
 				if (playerVelocity.y < 0.0f) {
@@ -262,7 +262,7 @@ void Play::Collision() {
 
 				for (const std::unique_ptr<Texture2D>& shockWaveTex : shockWaveTextures) {
 
-					if (shockWaveTex->Colision(*enemyTex)) {
+					if (shockWaveTex->Collision(*enemyTex)) {
 						enemy->StatusRequest(Enemy::Status::kDeath);
 					}
 				}

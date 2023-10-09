@@ -136,7 +136,7 @@ void UIeditor::Update(const Mat4x4& vpvpMat) {
 	mousePos = MakeMatrixInverse(vpvpMat) * mousePos;
 	
 	for (auto tex = textures.begin(); tex != textures.end(); tex++) {
-		if (tex->second.Colision({ mousePos.x, mousePos.y })) {
+		if (tex->second.Collision({ mousePos.x, mousePos.y })) {
 			if (mouse->Pushed(Mouse::Button::Left)) {
 				texItr = tex;
 				texItr->second.scale *= 1.2f;

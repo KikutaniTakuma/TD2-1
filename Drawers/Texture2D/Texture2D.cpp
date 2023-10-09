@@ -291,7 +291,7 @@ void Texture2D::Debug(const std::string& guiName) {
 	ImGui::End();
 }
 
-bool Texture2D::Colision(const Vector2& pos2D) const {
+bool Texture2D::Collision(const Vector2& pos2D) const {
 	Vector2 max;
 	Vector2 min;
 	max.x = std::max_element(worldPos.begin(), worldPos.end(),
@@ -320,7 +320,7 @@ bool Texture2D::Colision(const Vector2& pos2D) const {
 	return false;
 }
 
-bool Texture2D::Colision(const Texture2D& tex2D) const {
+bool Texture2D::Collision(const Texture2D& tex2D) const {
 	Vector3 max;
 	Vector3 min;
 	max.x = std::max_element(worldPos.begin(), worldPos.end(),
