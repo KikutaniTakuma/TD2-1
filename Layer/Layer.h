@@ -40,6 +40,9 @@ public:
 	/// </summary>
 	static void GlobalVariablesUpdate() { globalVariables_->Update(); }
 
+
+	const Texture2D* GetHighestTex() { return tex_[nowLayer_].get(); }
+
 private:
 
 	/// <summary>
@@ -62,13 +65,15 @@ private:
 private:
 
 	// テクスチャ
-	std::unique_ptr<Texture2D> tex_;
+	std::vector<std::unique_ptr<Texture2D>> tex_;
 
 	// HP
-	int hitPoint_;
+	std::vector<int> hitPoint_;
 
 	// HPの最大値
-	int kMaxHitPoint_;
+	std::vector<int> kMaxHitPoint_;
 
+	// 今の層
+	int nowLayer_;
 
 };

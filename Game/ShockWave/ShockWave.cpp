@@ -4,13 +4,19 @@
 
 std::unique_ptr<GlobalVariables> ShockWave::globalVariables_ = std::make_unique<GlobalVariables>();
 
-float ShockWave::kSpeed_ = 50.0f;
+float ShockWave::kSpeed_[static_cast<uint16_t>(Size::kEnd)];
 
 float ShockWave::kSize_[static_cast<uint16_t>(Size::kEnd)];
 
 float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
 
-int ShockWave::kDeleteFrame_ = 300;
+int ShockWave::kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)];
+
+const std::string ShockWave::typeNames_[static_cast<uint16_t>(Size::kEnd)] = {
+	"Small",
+	"Middle",
+	"Major"
+};
 
 const std::string ShockWave::groupName_ = "StaticShockWave";
 
@@ -21,18 +27,23 @@ ShockWave::ShockWave(const Vector3& pos, float highest) {
 	for (int i = 0; i < kWaveNum_; i++) {
 		textures_.push_back(std::make_unique<Texture2D>());
 	}
+	if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kSmall)] && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)]) {
+		type_ = Size::kSmall;
+	}
+	else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)] && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMajor)]) {
+		type_ = Size::kMiddle;
+	}
+	else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMajor)]) {
+		type_ = Size::kMajor;
+	}
+	else {
+		type_ = Size::kSmall;
+	}
+
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		tex->LoadTexture("./Resources/uvChecker.png");
 		tex->pos = pos;
-		if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kSmall)] && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)]) {
-			tex->scale *= kSize_[static_cast<uint16_t>(Size::kSmall)];
-		}
-		else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)] && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMajor)]) {
-			tex->scale *= kSize_[static_cast<uint16_t>(Size::kMiddle)];
-		}
-		else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMajor)]) {
-			tex->scale *= kSize_[static_cast<uint16_t>(Size::kMajor)];
-		}
+		tex->scale *= kSize_[static_cast<uint16_t>(type_)];
 		tex->Update();
 	}
 
@@ -54,7 +65,28 @@ void ShockWave::SetGlobalVariable() {
 
 	globalVariables_->CreateGroup(groupName_);
 
-	globalVariables_->AddItem(groupName_, "kSpeed", kSpeed_);
+	for (int i = 0; i < static_cast<int>(Size::kEnd); i++) {
+
+		std::string item = "kSpeed";
+		item = item + typeNames_[i];
+		globalVariables_->AddItem(groupName_, item, kSpeed_[i]);
+
+		item = "kSize";
+		item = item + typeNames_[i];
+		globalVariables_->AddItem(groupName_, item, kSize_[i]);
+
+		item = "kHighCriteria";
+		item = item + typeNames_[i];
+		globalVariables_->AddItem(groupName_, item, kHighCriteria_[i]);
+
+		item = "kDeleteFrame";
+		item = item + typeNames_[i];
+		globalVariables_->AddItem(groupName_, item, kDeleteFrame_[i]);
+	}
+
+	/*globalVariables_->AddItem(groupName_, "kSpeedSmall", kSpeed_[static_cast<uint16_t>(Size::kSmall)]);
+	globalVariables_->AddItem(groupName_, "kSpeedMiddle", kSpeed_[static_cast<uint16_t>(Size::kMiddle)]);
+	globalVariables_->AddItem(groupName_, "kSpeedMajor", kSpeed_[static_cast<uint16_t>(Size::kMajor)]);
 
 	globalVariables_->AddItem(groupName_, "kSizeSmall", kSize_[static_cast<uint16_t>(Size::kSmall)]);
 	globalVariables_->AddItem(groupName_, "kSizeMiddle", kSize_[static_cast<uint16_t>(Size::kMiddle)]);
@@ -64,7 +96,7 @@ void ShockWave::SetGlobalVariable() {
 	globalVariables_->AddItem(groupName_, "kHighCriteriaMiddle", kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)]);
 	globalVariables_->AddItem(groupName_, "kHighCriteriaMajor", kHighCriteria_[static_cast<uint16_t>(Size::kMajor)]);
 
-	globalVariables_->AddItem(groupName_, "kDeleteFrame", kDeleteFrame_);
+	globalVariables_->AddItem(groupName_, "kDeleteFrame", kDeleteFrame_);*/
 
 	globalVariables_->LoadFile(groupName_);
 	ApplyGlobalVariable();
@@ -72,7 +104,26 @@ void ShockWave::SetGlobalVariable() {
 
 void ShockWave::ApplyGlobalVariable() {
 
-	kSpeed_ = globalVariables_->GetFloatValue(groupName_, "kSpeed");
+	for (int i = 0; i < static_cast<int>(Size::kEnd); i++) {
+
+		std::string item = "kSpeed";
+		item = item + typeNames_[i];
+		kSpeed_[i] = globalVariables_->GetFloatValue(groupName_, item);
+
+		item = "kSize";
+		item = item + typeNames_[i];
+		kSize_[i] = globalVariables_->GetFloatValue(groupName_, item);
+
+		item = "kHighCriteria";
+		item = item + typeNames_[i];
+		kHighCriteria_[i] = globalVariables_->GetFloatValue(groupName_, item);
+
+		item = "kDeleteFrame";
+		item = item + typeNames_[i];
+		kDeleteFrame_[i] = globalVariables_->GetIntValue(groupName_, item);
+	}
+
+	/*kSpeed_ = globalVariables_->GetFloatValue(groupName_, "kSpeed");
 
 	kDeleteFrame_ = globalVariables_->GetIntValue(groupName_, "kDeleteFrame");
 
@@ -82,7 +133,7 @@ void ShockWave::ApplyGlobalVariable() {
 
 	kHighCriteria_[static_cast<uint16_t>(Size::kSmall)] = globalVariables_->GetFloatValue(groupName_, "kHighCriteriaSmall");
 	kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)] = globalVariables_->GetFloatValue(groupName_, "kHighCriteriaMiddle");
-	kHighCriteria_[static_cast<uint16_t>(Size::kMajor)] = globalVariables_->GetFloatValue(groupName_, "kHighCriteriaMajor");
+	kHighCriteria_[static_cast<uint16_t>(Size::kMajor)] = globalVariables_->GetFloatValue(groupName_, "kHighCriteriaMajor");*/
 
 }
 
@@ -92,7 +143,7 @@ void ShockWave::Update() {
 
 	deleteCount_++;
 
-	if (deleteCount_ == kDeleteFrame_) {
+	if (deleteCount_ == kDeleteFrame_[static_cast<int>(type_)]) {
 		textures_.clear();
 		isDelete_ = true;
 	}
@@ -101,10 +152,10 @@ void ShockWave::Update() {
 	int i = 0;
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		if (i == 0) {
-			tex->pos.x += kSpeed_ * FrameInfo::GetInstance()->GetDelta();
+			tex->pos.x += kSpeed_[static_cast<int>(type_)] * FrameInfo::GetInstance()->GetDelta();
 		}
 		else {
-			tex->pos.x -= kSpeed_ * FrameInfo::GetInstance()->GetDelta();
+			tex->pos.x -= kSpeed_[static_cast<int>(type_)] * FrameInfo::GetInstance()->GetDelta();
 		}
 		i++;
 	}

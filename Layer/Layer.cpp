@@ -2,9 +2,9 @@
 
 Layer::Layer() {
 
-	tex_ = std::make_unique<Texture2D>();
+	/*tex_ = std::make_unique<Texture2D>();
 	tex_->LoadTexture("./Resources/uvChecker.png");
-	kMaxHitPoint_ = 5;
+	kMaxHitPoint_ = 5;*/
 }
 
 void Layer::Initialize() {
@@ -16,14 +16,14 @@ void Layer::Initialize() {
 void Layer::Update() {
 
 
-	tex_->Update();
+	//tex_->Update();
 }
 
 //void Layer::Draw(const Mat4x4& viewProjection) {
 //
 //}
 
-void Layer::Draw2D(const Mat4x4& viewProjection) {
-
-	tex_->Draw(viewProjection, Pipeline::Normal, false);
-}
+//void Layer::Draw2D(const Mat4x4& viewProjection) {
+//
+//	//tex_->Draw(viewProjection, Pipeline::Normal, false);
+//}

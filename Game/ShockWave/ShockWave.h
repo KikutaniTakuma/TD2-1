@@ -96,19 +96,25 @@ private:
 	// 静的メンバ定数のグローバル変数のグループネーム
 	static const std::string groupName_;
 
+	// 
+	static const std::string typeNames_[static_cast<uint16_t>(Size::kEnd)];
+
 	// サイズ(スケール)
 	static float kSize_[static_cast<uint16_t>(Size::kEnd)];
 
 	// 移動スピード
-	static float kSpeed_;
+	static float kSpeed_[static_cast<uint16_t>(Size::kEnd)];
 
 	// 消えるまでのフレーム数
-	static int kDeleteFrame_;
+	static int kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)];
 
 private:
 
 	// テクスチャ
 	std::list<std::unique_ptr<Texture2D>> textures_;
+
+	// type(size)
+	Size type_;
 
 	// 消えるまでのカウント
 	int deleteCount_;
