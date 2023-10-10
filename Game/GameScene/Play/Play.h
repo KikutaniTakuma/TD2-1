@@ -96,11 +96,11 @@ private:
 	// グローバル変数
 	std::unique_ptr<GlobalVariables> globalVariables_;
 
-	const char* stageGruopName_ = "Stage";
+	const std::string stageGruopName_ = "Stage";
 
-	const char* enemyGruoopName_ = "Enemy";
+	const std::string enemyGruoopName_ = "Enemy";
 
-	const char* enemyParameter[static_cast<uint16_t>(EnemyParameter::kEnd)] = {
+	const std::string enemyParameter[static_cast<uint16_t>(EnemyParameter::kEnd)] = {
 		"Pos", // 座標
 	};
 

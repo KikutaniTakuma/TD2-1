@@ -8,7 +8,7 @@ Player::Player() {
 	
 	input_ = Input::GetInstance();
 
-	tex_ = std::make_shared<Texture2D>();
+	tex_ = std::make_unique<Texture2D>();
 	tex_->LoadTexture("./Resources/uvChecker.png");
 
 	globalVariables_ = std::make_unique<GlobalVariables>();

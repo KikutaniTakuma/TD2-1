@@ -141,7 +141,7 @@ private:
 	Play* play_ = nullptr;
 
 	// プレイヤーのテクスチャ
-	std::shared_ptr<Texture2D> tex_;
+	std::unique_ptr<Texture2D> tex_;
 
 	// 入力状況
 	Input* input_ = nullptr;
@@ -150,7 +150,7 @@ private:
 	std::unique_ptr<GlobalVariables> globalVariables_;
 
 	// グローバル変数のグループネーム
-	const char* groupName_ = "Player";
+	const std::string groupName_ = "Player";
 
 	// 今の状態
 	Status status_ = Status::kNormal;

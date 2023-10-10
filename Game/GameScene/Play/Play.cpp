@@ -44,6 +44,8 @@ void Play::InitializeGlobalVariable() {
 
 	globalVariables_->LoadFile("Game");
 
+	camera2D_->pos = globalVariables_->GetVector3Value("Game", "Camera2DPos");
+
 	kMaxStageNum_ = globalVariables_->GetIntValue("Game", "kMaxStageNum");
 
 	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
@@ -54,7 +56,7 @@ void Play::InitializeGlobalVariable() {
 
 		std::string stage = std::to_string(stageNum);
 
-		std::string g = std::string(stageGruopName_) + stage;
+		std::string g = stageGruopName_ + stage;
 
 		globalVariables_->LoadFile(g);
 
@@ -77,7 +79,7 @@ void Play::InitializeGlobalVariable() {
 
 			std::string enemy = std::to_string(enemyNum);
 
-			std::string i = std::string(enemyGruoopName_) + enemy + std::string(enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)]);
+			std::string i = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)];
 
 			//globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 			enemyPoses_[stageNum][enemyNum] = globalVariables_->GetVector3Value(g, i);
@@ -92,11 +94,13 @@ void Play::SetGlobalVariable() {
 
 	globalVariables_->AddItem("Game", "kMaxStageNum", kMaxStageNum_);
 
+	globalVariables_->AddItem("Game", "Camera2DPos", camera2D_->pos);
+	
 	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
 
 		std::string stage = std::to_string(stageNum);
 
-		std::string g = std::string(stageGruopName_) + stage;
+		std::string g = stageGruopName_ + stage;
 
 		globalVariables_->CreateGroup(g);
 
@@ -118,7 +122,7 @@ void Play::SetGlobalVariable() {
 
 			std::string enemy = std::to_string(enemyNum);
 
-			std::string i = std::string(enemyGruoopName_) + enemy + std::string(enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)]);
+			std::string i = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)];
 
 			globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 		}
@@ -132,11 +136,13 @@ void Play::ApplyGlobalVariable() {
 
 	kMaxStageNum_= globalVariables_->GetIntValue("Game", "kMaxStageNum");
 
+	camera2D_->pos = globalVariables_->GetVector3Value("Game", "Camera2DPos");
+
 	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
 
 		std::string stage = std::to_string(stageNum);
 
-		std::string g = std::string(stageGruopName_) + stage;
+		std::string g = stageGruopName_ + stage;
 
 		if (enemyNums_.size() <= stageNum) {
 			enemyNums_.push_back(1);
@@ -163,7 +169,7 @@ void Play::ApplyGlobalVariable() {
 
 			std::string enemy = std::to_string(enemyNum);
 
-			std::string i = std::string(enemyGruoopName_) + enemy + std::string(enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)]);
+			std::string i = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)];
 
 			if (preMaxStageNum_ < kMaxStageNum_) {
 				globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);

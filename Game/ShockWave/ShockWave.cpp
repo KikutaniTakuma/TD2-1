@@ -12,7 +12,7 @@ float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
 
 int ShockWave::kDeleteFrame_ = 300;
 
-const char* ShockWave::groupName_ = "StaticShockWave";
+const std::string ShockWave::groupName_ = "StaticShockWave";
 
 ShockWave::ShockWave(const Vector3& pos, float highest) {
 
