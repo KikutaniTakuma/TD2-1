@@ -94,7 +94,7 @@ private:
 	static std::unique_ptr<GlobalVariables> globalVariables_;
 
 	// 静的メンバ定数のグローバル変数のグループネーム
-	static const char* groupName_;
+	static const std::string groupName_;
 
 	// サイズ(スケール)
 	static float kSize_[static_cast<uint16_t>(Size::kEnd)];

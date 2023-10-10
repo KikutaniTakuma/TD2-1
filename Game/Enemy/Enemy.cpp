@@ -6,11 +6,11 @@ std::unique_ptr<GlobalVariables> Enemy::globalVariables_ = std::make_unique<Glob
 
 float Enemy::kFallingSpeed_ = -9.8f;
 
-const char* Enemy::groupName_ = "StaticEnemy";
+const std::string Enemy::groupName_ = "StaticEnemy";
 
 Enemy::Enemy(const Vector3& pos, float scale) {
 
-	tex_ = std::make_shared<Texture2D>();
+	tex_ = std::make_unique<Texture2D>();
 	tex_->LoadTexture("./Resources/uvChecker.png");
 
 	firstPos_ = pos;

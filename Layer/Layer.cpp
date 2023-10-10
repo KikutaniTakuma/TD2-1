@@ -1,7 +1,9 @@
 #include "Layer.h"
 
 Layer::Layer() {
-	tex_.LoadTexture("./Resources/uvChecker.png");
+
+	tex_ = std::make_unique<Texture2D>();
+	tex_->LoadTexture("./Resources/uvChecker.png");
 	kMaxHitPoint_ = 5;
 }
 
@@ -14,7 +16,7 @@ void Layer::Initialize() {
 void Layer::Update() {
 
 
-	tex_.Update();
+	tex_->Update();
 }
 
 //void Layer::Draw(const Mat4x4& viewProjection) {
@@ -23,5 +25,5 @@ void Layer::Update() {
 
 void Layer::Draw2D(const Mat4x4& viewProjection) {
 
-	tex_.Draw(viewProjection, Pipeline::Normal, false);
+	tex_->Draw(viewProjection, Pipeline::Normal, false);
 }

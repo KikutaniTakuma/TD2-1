@@ -135,12 +135,12 @@ private:
 	static std::unique_ptr<GlobalVariables> globalVariables_;
 
 	// 静的メンバ定数のグローバル変数のグループネーム
-	static const char* groupName_;
+	static const std::string groupName_;
 
 private:
 
 	// Enemyのテクスチャ
-	std::shared_ptr<Texture2D> tex_;
+	std::unique_ptr<Texture2D> tex_;
 
 	// 初期座標の保存用。倒した敵を生成するのに使うイメージ。
 	Vector3 firstPos_;
