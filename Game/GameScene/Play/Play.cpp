@@ -6,6 +6,10 @@
 
 Play::Play() {
 
+	Enemy::GlobalVariablesLoad();
+	ShockWave::GlobalVariablesLoad();
+	Layer::GlobalVariablesLoad();
+
 	camera2D_ = std::make_unique<Camera>(Camera::Type::Othographic);
 	camera3D_ = std::make_unique<Camera>(Camera::Type::Projecction);
 
@@ -18,25 +22,35 @@ Play::Play() {
 
 	enemyNums_.push_back(1);
 
-	preEnemyNums_ = enemyNums_;
 	preMaxStageNum_ = kMaxStageNum_;
-
-	isFile_ = true;
+	preEnemyNums_ = enemyNums_;
+	preLayerNums_ = kLayerNums_;
 
 	globalVariables_ = std::make_unique<GlobalVariables>();
+
+	InitializeGlobalVariable();
 
 	SetGlobalVariable();
 
 	InitializeGlobalVariable();
+
+
+	layer_ = std::make_unique<Layer>(kLayerNums_[stageNum_], kLayerHitPoints_[stageNum_]);
+
+
 }
 
 void Play::Initialize() {
 
+	shockWaves_.clear();
+
+	layer_->Initialize(kLayerNums_[stageNum_], kLayerHitPoints_[stageNum_]);
+
+	player_->Initialize();
+
 	EnemeiesClear();
 
 	EnemyGeneration();
-
-	player_->Initialize();
 
 }
 
@@ -49,8 +63,6 @@ void Play::InitializeGlobalVariable() {
 	kMaxStageNum_ = globalVariables_->GetIntValue("Game", "kMaxStageNum");
 
 	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
-
-		isFile_ = true;
 
 		//const char stage = (char)stageNum;
 
@@ -83,6 +95,30 @@ void Play::InitializeGlobalVariable() {
 
 			//globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 			enemyPoses_[stageNum][enemyNum] = globalVariables_->GetVector3Value(g, i);
+		}
+
+
+		if (kLayerNums_.size() <= stageNum) {
+			kLayerNums_.push_back(1);
+		}
+
+		kLayerNums_[stageNum] = globalVariables_->GetIntValue(g, "LayerNum");
+
+		if (kLayerHitPoints_.size() <= stageNum) {
+			kLayerHitPoints_.push_back(std::vector<int>());
+		}
+
+		for (int layerNum = 0; layerNum < kLayerNums_[stageNum]; layerNum++) {
+
+			if (kLayerHitPoints_[stageNum].size() <= layerNum) {
+				kLayerHitPoints_[stageNum].push_back(1);
+			}
+
+			std::string layer = std::to_string(layerNum);
+
+			std::string i = layerGruoopName_ + layer + layerParameter[static_cast<uint16_t>(LayerParameter::kHP)];
+
+			kLayerHitPoints_[stageNum][layerNum] = globalVariables_->GetIntValue(g, i);
 		}
 	}
 
@@ -126,6 +162,29 @@ void Play::SetGlobalVariable() {
 
 			globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 		}
+
+		if (kLayerNums_.size() <= stageNum) {
+			kLayerNums_.push_back(1);
+		}
+
+		globalVariables_->AddItem(g, "LayerNum", kLayerNums_[stageNum]);
+
+		if (kLayerHitPoints_.size() <= stageNum) {
+			kLayerHitPoints_.push_back(std::vector<int>());
+		}
+
+		for (int layerNum = 0; layerNum < kLayerNums_[stageNum]; layerNum++) {
+
+			if (kLayerHitPoints_[stageNum].size() <= layerNum) {
+				kLayerHitPoints_[stageNum].push_back(1);
+			}
+
+			std::string layer = std::to_string(layerNum);
+
+			std::string i = layerGruoopName_ + layer + layerParameter[static_cast<uint16_t>(LayerParameter::kHP)];
+
+			globalVariables_->AddItem(g, i, kLayerHitPoints_[stageNum][layerNum]);
+		}
 	}
 
 	//globalVariables_->LoadFile(groupName_);m
@@ -151,6 +210,9 @@ void Play::ApplyGlobalVariable() {
 		if (preMaxStageNum_ < kMaxStageNum_) {
 			globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
 		}
+		else if (enemyNums_.size() > preEnemyNums_.size()) {
+			globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
+		}
 		else if (enemyNums_[stageNum] != preEnemyNums_[stageNum]) {
 			globalVariables_->AddItem(g, "EnemyNum", enemyNums_[stageNum]);
 		}
@@ -174,11 +236,56 @@ void Play::ApplyGlobalVariable() {
 			if (preMaxStageNum_ < kMaxStageNum_) {
 				globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 			}
+			else if (enemyNums_.size() > preEnemyNums_.size()) {
+				globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
+			}
 			else if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
 				globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 			}
 			//globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 			enemyPoses_[stageNum][enemyNum] = globalVariables_->GetVector3Value(g, i);
+		}
+
+		if (kLayerNums_.size() <= stageNum) {
+			kLayerNums_.push_back(1);
+		}
+
+		if (preMaxStageNum_ < kMaxStageNum_) {
+			globalVariables_->AddItem(g, "LayerNum", kLayerNums_[stageNum]);
+		}
+		else if (kLayerNums_.size() > preLayerNums_.size()) {
+			globalVariables_->AddItem(g, "LayerNum", kLayerNums_[stageNum]);
+		}
+		else if (kLayerNums_[stageNum] != preLayerNums_[stageNum]) {
+			globalVariables_->AddItem(g, "LayerNum", kLayerNums_[stageNum]);
+		}
+		kLayerNums_[stageNum] = globalVariables_->GetIntValue(g, "LayerNum");
+
+		if (kLayerHitPoints_.size() <= stageNum) {
+			kLayerHitPoints_.push_back(std::vector<int>());
+		}
+
+		for (int layerNum = 0; layerNum < kLayerNums_[stageNum]; layerNum++) {
+
+			if (kLayerHitPoints_[stageNum].size() <= layerNum) {
+				kLayerHitPoints_[stageNum].push_back(1);
+			}
+
+			std::string layer = std::to_string(layerNum);
+
+			std::string i = layerGruoopName_ + layer + layerParameter[static_cast<uint16_t>(LayerParameter::kHP)];
+
+			if (preMaxStageNum_ < kMaxStageNum_) {
+				globalVariables_->AddItem(g, i, kLayerHitPoints_[stageNum][layerNum]);
+			}
+			else if (kLayerNums_.size() > preLayerNums_.size()) {
+				globalVariables_->AddItem(g, i, kLayerHitPoints_[stageNum][layerNum]);
+			}
+			else if (kLayerNums_[stageNum] != preLayerNums_[stageNum]) {
+				globalVariables_->AddItem(g, i, kLayerHitPoints_[stageNum][layerNum]);
+			}
+
+			kLayerHitPoints_[stageNum][layerNum] = globalVariables_->GetIntValue(g, i);
 		}
 	}
 
@@ -220,6 +327,21 @@ void Play::SetEnemyParametar() {
 		enemy->SetParametar(enemyPoses_[stageNum_][i]);
 		i++;
 	}
+}
+
+void Play::CreateLayer() {
+
+	if (kLayerNums_[stageNum_] != preLayerNums_[stageNum_]) {
+
+		layer_->Initialize(kLayerNums_[stageNum_], kLayerHitPoints_[stageNum_]);
+	}
+
+}
+
+void Play::SetLayerParametar() {
+
+	layer_->SetParametar(kLayerHitPoints_[stageNum_]);
+
 }
 
 void Play::DeleteShockWave() {
@@ -282,8 +404,9 @@ void Play::Update() {
 
 #ifdef _DEBUG
 
-	preEnemyNums_ = enemyNums_;
 	preMaxStageNum_ = kMaxStageNum_;
+	preEnemyNums_ = enemyNums_;
+	preLayerNums_ = kLayerNums_;
 
 	ImGui::Begin("PlayScene");
 	ImGui::SliderInt("NowStage 0 = 1stage", &stageNum_, 0, kMaxStageNum_ - 1);
@@ -294,6 +417,7 @@ void Play::Update() {
 	//SetGlobalVariable();
 	Enemy::GlobalVariablesUpdate();
 	ShockWave::GlobalVariablesUpdate();
+	Layer::GlobalVariablesUpdate();
 
 #endif // _DEBUG
 
@@ -304,8 +428,11 @@ void Play::Update() {
 	}
 
 #ifdef _DEBUG
+
 	EnemyGeneration();
 	SetEnemyParametar();
+	CreateLayer();
+	SetLayerParametar();
 
 #endif // _DEBUG
 	player_->Update();
@@ -323,16 +450,19 @@ void Play::Update() {
 		shockWave->Update();
 	}
 
-	// これと押すとメモリリーク起きる
 	DeleteShockWave();
 
 	Collision();
+
+	layer_->Update();
 
 	camera2D_->Update();
 	camera3D_->Update();
 }
 
 void Play::Draw() {
+
+	layer_->Draw2D(camera2D_->GetViewOthographics());
 
 	int i = 0;
 

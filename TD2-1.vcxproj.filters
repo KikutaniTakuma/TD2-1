@@ -158,11 +158,11 @@
     <ClCompile Include="Game\Enemy\Enemy.cpp">
       <Filter>Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Layer\Layer.cpp">
-      <Filter>Layer</Filter>
-    </ClCompile>
     <ClCompile Include="Game\ShockWave\ShockWave.cpp">
       <Filter>ShockWave</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Layer\Layer.cpp">
+      <Filter>Layer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -483,11 +483,11 @@
     <ClInclude Include="Game\Enemy\Enemy.h">
       <Filter>Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Layer\Layer.h">
-      <Filter>Layer</Filter>
-    </ClInclude>
     <ClInclude Include="Game\ShockWave\ShockWave.h">
       <Filter>ShockWave</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Layer\Layer.h">
+      <Filter>Layer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

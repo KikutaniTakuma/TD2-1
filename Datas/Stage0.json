@@ -15,6 +15,9 @@
             300.0,
             0.0
         ],
-        "EnemyNum": 3
+        "EnemyNum": 3,
+        "Layer0HP": 1,
+        "Layer1HP": 2,
+        "LayerNum": 2
     }
 }

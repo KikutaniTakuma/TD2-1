@@ -69,6 +69,11 @@ public:
 	const Texture2D* GetTex() { return tex_.get(); }
 
 	/// <summary>
+	/// グローバル変数のロード
+	/// </summary>
+	static void GlobalVariablesLoad() { globalVariables_->LoadFile(groupName_); }
+
+	/// <summary>
 	/// 静的メンバ定数のImGui用
 	/// </summary>
 	static void GlobalVariablesUpdate(){ globalVariables_->Update(); }

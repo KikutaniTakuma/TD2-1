@@ -64,6 +64,11 @@ public:
 	bool GetDeleteFlag() const { return isDelete_; }
 
 	/// <summary>
+	/// グローバル変数のロード
+	/// </summary>
+	static void GlobalVariablesLoad() { globalVariables_->LoadFile(groupName_); }
+
+	/// <summary>
 	/// 静的メンバ定数のImGui用
 	/// </summary>
 	static void GlobalVariablesUpdate() { globalVariables_->Update(); }
@@ -100,7 +105,7 @@ private:
 	static const std::string typeNames_[static_cast<uint16_t>(Size::kEnd)];
 
 	// サイズ(スケール)
-	static float kSize_[static_cast<uint16_t>(Size::kEnd)];
+	static Vector2 kSize_[static_cast<uint16_t>(Size::kEnd)];
 
 	// 移動スピード
 	static float kSpeed_[static_cast<uint16_t>(Size::kEnd)];

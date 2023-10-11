@@ -9,6 +9,7 @@
 #include "Game/Player/Player.h"
 #include "Game/Enemy/Enemy.h"
 #include "Game/ShockWave/ShockWave.h"
+#include "Game/Layer/Layer.h"
 
 #include "GlobalVariables/GlobalVariables.h"
 
@@ -19,6 +20,11 @@ public:
 	// ImGuiで設定するエネミーのパラメータ
 	enum class EnemyParameter {
 		kPos, // ポジション
+		kEnd, // 末尾。要素数を取り出すよう。
+	};
+
+	enum class LayerParameter {
+		kHP, // HP
 		kEnd, // 末尾。要素数を取り出すよう。
 	};
 
@@ -82,6 +88,16 @@ private:
 	void SetEnemyParametar();
 
 	/// <summary>
+	/// 層の生成
+	/// </summary>
+	void CreateLayer();
+
+	/// <summary>
+	/// ImGuiで変えた層のパラメータのセット
+	/// </summary>
+	void SetLayerParametar();
+
+	/// <summary>
 	/// 衝撃波の削除
 	/// </summary>
 	void DeleteShockWave();
@@ -104,6 +120,12 @@ private:
 		"Pos", // 座標
 	};
 
+	const std::string layerGruoopName_ = "Layer";
+
+	const std::string layerParameter[static_cast<uint16_t>(LayerParameter::kEnd)] = {
+		"HP", // HP
+	};
+
 private:
 
 	std::unique_ptr<Camera> camera2D_;
@@ -117,6 +139,14 @@ private:
 
 	std::list<std::unique_ptr<ShockWave>> shockWaves_;
 
+	std::unique_ptr<Layer> layer_;
+
+	// 複数ステージの複数ある層のHP１つ１つが保存される配列
+	std::vector<std::vector<int>> kLayerHitPoints_;
+
+	// 複数ステージのある層の数
+	std::vector<int> kLayerNums_;
+
 	// 今のステージ。０が1ステージ目
 	int stageNum_;
 
@@ -126,11 +156,12 @@ private:
 	// フラグ用
 	int preMaxStageNum_;
 
-	bool isFile_;
-
 	// フラグ用
 	std::vector<int> preEnemyNums_;
 
+	// フラグ用
+	std::vector<int> preLayerNums_;
 
+	// ステージ毎の、層毎の、それぞれのエネミーのポジション
 	std::vector<std::vector<Vector3>> enemyPoses_;
 };

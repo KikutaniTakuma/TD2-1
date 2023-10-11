@@ -4,13 +4,13 @@
 
 std::unique_ptr<GlobalVariables> ShockWave::globalVariables_ = std::make_unique<GlobalVariables>();
 
-float ShockWave::kSpeed_[static_cast<uint16_t>(Size::kEnd)];
+float ShockWave::kSpeed_[static_cast<uint16_t>(Size::kEnd)] = {};
 
-float ShockWave::kSize_[static_cast<uint16_t>(Size::kEnd)];
+Vector2 ShockWave::kSize_[static_cast<uint16_t>(Size::kEnd)] = {};
 
-float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
+float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kEnd)] = {};
 
-int ShockWave::kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)];
+int ShockWave::kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)] = {};
 
 const std::string ShockWave::typeNames_[static_cast<uint16_t>(Size::kEnd)] = {
 	"Small",
@@ -43,7 +43,7 @@ ShockWave::ShockWave(const Vector3& pos, float highest) {
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		tex->LoadTexture("./Resources/uvChecker.png");
 		tex->pos = pos;
-		tex->scale *= kSize_[static_cast<uint16_t>(type_)];
+		tex->scale = kSize_[static_cast<uint16_t>(type_)];
 		tex->Update();
 	}
 
@@ -112,7 +112,7 @@ void ShockWave::ApplyGlobalVariable() {
 
 		item = "kSize";
 		item = item + typeNames_[i];
-		kSize_[i] = globalVariables_->GetFloatValue(groupName_, item);
+		kSize_[i] = globalVariables_->GetVector2Value(groupName_, item);
 
 		item = "kHighCriteria";
 		item = item + typeNames_[i];

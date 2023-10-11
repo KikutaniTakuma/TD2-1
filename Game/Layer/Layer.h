@@ -8,13 +8,21 @@
 class Layer
 {
 public:
-	Layer();
+
+	Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints);
 	~Layer() = default;
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	//void Initialize();
+
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="kMaxLayerNum">層の数</param>
+	/// <param name="kMaxHitPoints">層毎のHP</param>
+	void Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints);
 
 	/// <summary>
 	/// 更新
@@ -36,12 +44,27 @@ public:
 public:
 
 	/// <summary>
+	/// グローバル変数のロード
+	/// </summary>
+	static void GlobalVariablesLoad() { globalVariables_->LoadFile(groupName_); }
+
+	/// <summary>
 	/// 静的メンバ定数のImGui用
 	/// </summary>
 	static void GlobalVariablesUpdate() { globalVariables_->Update(); }
 
+	/// <summary>
+	/// HPなどのパラメーターをいれる
+	/// </summary>
+	void SetParametar(std::vector<int> kMaxHitPoints);
 
 	const Texture2D* GetHighestTex() { return tex_[nowLayer_].get(); }
+
+	const int GetNowLayer() { return nowLayer_; }
+
+	const bool GetChangeLayerFlag() { return isChangeLayer_; }
+
+	const bool GetClearFlag() { return isClear_; }
 
 private:
 
@@ -60,7 +83,12 @@ private:
 	// グローバル変数
 	static std::unique_ptr<GlobalVariables> globalVariables_;
 
+	// 静的メンバ定数のグローバル変数のグループネーム
+	static const std::string groupName_;
 
+	static Vector2 kLayer2DScale_;
+
+	static float kFirstLayerCenterPosY_;
 
 private:
 
@@ -68,12 +96,19 @@ private:
 	std::vector<std::unique_ptr<Texture2D>> tex_;
 
 	// HP
-	std::vector<int> hitPoint_;
+	std::vector<int> hitPoints_;
 
 	// HPの最大値
-	std::vector<int> kMaxHitPoint_;
+	std::vector<int> kMaxHitPoints_;
+
+	// 層の数
+	int kMaxLayerNum_;
 
 	// 今の層
 	int nowLayer_;
+
+	bool isChangeLayer_;
+
+	bool isClear_;
 
 };
