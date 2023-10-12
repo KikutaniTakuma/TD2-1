@@ -15,11 +15,6 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	//void Initialize();
-
-	/// <summary>
-	/// 初期化
-	/// </summary>
 	/// <param name="kMaxLayerNum">層の数</param>
 	/// <param name="kMaxHitPoints">層毎のHP</param>
 	void Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints);
@@ -53,6 +48,8 @@ public:
 	/// </summary>
 	static void GlobalVariablesUpdate() { globalVariables_->Update(); }
 
+public:
+
 	/// <summary>
 	/// HPなどのパラメーターをいれる
 	/// </summary>
@@ -60,11 +57,18 @@ public:
 
 	const Texture2D* GetHighestTex() { return tex_[nowLayer_].get(); }
 
+	const float GetHighestPosY() { return (tex_[nowLayer_]->pos.y + tex_[nowLayer_]->scale.y / 2.0f); }
+
 	const int GetNowLayer() { return nowLayer_; }
 
 	const bool GetChangeLayerFlag() { return isChangeLayer_; }
 
 	const bool GetClearFlag() { return isClear_; }
+
+	/// <summary>
+	/// ダメージの加算
+	/// </summary>
+	void AddDamage(int damage) { damage_ += damage; }
 
 private:
 
@@ -78,6 +82,11 @@ private:
 	/// </summary>
 	void ApplyGlobalVariable();
 
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	void Reset();
+
 private:
 
 	// グローバル変数
@@ -90,6 +99,8 @@ private:
 
 	static float kFirstLayerCenterPosY_;
 
+	static float highestPosY_;
+
 private:
 
 	// テクスチャ
@@ -100,6 +111,8 @@ private:
 
 	// HPの最大値
 	std::vector<int> kMaxHitPoints_;
+
+	int damage_;
 
 	// 層の数
 	int kMaxLayerNum_;

@@ -19,7 +19,7 @@ public:
 
 	/// <param name="pos">プレイヤーの座標</param>
 	/// <param name="highest">プレイヤーの最大の高さ</param>
-	ShockWave(const Vector3& pos, float highest);
+	ShockWave(const Vector3& pos, float highest, float layerY);
 	~ShockWave();
 
 	/// <summary>
@@ -84,6 +84,8 @@ private:
 	/// jsonファイルからの呼び出し
 	/// </summary>
 	void ApplyGlobalVariable();
+
+	void Collision(const float& y);
 
 public:
 

@@ -58,6 +58,7 @@ void Player::EnemyStep(bool step) {
 	}
 	else {
 		isSteped_ = true;
+		isFly_ = false;
 		statusRequest_ = Status::kFalling;
 	}
 }
@@ -78,7 +79,7 @@ void Player::Initialize() {
 	isSteped_ = false;
 }
 
-void Player::Update() {
+void Player::Update(const float& y) {
 
 	globalVariables_->Update();
 	ApplyGlobalVariable();
@@ -89,16 +90,16 @@ void Player::Update() {
 		switch (status_)
 		{
 		case Player::Status::kNormal:
-			NormalInitialize();
+			NormalInitialize(y);
 			break;
 		case Player::Status::kHipDrop:
 			HipDropInitialize();
 			break;
 		case Player::Status::kLanding:
-			LandingInitialize();
+			LandingInitialize(y);
 			break;
 		case Player::Status::kFalling:
-			FallingInitialize();
+			FallingInitialize(y);
 			break;
 		default:
 			break;
@@ -110,16 +111,16 @@ void Player::Update() {
 	switch (status_)
 	{
 	case Player::Status::kNormal:
-		NormalUpdate();
+		NormalUpdate(y);
 		break;
 	case Player::Status::kHipDrop:
-		HipDropUpdate();
+		HipDropUpdate(y);
 		break;
 	case Player::Status::kLanding:
-		LandingUpdate();
+		LandingUpdate(y);
 		break;
 	case Player::Status::kFalling:
-		FallingUpdate();
+		FallingUpdate(y);
 		break;
 	default:
 		break;
@@ -128,17 +129,18 @@ void Player::Update() {
 	tex_->Update();
 }
 
-void Player::NormalInitialize() {
+void Player::NormalInitialize(const float& y) {
 
 	velocity_ = {};
 	highest_ = 0.0f;
+	Collision(y);
 	
 	isStep_ = false;
 	isSteped_ = false;
 	
 }
 
-void Player::NormalUpdate() {
+void Player::NormalUpdate(const float& y) {
 
 	float deletaTime = FrameInfo::GetInstance()->GetDelta();
 
@@ -158,10 +160,12 @@ void Player::NormalUpdate() {
 		if (input_->GetKey()->Pushed(DIK_SPACE)) {
 			statusRequest_ = Status::kHipDrop;
 		}
-		else {
+		/*else {
 			velocity_.y += kGravity_ * deletaTime;
-		}
+		}*/
 	}
+
+	velocity_.y += kGravity_ * deletaTime;
 
 	// ジャンプ入力
 	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) || input_->GetKey()->Pushed(DIK_UP)))) {
@@ -179,11 +183,15 @@ void Player::NormalUpdate() {
 	MemoHighest();
 
 	// 地面との当たり判定。
-	if (tex_->pos.y <= 0.0f && isFly_) {
-		tex_->pos.y = 0.0f;
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y && isFly_) {
+
+		Collision(y);
 		velocity_.y = 0.0f;
 		isFly_ = false;
 		statusRequest_ = Status::kLanding;
+	}
+	else {
+		Collision(y);
 	}
 }
 
@@ -192,52 +200,69 @@ void Player::HipDropInitialize() {
 	velocity_ = {};
 }
 
-void Player::HipDropUpdate() {
+void Player::HipDropUpdate(const float& y) {
 
 	velocity_.y += kHipDropSpeed_ * FrameInfo::GetInstance()->GetDelta();
 	tex_->pos += velocity_;
 
-	if (tex_->pos.y <= 0.0f) {
-		tex_->pos.y = 0.0f;
-		velocity_.y = 0.0f;
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y && isFly_) {
 
+		Collision(y);
+		velocity_.y = 0.0f;
+		isFly_ = false;
 		statusRequest_ = Status::kLanding;
 	}
 
 }
 
-void Player::LandingInitialize() {
+void Player::LandingInitialize(const float& y) {
 
 	velocity_ = {};
 
-	if (highest_ >= ShockWave::kHighCriteria_[static_cast<uint16_t>(ShockWave::Size::kSmall)]) {
-		play_->CreatShockWave(tex_->pos, highest_);
+	Collision(y);
+
+	if (highest_ > ShockWave::kHighCriteria_[static_cast<uint16_t>(ShockWave::Size::kSmall)] - y) {
+		play_->CreatShockWave(tex_->pos, highest_, y);
 	}
 }
 
-void Player::LandingUpdate() {
+void Player::LandingUpdate(const float& y) {
 
+	Collision(y);
 	statusRequest_ = Status::kNormal;
 
 }
 
-void Player::FallingInitialize() {
+void Player::FallingInitialize(const float& y) {
 
+	Collision(y);
 	velocity_ = {};
 
 }
 
-void Player::FallingUpdate() {
+void Player::FallingUpdate(const float& y) {
 
 	velocity_.y += kGravity_ * FrameInfo::GetInstance()->GetDelta();
 	tex_->pos += velocity_;
 
-	if (tex_->pos.y <= 0.0f) {
-		tex_->pos.y = 0.0f;
-		velocity_.y = 0.0f;
+	// 地面との当たり判定。
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
 
+		Collision(y);
+		velocity_.y = 0.0f;
+		isFly_ = false;
 		statusRequest_ = Status::kNormal;
 	}
+}
+
+void Player::Collision(const float& y) {
+
+	float posY = tex_->pos.y - tex_->scale.y / 2.0f;
+
+	if (y > posY) {
+		tex_->pos.y += y - posY;
+	}
+
 }
 
 void Player::MemoHighest() {

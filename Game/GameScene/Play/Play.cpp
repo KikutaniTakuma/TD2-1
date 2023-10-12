@@ -28,7 +28,7 @@ Play::Play() {
 
 	globalVariables_ = std::make_unique<GlobalVariables>();
 
-	InitializeGlobalVariable();
+	//InitializeGlobalVariable();
 
 	SetGlobalVariable();
 
@@ -291,8 +291,8 @@ void Play::ApplyGlobalVariable() {
 
 }
 
-void Play::CreatShockWave(const Vector3& pos, float highest) {
-	shockWaves_.push_back(std::make_unique<ShockWave>(pos, highest));
+void Play::CreatShockWave(const Vector3& pos, float highest, float y) {
+	shockWaves_.push_back(std::make_unique<ShockWave>(pos, highest, y));
 }
 
 void Play::EnemyGeneration() {
@@ -304,7 +304,7 @@ void Play::EnemyGeneration() {
 		for (int num = 0; num < enemyNums_[stageNum_]; num++) {
 			if (num >= size) {
 
-				enemies_.push_back(std::make_unique<Enemy>(enemyPoses_[stageNum_][num]));
+				enemies_.push_back(std::make_unique<Enemy>(enemyPoses_[stageNum_][num], layer_->GetHighestPosY()));
 
 			}
 		}
@@ -324,7 +324,7 @@ void Play::SetEnemyParametar() {
 		if (enemyNums_[stageNum_] == i) {
 			break;
 		}
-		enemy->SetParametar(enemyPoses_[stageNum_][i]);
+		enemy->SetParametar(enemyPoses_[stageNum_][i], layer_->GetHighestPosY());
 		i++;
 	}
 }
@@ -435,7 +435,7 @@ void Play::Update() {
 	SetLayerParametar();
 
 #endif // _DEBUG
-	player_->Update();
+	player_->Update(layer_->GetHighestPosY());
 
 	int i = 0;
 
@@ -443,7 +443,7 @@ void Play::Update() {
 		if (enemyNums_[stageNum_] == i) {
 			break;
 		}
-		enemy->Update();
+		enemy->Update(layer_.get(), layer_->GetHighestPosY());
 		i++;
 	}
 	for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {

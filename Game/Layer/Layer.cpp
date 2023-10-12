@@ -20,7 +20,15 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
 		tex_[i]->LoadTexture("./Resources/uvChecker.png");
-
+		if (i % 3 == 0) {
+			tex_[i]->color = 0xFFFFFFFF;
+		}
+		else if (i % 3 == 1) {
+			tex_[i]->color = 0xFF0000FF;
+		}
+		else {
+			tex_[i]->color = 0xFFFF00FF;
+		}
 		tex_[i]->Update();
 	}
 
@@ -60,7 +68,15 @@ void Layer::ApplyGlobalVariable() {
 			tex_[i]->scale = kLayer2DScale_;
 			tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
 			tex_[i]->LoadTexture("./Resources/uvChecker.png");
-
+			if (i % 3 == 0) {
+				tex_[i]->color = 0xFFFFFFFF;
+			}
+			else if (i % 3 == 1) {
+				tex_[i]->color = 0xFF0000FF;
+			}
+			else {
+				tex_[i]->color = 0xFFFF00FF;
+			}
 			tex_[i]->Update();
 		}
 	}
@@ -69,24 +85,41 @@ void Layer::ApplyGlobalVariable() {
 
 			tex_[i]->scale = kLayer2DScale_;
 			tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
-
+			if (i % 3 == 0) {
+				tex_[i]->color = 0xFFFFFFFF;
+			}
+			else if (i % 3 == 1) {
+				tex_[i]->color = 0xFF0000FF;
+			}
+			else {
+				tex_[i]->color = 0xFFFF00FF;
+			}
 			tex_[i]->Update();
 		}
 	}
 }
 
-//void Layer::Initialize() {
-//
-//	hitPoints_ = kMaxHitPoints_;
-//	nowLayer_ = 0;
-//
-//	for (int i = 0; i < kMaxLayerNum_; i++) {
-//
-//		tex_[i]->scale = kLayer2DScale_;
-//		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
-//		tex_[i]->Update();
-//	}
-//}
+void Layer::Reset() {
+
+	hitPoints_ = kMaxHitPoints_;
+	nowLayer_ = 0;
+
+	for (int i = 0; i < kMaxLayerNum_; i++) {
+
+		if (i % 3 == 0) {
+			tex_[i]->color = 0xFFFFFFFF;
+		}
+		else if (i % 3 == 1) {
+			tex_[i]->color = 0xFF0000FF;
+		}
+		else {
+			tex_[i]->color = 0xFFFF00FF;
+		}
+		tex_[i]->scale = kLayer2DScale_;
+		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
+		tex_[i]->Update();
+	}
+}
 
 void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 
@@ -102,8 +135,16 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 		tex_.push_back(std::make_unique<Texture2D>());
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
+		if (i % 3 == 0) {
+			tex_[i]->color = 0xFFFFFFFF;
+		}
+		else if (i % 3 == 1) {
+			tex_[i]->color = 0xFF0000FF;
+		}
+		else {
+			tex_[i]->color = 0xFFFF00FF;
+		}
 		tex_[i]->LoadTexture("./Resources/uvChecker.png");
-
 		tex_[i]->Update();
 	}
 }
@@ -111,6 +152,26 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 void Layer::Update() {
 
 	ApplyGlobalVariable();
+
+	hitPoints_[nowLayer_] -= damage_;
+
+	if (hitPoints_[nowLayer_] <= 0) {
+		hitPoints_[nowLayer_] = 0;
+
+		if (nowLayer_ == kMaxLayerNum_ - 1) {
+			// クリア処理
+
+			// 今は仮で層のリセット
+			Reset();
+
+		}
+		else {
+			nowLayer_++;
+			hitPoints_[nowLayer_] = kMaxHitPoints_[nowLayer_];
+		}
+	}
+
+	damage_ = 0;
 
 	for (int i = 0; i < kMaxLayerNum_; i++) {
 		tex_[i]->Update();

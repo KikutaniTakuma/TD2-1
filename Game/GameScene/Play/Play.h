@@ -53,7 +53,7 @@ public:
 	/// </summary>
 	/// <param name="highest">プレイヤーの座標</param>
 	/// <param name="highest">プレイヤーの最大の高さ</param>
-	void CreatShockWave(const Vector3& pos, float highest);
+	void CreatShockWave(const Vector3& pos, float highest, float y);
 
 private:
 

@@ -5,6 +5,8 @@
 
 #include "GlobalVariables/GlobalVariables.h"
 
+class Layer;
+
 class Enemy
 {
 public:
@@ -22,8 +24,9 @@ public:
 	/// 生成
 	/// </summary>
 	/// <param name="pos">初期座標</param>
-	/// /// <param name="scale">スケール</param>
-	Enemy(const Vector3& pos, float scale = 40.0f);
+	/// <param name="layerY">層の上のY座標</param>
+	/// <param name="scale">スケール</param>
+	Enemy(const Vector3& pos, const float& layerY, float scale = 40.0f);
 	~Enemy() = default;
 	
 
@@ -35,7 +38,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(Layer* layer, const float& y);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
@@ -54,7 +57,7 @@ public:
 	/// 状態のリクエスト
 	/// </summary>
 	/// <param name="status">したい状態</param>
-	void StatusRequest(Status status) { status_ = status; }
+	void StatusRequest(Status status) { statusRequest_ = status; }
 
 	/// <summary>
 	/// 今の状態の確認。あたり判定のフラグに使用。
@@ -81,7 +84,7 @@ public:
 	/// <summary>
 	/// 初期座標などのパラメーターをいれる
 	/// </summary>
-	void SetParametar(const Vector3& pos);
+	void SetParametar(const Vector3& pos, const float& y = 0);
 
 private:
 
@@ -111,7 +114,7 @@ private:
 	/// <summary>
 	/// 落ちる時のアップデート
 	/// </summary>
-	void FallingUpdate();
+	void FallingUpdate(const float& y);
 
 	/// <summary>
 	/// 落ち切った時の初期化
@@ -125,11 +128,13 @@ private:
 	/// <summary>
 	/// 死んだときの初期化
 	/// </summary>
-	void DeathInitialize();
+	void DeathInitialize(Layer* layer);
 	/// <summary>
 	/// 死んだときのアップデート
 	/// </summary>
 	void DeathUpdate();
+
+	void Collision(const float& y);
 
 private:
 
