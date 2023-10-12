@@ -11,6 +11,7 @@
 #include "Utils/Camera/Camera.h"
 #include "Drawers/Texture2D/Texture2D.h"
 #include "Drawers/Model/Model.h"
+#include "Drawers/Particle/Particle.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -29,6 +30,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	static auto* const frameInfo = FrameInfo::GetInstance();
 
 	auto input = Input::GetInstance();
+
+	Particle hoge{1000};
+	hoge.LoadTexture("./Resources/uvChecker.png");
+
+	Camera camera;
+	camera.pos.z = -3.0f;
 
 	/// 
 	/// メインループ
@@ -52,7 +59,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 更新処理
 		/// 
 
-
+		hoge.Update();
+		hoge.Debug("particle test");
 
 		///
 		/// 更新処理ここまで
@@ -61,6 +69,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
+		camera.Update();
+
+		hoge.Draw(camera.GetViewOthographics(), Pipeline::None);
 
 		///
 		/// 描画処理ここまで

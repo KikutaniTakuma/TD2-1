@@ -28,6 +28,7 @@ private:
 		Vector2 scale;
 		Vector3 rotate;
 		Vector3 pos;
+		uint32_t color;
 		
 		Vector3 movePos;
 		bool isActive;
@@ -88,6 +89,9 @@ private:
 
 		// 消える時間(milliseconds)
 		std::pair<uint32_t, uint32_t> death;
+
+		// 色
+		std::pair<uint32_t, uint32_t> color;
 
 		///
 		/// 
@@ -213,15 +217,13 @@ public:
 		wvpMat.Resize(index);
 		srvHeap.CreateStructuredBufferView(wvpMat, 1);
 		colorBuf.Resize(index);
-		srvHeap.CreateStructuredBufferView(wvpMat, 2);
+		srvHeap.CreateStructuredBufferView(colorBuf, 2);
 		wtfs.resize(index);
 	}
 
 public:
 	Vector2 uvPibot;
 	Vector2 uvSize;
-
-	uint32_t color;
 
 	std::deque<Setting> settings;
 

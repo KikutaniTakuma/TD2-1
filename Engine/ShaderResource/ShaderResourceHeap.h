@@ -51,8 +51,8 @@ public:
 
 	template<class T>
 	void CreateConstBufferView(ConstBuffer<T>& conBuf, uint32_t heapIndex) {
-		assert(currentHadleIndex < heapSize);
-		if (currentHadleIndex >= heapSize) {
+		assert(heapIndex < heapSize);
+		if (heapIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
@@ -78,8 +78,8 @@ public:
 
 	template<class T>
 	void CreateStructuredBufferView(StructuredBuffer<T>& strcBuf, uint32_t heapIndex) {
-		assert(currentHadleIndex < heapSize);
-		if (currentHadleIndex >= heapSize) {
+		assert(heapIndex < heapSize);
+		if (heapIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 

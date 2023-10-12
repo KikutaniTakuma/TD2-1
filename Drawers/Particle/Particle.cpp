@@ -2,6 +2,7 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
+#include "Engine/FrameInfo/FrameInfo.h"
 #include <numeric>
 
 /// <summary>
@@ -83,7 +84,6 @@ Particle::Particle(uint32_t indexNum) :
 	uvSize(Vector2::identity),
 	tex(nullptr),
 	isLoad(false),
-	color(std::numeric_limits<uint32_t>::max()),
 	wvpMat(indexNum),
 	colorBuf(indexNum),
 	aniStartTime_(),
@@ -139,8 +139,6 @@ Particle& Particle::operator=(const Particle& right) {
 	uvPibot = right.uvPibot;
 	uvSize = right.uvSize;
 
-	color = right.color;
-
 	tex = right.tex;
 	isLoad = right.isLoad;
 
@@ -165,8 +163,6 @@ Particle& Particle::operator=(Particle&& right) noexcept {
 
 	uvPibot = std::move(right.uvPibot);
 	uvSize = std::move(right.uvSize);
-
-	color = std::move(right.color);
 
 	tex = std::move(right.tex);
 	isLoad = std::move(right.isLoad);
@@ -203,6 +199,7 @@ void Particle::LoadTexture(const std::string& fileName) {
 	srvHeap.InitializeReset(3);
 	srvHeap.CreateTxtureView(tex);
 	srvHeap.CreateStructuredBufferView(wvpMat);
+	srvHeap.CreateStructuredBufferView(colorBuf);
 }
 
 void Particle::ThreadLoadTexture(const std::string& fileName) {
@@ -218,13 +215,16 @@ void Particle::Update() {
 		srvHeap.InitializeReset(3);
 		srvHeap.CreateTxtureView(tex);
 		srvHeap.CreateStructuredBufferView(wvpMat);
+		srvHeap.CreateStructuredBufferView(colorBuf);
 		isLoad = true;
 	}
 
 	// currentSettingIndexがsettingの要素数を超えてたらassertで止める
-	assert(currentSettingIndex < settings.size());
+	if (currentSettingIndex >= settings.size() || settings.empty()) {
+		return;
+	}
 	auto nowTime = std::chrono::steady_clock::now();
-	settings[currentSettingIndex].isValid.Update();
+
 
 	// 有効になった瞬間始めた瞬間を保存
 	if (settings[currentSettingIndex].isValid.OnEnter()) {
@@ -234,7 +234,7 @@ void Particle::Update() {
 		this->Resize(settings[currentSettingIndex].emitter.particleMaxNum);
 	}
 	// 有効中
-	else if (settings[currentSettingIndex].isValid.OnStay() ) {
+	else if (settings[currentSettingIndex].isValid.OnStay()) {
 		// 最後に出した時間からのmilliseconds
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - settings[currentSettingIndex].durationTime);
 
@@ -253,7 +253,7 @@ void Particle::Update() {
 				// ポジションランダム
 				Vector3 maxPos = settings[currentSettingIndex].emitter.pos + settings[currentSettingIndex].emitter.size;
 				Vector3 minPos = settings[currentSettingIndex].emitter.pos - settings[currentSettingIndex].emitter.size;
-				[[maybe_unused]]Vector3 posRotate;
+				[[maybe_unused]] Vector3 posRotate;
 				Vector3 pos;
 
 				// ポジションのランダム
@@ -271,7 +271,7 @@ void Particle::Update() {
 					pos *= HoriMakeMatrixAffin(Vector3::identity, posRotate, Vector3::zero);
 					break;
 				}
-				
+
 				// 大きさランダム
 				Vector2 size = UtilsLib::Random(settings[currentSettingIndex].size.first, settings[currentSettingIndex].size.second);
 
@@ -286,7 +286,10 @@ void Particle::Update() {
 
 				// 死ぬ時間ランダム
 				uint32_t deathTime = UtilsLib::Random(settings[currentSettingIndex].death.first, settings[currentSettingIndex].death.second);
-			
+
+				// カラー(今後ラープさせる予定)
+				uint32_t color = settings[currentSettingIndex].color.first;
+
 				// ステータスセット
 				wtfs[i].pos = pos;
 				wtfs[i].scale = size;
@@ -294,19 +297,50 @@ void Particle::Update() {
 				wtfs[i].deathTime = std::chrono::milliseconds(deathTime);
 				wtfs[i].startTime = nowTime;
 				wtfs[i].isActive = true;
+				wtfs[i].color = color;
 			}
 
 			// インデックスを更新
 			currentParticleIndex = currentParticleIndex + particleNum;
 		}
 	}
+
+	// もし今の設定の有効時間を過ぎていたら終了
+	if (settings[currentSettingIndex].isValid.flg_&& 
+		settings[currentSettingIndex].validTime <
+		std::chrono::duration_cast<std::chrono::milliseconds>(
+			nowTime - settings[currentSettingIndex].startTime
+		))
+	{
+		settings[currentSettingIndex].isValid.flg_ = false;
+
+		currentSettingIndex++;
+		if (currentSettingIndex >= settings.size()) {
+			currentSettingIndex = 0;
+		}
+	}
+
+	for (auto& wtf : wtfs) {
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - wtf.startTime);
+		if (wtf.isActive) {
+			if (duration > wtf.deathTime) {
+				wtf.isActive = false;
+			}
+			else {
+				wtf.pos += wtf.movePos * FrameInfo::GetInstance()->GetDelta();
+			}
+		}
+
+	}
+
+	settings[currentSettingIndex].isValid.Update();
 }
 
 void Particle::Draw(
 	const Mat4x4& viewProjection,
 	Pipeline::Blend blend
 ) {
-	if (tex && isLoad) {
+	if (tex && isLoad && !settings.empty() && settings[currentSettingIndex].isValid.flg_) {
 		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
 		const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
 
@@ -323,7 +357,14 @@ void Particle::Draw(
 		vertexResource->Unmap(0, nullptr);
 
 		for (uint32_t i = 0; i < wvpMat.Size();i++) {
-			wvpMat[i] = viewProjection * VertMakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos);
+			if (wtfs[i].isActive) {
+				wvpMat[i] = viewProjection * VertMakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos);
+				colorBuf[i] = UintToVector4(wtfs[i].color);
+			}
+			else {
+				wvpMat[i] = Mat4x4();
+				colorBuf[i] = UintToVector4(0u);
+			}
 		}
 
 		auto commandlist = Engine::GetCommandList();
@@ -346,9 +387,80 @@ void Particle::Draw(
 
 void Particle::Debug(const std::string& guiName) {
 	ImGui::Begin(guiName.c_str());
-	
-	ImGui::DragFloat2("uvPibot", &uvPibot.x, 0.01f);
-	ImGui::DragFloat2("uvSize", &uvSize.x, 0.01f);
+	if (ImGui::Button("Setting Add")) {
+		settings.push_back(Setting{});
+	}
+	for (auto i = 0llu; i < settings.size();i++) {
+		if (ImGui::TreeNode(("setting : " + std::to_string(i)).c_str())) {
+			// エミッターの設定
+			if (ImGui::TreeNode("Emitter")) {
+				ImGui::DragFloat3("pos", &settings[i].emitter.pos.x, 0.01f);
+				ImGui::DragFloat3("size", &settings[i].emitter.size.x, 0.01f);
+				int32_t type = static_cast<int32_t>(settings[i].emitter.type);
+				ImGui::SliderInt("type", &type, 0, 1);
+				settings[i].emitter.type = static_cast<decltype(settings[i].emitter.type)>(type);
+				if (type == 1) {
+					ImGui::DragFloat("circleSize", &settings[i].emitter.circleSize, 0.01f);
+					ImGui::DragFloat3("rotate first", &settings[i].emitter.rotate.first.x, 0.01f);
+					ImGui::DragFloat3("rotate second", &settings[i].emitter.rotate.second.x, 0.01f);
+				}
+				int32_t particleMaxNum = static_cast<int32_t>(settings[i].emitter.particleMaxNum);
+				ImGui::DragInt("particleMaxNum", &particleMaxNum, 0.1f, 0);
+				settings[i].emitter.particleMaxNum = uint32_t(particleMaxNum);
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("Particle")) {
+				ImGui::DragFloat2("size first", &settings[i].size.first.x, 0.01f);
+				ImGui::DragFloat2("size second", &settings[i].size.second.x, 0.01f);
+				ImGui::DragFloat3("velocity first", &settings[i].velocity.first.x, 0.01f);
+				ImGui::DragFloat3("velocity second", &settings[i].velocity.second.x, 0.01f);
+				ImGui::DragFloat3("rotate first", &settings[i].rotate.first.x, 0.01f);
+				ImGui::DragFloat3("rotate second", &settings[i].rotate.second.x, 0.01f);
+
+				auto particleNumFirst = int32_t(settings[i].particleNum.first);
+				auto particleNumSecond = int32_t(settings[i].particleNum.second);
+				ImGui::DragInt("particleNum first", &particleNumFirst, 1.0f);
+				ImGui::DragInt("particleNum second", &particleNumSecond, 1.0f);
+				settings[i].particleNum.first = uint32_t(particleNumFirst);
+				settings[i].particleNum.second = uint32_t(particleNumSecond);
+
+				auto freqFirst = int32_t(settings[i].freq.first);
+				auto freqSecond = int32_t(settings[i].freq.second);
+				ImGui::DragInt("freq first", &freqFirst, 10.0f);
+				ImGui::DragInt("freq second", &freqSecond, 10.0f);
+				settings[i].freq.first = uint32_t(freqFirst);
+				settings[i].freq.second = uint32_t(freqSecond);
+
+				auto deathFirst = int32_t(settings[i].death.first);
+				auto deathSecond = int32_t(settings[i].death.second);
+				ImGui::DragInt("death first", &deathFirst, 10.0f);
+				ImGui::DragInt("death second", &deathSecond, 10.0f);
+				settings[i].death.first = uint32_t(deathFirst);
+				settings[i].death.second = uint32_t(deathSecond);
+
+				Vector4 colorFirst = UintToVector4(settings[i].color.first);
+				Vector4 colorSecond = UintToVector4(settings[i].color.second);
+				ImGui::ColorEdit4("color first", colorFirst.m.data());
+				ImGui::ColorEdit4("color second", colorSecond.m.data());
+				settings[i].color.first = Vector4ToUint(colorFirst);
+				settings[i].color.second = Vector4ToUint(colorSecond);
+
+				int32_t validTime = int32_t(settings[i].validTime.count());
+				ImGui::DragInt("vaild time", &validTime, 1.0f, 0);
+				settings[i].validTime = std::chrono::milliseconds(validTime);
+				ImGui::TreePop();
+			}
+
+			if (ImGui::Button("start")) {
+				settings[i].isValid.flg_ = true;
+			}
+			if (ImGui::Button("stop")) {
+				settings[i].isValid.flg_ = false;
+			}
+			ImGui::TreePop();
+		}
+	}
+
 	ImGui::End();
 }
 

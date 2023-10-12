@@ -1,43 +1,87 @@
 #include "UtilsLib.h"
-#include "Utils/Math/Vector2.h"
-#include "Utils/Math/Vector3.h"
-#include <random>
-
 
 namespace UtilsLib {
-	template<>
-	float Random<float>(float min, float max) {
+	int8_t Random(int8_t min, int8_t max) {
+		static std::random_device seed;
+		static std::mt19937_64 rnd(seed());
+		std::uniform_int_distribution<> dist{ min, max };
+
+		return static_cast<int8_t>(dist(rnd));
+	}
+	uint8_t Random(uint8_t min, uint8_t max) {
+		static std::random_device seed;
+		static std::mt19937_64 rnd(seed());
+		std::uniform_int_distribution<> dist{ min, max };
+
+		return static_cast<uint8_t>(dist(rnd));
+	}
+
+	int16_t Random(int16_t min, int16_t max) {
+		static std::random_device seed;
+		static std::mt19937_64 rnd(seed());
+		std::uniform_int_distribution<> dist{ min, max };
+
+		return static_cast<int16_t>(dist(rnd));
+	}
+
+	uint16_t Random(uint16_t min, uint16_t max) {
+		static std::random_device seed;
+		static std::mt19937_64 rnd(seed());
+		std::uniform_int_distribution<> dist{ min, max };
+
+		return static_cast<uint16_t>(dist(rnd));
+	}
+
+	int32_t Random(int32_t min, int32_t max) {
+		static std::random_device seed;
+		static std::mt19937_64 rnd(seed());
+		std::uniform_int_distribution<> dist{ min, max };
+
+		return static_cast<int32_t>(dist(rnd));
+	}
+
+	uint32_t Random(uint32_t min, uint32_t max) {
+		static std::random_device seed;
+		static std::mt19937_64 rnd(seed());
+		std::uniform_int_distribution<> dist{ int32_t(min), int32_t(max) };
+
+		return static_cast<uint32_t>(dist(rnd));
+	}
+
+	float Random(float min, float max) {
 		static std::random_device seed;
 		static std::mt19937_64 rnd(seed());
 		std::uniform_real_distribution<float> dist{ min, max };
 
-		return dist(rnd);
+		return static_cast<float>(dist(rnd));
 	}
-	template<>
-	double Random<double>(double min, double max) {
+
+	double Random(double min, double max) {
 		static std::random_device seed;
 		static std::mt19937_64 rnd(seed());
 		std::uniform_real_distribution<double> dist{ min, max };
 
-		return dist(rnd);
+		return static_cast<double>(dist(rnd));
 	}
-	template<>
-	Vector2 Random<Vector2>(Vector2 min, Vector2 max) {
+
+
+	Vector2 Random(Vector2 min, Vector2 max) {
 		Vector2 result;
-		result.x = Random<float>(min.x, max.x);
-		result.y = Random<float>(min.y, max.y);
+		result.x = Random(min.x, max.x);
+		result.y = Random(min.y, max.y);
 
 		return result;
 	}
-	template<>
-	Vector3 Random<Vector3>(Vector3 min, Vector3 max) {
+
+	Vector3 Random(Vector3 min, Vector3 max) {
 		Vector3 result;
-		result.x = Random<float>(min.x, max.x);
-		result.y = Random<float>(min.y, max.y);
-		result.z = Random<float>(min.z, max.z);
+		result.x = Random(min.x, max.x);
+		result.y = Random(min.y, max.y);
+		result.z = Random(min.z, max.z);
 
 		return result;
 	}
+
 
 	Flg::Flg():
 		flg_(false),
