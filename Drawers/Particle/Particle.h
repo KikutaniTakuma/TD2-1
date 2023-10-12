@@ -8,6 +8,8 @@
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector4.h"
 
+#include "Utils/UtilsLib/UtilsLib.h"
+
 #include <array>
 
 class Particle {
@@ -29,6 +31,12 @@ private:
 		
 		Vector3 movePos;
 		bool isActive;
+
+		// スタートした時間
+		std::chrono::steady_clock::time_point startTime;
+
+		// 消える時間
+		std::chrono::milliseconds deathTime;
 	};
 
 	enum class EmitterType {
@@ -37,35 +45,65 @@ private:
 	};
 
 	struct Emitter {
+		// エミッターの場所
 		Vector3 pos;
 
+		// エミッターの大きさ
 		Vector3 size;
+
+		// エミッターのタイプ(立方体か球か)
 		EmitterType type;
+
+		// 球のときの半径
 		float circleSize;
+
+		// 球のときのランダム範囲
+		std::pair<Vector3, Vector3> rotate;
+
+		uint32_t particleMaxNum;
 	};
 
 	struct Setting {
 		Emitter emitter;
-		
+
+		///
+		/// 乱数の範囲
+		/// 
+
 		// 大きさ
-		Vector3 startSize;
-		Vector3 endSize;
+		std::pair<Vector2, Vector2> size;
 
-		// 移動
-		Vector3 startVelocity;
-		Vector3 endVelocity;
+		// 移動(速度)
+		std::pair<Vector3, Vector3> velocity;
 
-		// 一度にいくつ出すか
-		uint32_t startParticleNum;
-		uint32_t endParticleNum;
+		// 移動方向
+		std::pair<Vector3, Vector3> rotate;
 
-		// 出す頻度
-		std::chrono::milliseconds startFreq;
-		std::chrono::milliseconds endFreq;
 
-		// 消える時間
-		std::chrono::milliseconds startDeath;
-		std::chrono::milliseconds endDeath;
+		// 一度にいくつ出すか(数)
+		std::pair<uint32_t, uint32_t> particleNum;
+
+		// 出す頻度(milliseconds)
+		std::pair<uint32_t, uint32_t> freq;
+
+		// 消える時間(milliseconds)
+		std::pair<uint32_t, uint32_t> death;
+
+		///
+		/// 
+		/// 
+		
+		// スタートした時間
+		std::chrono::steady_clock::time_point startTime;
+
+		// 前に出した時間
+		std::chrono::steady_clock::time_point durationTime;
+
+		// 有効時間
+		std::chrono::milliseconds validTime;
+
+		// 今有効か
+		UtilsLib::Flg isValid;
 	};
 
 public:
@@ -174,13 +212,9 @@ public:
 	void Resize(uint32_t index) {
 		wvpMat.Resize(index);
 		srvHeap.CreateStructuredBufferView(wvpMat, 1);
+		colorBuf.Resize(index);
+		srvHeap.CreateStructuredBufferView(wvpMat, 2);
 		wtfs.resize(index);
-		for (size_t i = 0; i < wtfs.size(); i++) {
-			wtfs[i].scale = Vector2::identity * 512.0f;
-			wtfs[i].pos.x = 10.0f * i;
-			wtfs[i].pos.y = 10.0f * i;
-			wtfs[i].pos.z += 0.3f;
-		}
 	}
 
 public:
@@ -189,9 +223,15 @@ public:
 
 	uint32_t color;
 
-	std::deque<Setting> ssettings;
+	std::deque<Setting> settings;
 
 private:
+	// ループするか
+	UtilsLib::Flg isLoop_;
+
+	uint32_t currentSettingIndex;
+	uint32_t currentParticleIndex;
+
 	std::vector<WorldTransForm> wtfs;
 
 	ShaderResourceHeap srvHeap;
@@ -201,7 +241,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
 
 	StructuredBuffer<Mat4x4> wvpMat;
-	ConstBuffer<Vector4> colorBuf;
+	StructuredBuffer<Vector4> colorBuf;
 
 	Texture* tex;
 	bool isLoad;

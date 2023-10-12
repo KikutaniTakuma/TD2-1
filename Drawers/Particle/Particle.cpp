@@ -14,6 +14,69 @@ Shader Particle::shader = {};
 D3D12_INDEX_BUFFER_VIEW Particle::indexView = {};
 Microsoft::WRL::ComPtr<ID3D12Resource> Particle::indexResource = nullptr;
 
+void Particle::Initialize(const std::string& vsFileName, const std::string& psFileName) {
+	if (indexResource) { indexResource->Release(); }
+
+	LoadShader(vsFileName, psFileName);
+
+	uint16_t indices[] = {
+			0,1,3, 1,2,3
+	};
+	indexResource = Engine::CreateBufferResuorce(sizeof(indices));
+	indexView.BufferLocation = indexResource->GetGPUVirtualAddress();
+	indexView.SizeInBytes = sizeof(indices);
+	indexView.Format = DXGI_FORMAT_R16_UINT;
+	uint16_t* indexMap = nullptr;
+	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexMap));
+	for (int32_t i = 0; i < _countof(indices); i++) {
+		indexMap[i] = indices[i];
+	}
+	indexResource->Unmap(0, nullptr);
+
+	CreateGraphicsPipeline();
+}
+
+void Particle::Finalize() {
+	if (indexResource) {
+		indexResource->Release();
+		indexResource.Reset();
+	}
+}
+
+void Particle::LoadShader(const std::string& vsFileName, const std::string& psFileName) {
+	shader.vertex = ShaderManager::LoadVertexShader(vsFileName);
+	assert(shader.vertex);
+	shader.pixel = ShaderManager::LoadPixelShader(psFileName);
+	assert(shader.pixel);
+}
+
+void Particle::CreateGraphicsPipeline() {
+	D3D12_DESCRIPTOR_RANGE range = {};
+	range.NumDescriptors = 3;
+	range.BaseShaderRegister = 0;
+	range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+
+	std::array<D3D12_ROOT_PARAMETER, 1> rootPrams={};
+	rootPrams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootPrams[0].DescriptorTable.NumDescriptorRanges = 1;
+	rootPrams[0].DescriptorTable.pDescriptorRanges = &range;
+	rootPrams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	PipelineManager::CreateRootSgnature(rootPrams.data(), rootPrams.size(), true);
+	PipelineManager::SetShader(shader);
+	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
+	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
+	PipelineManager::IsDepth(false);
+
+	for (int32_t i = Pipeline::Blend::None; i < Pipeline::Blend::BlendTypeNum; i++) {
+		PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
+		graphicsPipelineState[i] = PipelineManager::Create();
+	}
+
+	PipelineManager::StateReset();
+}
+
 Particle::Particle(uint32_t indexNum) :
 	wtfs(),
 	uvPibot(),
@@ -22,16 +85,22 @@ Particle::Particle(uint32_t indexNum) :
 	isLoad(false),
 	color(std::numeric_limits<uint32_t>::max()),
 	wvpMat(indexNum),
-	colorBuf(),
+	colorBuf(indexNum),
 	aniStartTime_(),
 	aniCount_(0.0f),
 	uvPibotSpd_(0.0f),
-	isAnimation_(0.0f)
+	isAnimation_(0.0f),
+	settings(),
+	currentSettingIndex(0u),
+	currentParticleIndex(0u)
 {
 	for (uint32_t i = 0; i < wvpMat.Size();i++) {
 		wvpMat[i] = MakeMatrixIndentity();
 	}
-	*colorBuf = Vector4::identity;
+	
+	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
+		colorBuf[i] = Vector4::identity;
+	}
 
 	if (vertexResource) { vertexResource->Release(); }
 
@@ -78,7 +147,10 @@ Particle& Particle::operator=(const Particle& right) {
 	for (uint32_t i = 0; i < wvpMat.Size();i++) {
 		wvpMat[i] = right.wvpMat[i];
 	}
-	*colorBuf = *right.colorBuf;
+	
+	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
+		colorBuf[i] = right.colorBuf[i];
+	}
 
 	aniStartTime_ = right.aniStartTime_;
 	aniCount_ = right.aniCount_;
@@ -102,7 +174,9 @@ Particle& Particle::operator=(Particle&& right) noexcept {
 	for (uint32_t i = 0; i < wvpMat.Size(); i++) {
 		wvpMat[i] = right.wvpMat[i];
 	}
-	*colorBuf = *right.colorBuf;
+	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
+		colorBuf[i] = right.colorBuf[i];
+	}
 
 	aniStartTime_ = std::move(right.aniStartTime_);
 	aniCount_ = std::move(right.aniCount_);
@@ -119,72 +193,6 @@ Particle::~Particle() {
 	}
 }
 
-void Particle::Initialize(const std::string& vsFileName, const std::string& psFileName) {
-	if (indexResource) { indexResource->Release(); }
-
-	LoadShader(vsFileName, psFileName);
-
-	uint16_t indices[] = {
-			0,1,3, 1,2,3
-	};
-	indexResource = Engine::CreateBufferResuorce(sizeof(indices));
-	indexView.BufferLocation = indexResource->GetGPUVirtualAddress();
-	indexView.SizeInBytes = sizeof(indices);
-	indexView.Format = DXGI_FORMAT_R16_UINT;
-	uint16_t* indexMap = nullptr;
-	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexMap));
-	for (int32_t i = 0; i < _countof(indices); i++) {
-		indexMap[i] = indices[i];
-	}
-	indexResource->Unmap(0, nullptr);
-
-	CreateGraphicsPipeline();
-}
-
-void Particle::Finalize() {
-	if (indexResource) {
-		indexResource->Release();
-		indexResource.Reset();
-	}
-}
-
-void Particle::LoadShader(const std::string& vsFileName, const std::string& psFileName) {
-	shader.vertex = ShaderManager::LoadVertexShader(vsFileName);
-	assert(shader.vertex);
-	shader.pixel = ShaderManager::LoadPixelShader(psFileName);
-	assert(shader.pixel);
-}
-
-void Particle::CreateGraphicsPipeline() {
-	D3D12_DESCRIPTOR_RANGE range = {};
-	range.NumDescriptors = 2;
-	range.BaseShaderRegister = 0;
-	range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-	range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-
-	std::array<D3D12_ROOT_PARAMETER, 2> rootPrams={};
-	rootPrams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootPrams[0].DescriptorTable.NumDescriptorRanges = 1;
-	rootPrams[0].DescriptorTable.pDescriptorRanges = &range;
-	rootPrams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-
-	rootPrams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	rootPrams[1].Descriptor.ShaderRegister = 0;
-	rootPrams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-
-	PipelineManager::CreateRootSgnature(rootPrams.data(), rootPrams.size(), true);
-	PipelineManager::SetShader(shader);
-	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
-	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
-	PipelineManager::IsDepth(false);
-
-	for (int32_t i = Pipeline::Blend::None; i < Pipeline::Blend::BlendTypeNum; i++) {
-		PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
-		graphicsPipelineState[i] = PipelineManager::Create();
-	}
-
-	PipelineManager::StateReset();
-}
 
 void Particle::LoadTexture(const std::string& fileName) {
 	tex = TextureManager::GetInstance()->LoadTexture(fileName);
@@ -213,7 +221,85 @@ void Particle::Update() {
 		isLoad = true;
 	}
 
-	*colorBuf = UintToVector4(color);
+	// currentSettingIndexがsettingの要素数を超えてたらassertで止める
+	assert(currentSettingIndex < settings.size());
+	auto nowTime = std::chrono::steady_clock::now();
+	settings[currentSettingIndex].isValid.Update();
+
+	// 有効になった瞬間始めた瞬間を保存
+	if (settings[currentSettingIndex].isValid.OnEnter()) {
+		settings[currentSettingIndex].startTime = nowTime;
+		settings[currentSettingIndex].durationTime = nowTime;
+		// パーティクルの最大数を保存
+		this->Resize(settings[currentSettingIndex].emitter.particleMaxNum);
+	}
+	// 有効中
+	else if (settings[currentSettingIndex].isValid.OnStay() ) {
+		// 最後に出した時間からのmilliseconds
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - settings[currentSettingIndex].durationTime);
+
+		// 出す頻度ランダム
+		auto freq = UtilsLib::Random(settings[currentSettingIndex].freq.first, settings[currentSettingIndex].freq.second);
+
+		// 頻度時間を超えてたら
+		if (duration > decltype(duration)(freq)) {
+			settings[currentSettingIndex].durationTime = nowTime;
+
+			// パーティクルを出す数ランダム
+			auto particleNum = UtilsLib::Random(settings[currentSettingIndex].particleNum.first, settings[currentSettingIndex].particleNum.second);
+
+			// パーティクルの設定
+			for (uint32_t i = currentParticleIndex; i < currentParticleIndex + particleNum; i++) {
+				// ポジションランダム
+				Vector3 maxPos = settings[currentSettingIndex].emitter.pos + settings[currentSettingIndex].emitter.size;
+				Vector3 minPos = settings[currentSettingIndex].emitter.pos - settings[currentSettingIndex].emitter.size;
+				[[maybe_unused]]Vector3 posRotate;
+				Vector3 pos;
+
+				// ポジションのランダム
+				switch (settings[currentSettingIndex].emitter.type)
+				{
+				case Particle::EmitterType::Cube:
+				default:
+					pos = UtilsLib::Random(minPos, maxPos);
+					break;
+
+				case Particle::EmitterType::Circle:
+					maxPos.x += settings[currentSettingIndex].emitter.circleSize;
+					pos = UtilsLib::Random(settings[currentSettingIndex].emitter.pos, maxPos);
+					posRotate = UtilsLib::Random(settings[currentSettingIndex].emitter.rotate.first, settings[currentSettingIndex].emitter.rotate.second);
+					pos *= HoriMakeMatrixAffin(Vector3::identity, posRotate, Vector3::zero);
+					break;
+				}
+				
+				// 大きさランダム
+				Vector2 size = UtilsLib::Random(settings[currentSettingIndex].size.first, settings[currentSettingIndex].size.second);
+
+				// 速度ランダム
+				Vector3 velocity = UtilsLib::Random(settings[currentSettingIndex].velocity.first, settings[currentSettingIndex].velocity.second);
+
+				// 移動方向ランダム
+				Vector3 rotate = UtilsLib::Random(settings[currentSettingIndex].rotate.first, settings[currentSettingIndex].rotate.second);
+
+				// 速度回転
+				velocity *= HoriMakeMatrixAffin(Vector3::identity, rotate, Vector3::zero);
+
+				// 死ぬ時間ランダム
+				uint32_t deathTime = UtilsLib::Random(settings[currentSettingIndex].death.first, settings[currentSettingIndex].death.second);
+			
+				// ステータスセット
+				wtfs[i].pos = pos;
+				wtfs[i].scale = size;
+				wtfs[i].movePos = velocity;
+				wtfs[i].deathTime = std::chrono::milliseconds(deathTime);
+				wtfs[i].startTime = nowTime;
+				wtfs[i].isActive = true;
+			}
+
+			// インデックスを更新
+			currentParticleIndex = currentParticleIndex + particleNum;
+		}
+	}
 }
 
 void Particle::Draw(
@@ -252,7 +338,6 @@ void Particle::Draw(
 		// 各種描画コマンドを積む
 		graphicsPipelineState[blend]->Use();
 		srvHeap.Use();
-		commandlist->SetGraphicsRootConstantBufferView(1, colorBuf.GetGPUVtlAdrs());
 		commandlist->IASetVertexBuffers(0, 1, &vertexView);
 		commandlist->IASetIndexBuffer(&indexView);
 		commandlist->DrawIndexedInstanced(6, wvpMat.Size(), 0, 0, 0);
@@ -260,13 +345,10 @@ void Particle::Draw(
 }
 
 void Particle::Debug(const std::string& guiName) {
-	*colorBuf = UintToVector4(color);
 	ImGui::Begin(guiName.c_str());
 	
 	ImGui::DragFloat2("uvPibot", &uvPibot.x, 0.01f);
 	ImGui::DragFloat2("uvSize", &uvSize.x, 0.01f);
-	ImGui::ColorEdit4("SphereColor", &colorBuf->color.r);
-	color = Vector4ToUint(*colorBuf);
 	ImGui::End();
 }
 
