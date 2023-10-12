@@ -6,21 +6,10 @@
 
 class Camera {
 /// <summary>
-/// タイプ
-/// </summary>
-public:
-	enum class Type : uint8_t {
-		Projecction,
-		Othographic
-	};
-
-
-/// <summary>
 /// コンストラクタ
 /// </summary>
 public:
 	Camera() noexcept;
-	Camera(Camera::Type mode) noexcept;
 	Camera(const Camera& right) noexcept;
 	Camera(Camera&& right) noexcept;
 	~Camera() noexcept = default;
@@ -56,14 +45,6 @@ public:
 	inline const Mat4x4& GetViewProjection() noexcept {
 		return viewProjecction;
 	}
-
-	/// <summary>
-	/// ビルボード用の透視投影行列を取得(TypeがOthographicの場合ゼロ行列が返る)
-	/// </summary>
-	/// <returns>透視投影行列</returns>
-	inline const Mat4x4& GetBillViewProjection() noexcept {
-		return billViewProjecction;
-	}
 	
 	/// <summary>
 	/// 平衡投影行列を取得(TypeがProjecctionの場合ゼロ行列が返る)
@@ -71,14 +52,6 @@ public:
 	/// <returns></returns>
 	inline const Mat4x4& GetViewOthographics() noexcept {
 		return viewOthograohics;
-	}
-
-	/// <summary>
-	/// ビルボード用の平衡投影行列を取得(TypeがProjecctionの場合ゼロ行列が返る)
-	/// </summary>
-	/// <returns></returns>
-	inline const Mat4x4& GetBillViewOthographics() noexcept {
-		return billViewOthograohics;
 	}
 
 	/// <summary>
@@ -109,7 +82,6 @@ public:
 /// メンバ変数
 /// </summary>
 public:
-	Type type;
 	bool isDebug;
 
 public:
@@ -125,25 +97,23 @@ public:
 	Vector2 gazePointRotate;
 	float gazePointRotateSpd;
 
-private:
+protected:
 	Vector3 worldPos;
 
-private:
+protected:
 	static constexpr float kNearClip = 0.01f;
 
 public:
 	float farClip;
 	float fov;
 
-private:
+protected:
 	Mat4x4 view;
 	Mat4x4 projection;
 	Mat4x4 othograohics;
 
 	Mat4x4 viewProjecction;
-	Mat4x4 billViewProjecction;
 	Mat4x4 viewOthograohics;
-	Mat4x4 billViewOthograohics;
 
 	Mat4x4 viewProjecctionVp;
 	Mat4x4 viewOthograohicsVp;

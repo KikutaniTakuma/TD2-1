@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <cassert>
+#include "Utils/Math/Vector3.h"
 
 class Easeing {
 public:
@@ -62,6 +63,10 @@ public:
 	T Get(const T& start, const T& end) {
 		static_assert(!std::is_pointer<T>::value, "Do not use pointer types");
 		return std::lerp<T>(start, end, ease_(t_));
+	}
+
+	Vector3 Get(const Vector3& start, const Vector3& end) {
+		return Vector3::Lerp(start, end, ease_(t_));
 	}
 
 	void Debug(const std::string& debugName);

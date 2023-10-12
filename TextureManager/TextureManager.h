@@ -50,7 +50,7 @@ public:
 	void ReleaseIntermediateResource();
 
 	bool ThreadLoadFinish() const {
-		return isThreadFinish;
+		return threadTextureBuff.empty();
 	}
 
 	inline ID3D12GraphicsCommandList* GetCommandList() const {

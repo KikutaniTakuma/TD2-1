@@ -17,8 +17,21 @@ private:
 	static constexpr uint16_t kVertexNum = 2u;
 
 public:
+	static void Initialize();
+
+private:
+	static Shader shader;
+
+	static Pipeline* pipline;
+
+public:
 	Line();
+	Line(const Line& right);
+	Line(Line&& right) noexcept;
 	~Line();
+
+	Line& operator=(const Line& right);
+	Line& operator=(Line&& right)noexcept;
 
 public:
 	void Draw(const Mat4x4& viewProjection, uint32_t color);
@@ -35,10 +48,6 @@ private:
 	VertexData* vertexMap;
 
 	ShaderResourceHeap heap;
-	
-	Shader shader;
-
-	Pipeline* pipline;
 
 	ConstBuffer<Mat4x4> wvpMat;
 };

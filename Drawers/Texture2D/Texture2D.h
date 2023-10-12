@@ -2,6 +2,7 @@
 #include "TextureManager/TextureManager.h"
 #include "Engine/Engine.h"
 #include "Engine/ConstBuffer/ConstBuffer.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "Engine/PipelineManager/PipelineManager.h"
 
 #include "Utils/Math/Vector3.h"
@@ -51,7 +52,7 @@ private:
 /// 静的メンバ変数
 /// </summary>
 private:
-	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)*2> graphicsPipelineState;
+	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState;
 	static Shader shader;
 
 	static D3D12_INDEX_BUFFER_VIEW indexView;
@@ -65,16 +66,9 @@ public:
 public:
 	void Update();
 
-	/// <summary>
-	/// Draw関数を実装
-	/// </summary>
-	/// <param name="viewProjection">カメラのマトリックス</param>
-	/// <param name="blend">ブレンドモード</param>
-	/// <param name="isDepth">深度バッファの有効か否か(trueなら有効)</param>
 	void Draw(
 		const Mat4x4& viewProjection,
-		Pipeline::Blend blend = Pipeline::Normal,
-		bool isDepth = true
+		Pipeline::Blend blend = Pipeline::Blend::None
 	);
 
 	void Debug(const std::string& guiName);

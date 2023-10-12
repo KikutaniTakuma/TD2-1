@@ -10,43 +10,13 @@
 #include "TextureManager/TextureManager.h"
 #include "Engine/ShaderManager/ShaderManager.h"
 #include <unordered_map>
+#include "MeshManager/Mesh/Mesh.h"
+
 class Pipeline;
 
 #include <wrl.h>
 
 class Model {
-public:
-	struct VertData {
-		Vector4 position;
-		Vector3 normal;
-		Vector2 uv;
-	};
-	struct IndexData {
-		uint32_t vertNum;
-		uint32_t uvNum;
-		uint32_t normalNum;
-
-		inline bool operator==(const IndexData& right) {
-			return vertNum == right.vertNum
-				&& uvNum == right.uvNum
-				&& normalNum == right.normalNum;
-		}
-		inline bool operator!=(const IndexData& right) {
-			return !(*this == right);
-		}
-	};
-
-	struct Mesh {
-		Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = nullptr;
-		// 頂点バッファビュー
-		D3D12_VERTEX_BUFFER_VIEW vertexView{};
-		// 頂点バッファマップ
-		VertData* vertexMap = nullptr;
-
-		// 頂点数
-		uint32_t vertNum = 0;
-	};
-
 private:
 	struct MatrixData {
 		Mat4x4 worldMat;
@@ -68,30 +38,48 @@ private:
 
 public:
 	Model();
-	Model(UINT maxDrawIndex_);
-	Model(const Model&) = default;
+	Model(const Model& right);
+	Model(Model&& right) noexcept;
 	~Model();
 
-	Model& operator=(const Model&) = default;
+	Model& operator=(const Model& right);
+	Model& operator=(Model&& right) noexcept;
 
 public:
 	void LoadObj(const std::string& fileName);
-private:
-	void LoadMtl(const std::string fileName);
 
 public:
-	void LoadShader(const std::string& vertex = "./Resources/Shaders/ModelShader/Model.VS.hlsl",
+	static void Initialize(
+		const std::string& vertex = "./Resources/Shaders/ModelShader/Model.VS.hlsl",
 		const std::string& pixel = "./Resources/Shaders/ModelShader/Model.PS.hlsl",
 		const std::string& geometory = "./Resources/Shaders/ModelShader/ModelNone.GS.hlsl",
 		const std::string& hull = {},
 		const std::string& domain = {}
 	);
 
+private:
+	static void LoadShader(
+		const std::string& vertex,
+		const std::string& pixel,
+		const std::string& geometory,
+		const std::string& hull,
+		const std::string& domain
+	);
+	static void CreateGraphicsPipeline();
+
+private:
+	static Shader shader;
+
+	static Pipeline* pipeline;
+	static bool loadShaderFlg;
+	static bool createGPFlg;
+
+
+public:
 	void Update();
 
 	void Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos);
 
-	void CreateGraphicsPipeline();
 
 	void Debug(const std::string& guiName);
 
@@ -109,26 +97,15 @@ public:
 
 
 private:
-	std::unordered_map<std::string, ShaderResourceHeap> SRVHeap;
+	Mesh* mesh;
 
-	std::unordered_map<std::string, Mesh> meshData;
-
-	Shader shader;
-
-	Pipeline* pipeline;
+	std::unordered_map<std::string, Mesh::CopyData> data;
 
 	bool loadObjFlg;
-	bool loadShaderFlg;
-	bool createGPFlg;
 
-	std::deque<ConstBuffer<MatrixData>> wvpData;
+	ConstBuffer<MatrixData> wvpData;
 
-	std::deque<ConstBuffer<DirectionLight>> dirLig;
+	ConstBuffer<DirectionLight> dirLig;
 
-	std::deque<ConstBuffer<Vector4>> colorBuf;
-
-	std::unordered_map<std::string, Texture*> tex;
-
-	UINT drawIndexNumber;
-	UINT maxDrawIndex;
+	ConstBuffer<Vector4> colorBuf;
 };

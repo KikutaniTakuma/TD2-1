@@ -10,6 +10,7 @@
 
 #include "Utils/Camera/Camera.h"
 #include "Drawers/Texture2D/Texture2D.h"
+#include "Drawers/Model/Model.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -28,12 +29,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	static auto* const frameInfo = FrameInfo::GetInstance();
 
 	auto input = Input::GetInstance();
-
-	Camera camera{ Camera::Type::Othographic };
-
-	Texture2D tex;
-	tex.LoadTexture("./Resources/uvChecker.png");
-	tex.scale *= 512.0f;
 
 	/// 
 	/// メインループ
@@ -57,7 +52,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 更新処理
 		/// 
 
-		tex.Update();
+
 
 		///
 		/// 更新処理ここまで
@@ -66,9 +61,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		camera.Update();
-
-		tex.Draw(camera.GetViewOthographics(), Pipeline::Normal, false);
 
 		///
 		/// 描画処理ここまで
