@@ -4,6 +4,7 @@
 #include "Drawers/Texture2D/Texture2D.h"
 
 #include "GlobalVariables/GlobalVariables.h"
+#include "Game/Gauge/Gauge.h"
 
 class Layer
 {
@@ -105,6 +106,8 @@ private:
 
 	// テクスチャ
 	std::vector<std::unique_ptr<Texture2D>> tex_;
+
+	std::unique_ptr<Gauge> gauge_;
 
 	// HP
 	std::vector<int> hitPoints_;

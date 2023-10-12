@@ -13,7 +13,7 @@ const std::string Enemy::groupName_ = "StaticEnemy";
 Enemy::Enemy(const Vector3& pos, const float& layerY, float scale) {
 
 	tex_ = std::make_unique<Texture2D>();
-	tex_->LoadTexture("./Resources/uvChecker.png");
+	tex_->LoadTexture("./Resources/Enemy/usabom.png");
 
 	firstPos_ = pos;
 	firstPos_.y += layerY;

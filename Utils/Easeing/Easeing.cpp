@@ -60,7 +60,7 @@ Vector2 Easeing::Get(const Vector2& start, const Vector2& end) {
 	return Vector2::Lerp(start, end, ease_(t_));
 }
 
-void Easeing::Debug(const std::string& debugName) {
+void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 #ifdef _DEBUG
 	easeTime_ = 1.0f / spdT_;
 	ImGui::Begin(debugName.c_str());

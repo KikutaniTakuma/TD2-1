@@ -9,7 +9,7 @@ Player::Player() {
 	input_ = Input::GetInstance();
 
 	tex_ = std::make_unique<Texture2D>();
-	tex_->LoadTexture("./Resources/uvChecker.png");
+	tex_->LoadTexture("./Resources/Player/usausa.png");
 
 	globalVariables_ = std::make_unique<GlobalVariables>();
 

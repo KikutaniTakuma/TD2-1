@@ -19,7 +19,7 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 		tex_.push_back(std::make_unique<Texture2D>());
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
-		tex_[i]->LoadTexture("./Resources/uvChecker.png");
+		tex_[i]->LoadTexture("./Resources/white2x2.png");
 		if (i % 3 == 0) {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
@@ -34,6 +34,9 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 
 	isChangeLayer_ = false;
 	isClear_ = false;
+
+	gauge_ = std::make_unique<Gauge>();
+	gauge_->Initialize(nowLayer_, kMaxHitPoints_[nowLayer_]);
 
 	SetGlobalVariable();
 }
@@ -67,7 +70,7 @@ void Layer::ApplyGlobalVariable() {
 			tex_.push_back(std::make_unique<Texture2D>());
 			tex_[i]->scale = kLayer2DScale_;
 			tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
-			tex_[i]->LoadTexture("./Resources/uvChecker.png");
+			tex_[i]->LoadTexture("./Resources/white2x2.png");
 			if (i % 3 == 0) {
 				tex_[i]->color = 0xFFFFFFFF;
 			}
@@ -144,14 +147,19 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 		else {
 			tex_[i]->color = 0xFFFF00FF;
 		}
-		tex_[i]->LoadTexture("./Resources/uvChecker.png");
+		tex_[i]->LoadTexture("./Resources/white2x2.png");
 		tex_[i]->Update();
 	}
+
+	gauge_->Initialize(hitPoints_[nowLayer_], kMaxHitPoints_[nowLayer_]);
+
 }
 
 void Layer::Update() {
 
 	ApplyGlobalVariable();
+
+	gauge_->Update(hitPoints_[nowLayer_], kMaxHitPoints_[nowLayer_], damage_);
 
 	hitPoints_[nowLayer_] -= damage_;
 
@@ -189,4 +197,6 @@ void Layer::Draw2D(const Mat4x4& viewProjection) {
 			tex_[i]->Draw(viewProjection, Pipeline::Normal, false);
 		}
 	}
+
+	gauge_->Draw2D(viewProjection);
 }
