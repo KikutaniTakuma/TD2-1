@@ -17,12 +17,7 @@ class Pipeline;
 #include <wrl.h>
 
 class Model {
-private:
-	struct MatrixData {
-		Mat4x4 worldMat;
-		Mat4x4 viewProjectoionMat;
-	};
-
+public:
 	struct DirectionLight {
 		Vector3 ligDirection;
 		float pad0;
@@ -34,6 +29,12 @@ private:
 		float pad3;
 		Vector3 ptColor;
 		float ptRange;
+	};
+
+private:
+	struct MatrixData {
+		Mat4x4 worldMat;
+		Mat4x4 viewProjectoionMat;
 	};
 
 public:
@@ -95,6 +96,7 @@ public:
 	uint32_t color;
 	Model* parent;
 
+	DirectionLight light;
 
 private:
 	Mesh* mesh;

@@ -1,6 +1,5 @@
 #pragma once
 #include "Pipeline/Pipeline.h"
-#include "Engine/ShaderManager/ShaderManager.h"
 #include <list>
 #include <vector>
 #include <memory>

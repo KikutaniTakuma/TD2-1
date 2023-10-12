@@ -1,9 +1,6 @@
 #pragma once
 #include "TextureManager/TextureManager.h"
-#include "Engine/Engine.h"
-#include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/PipelineManager/PipelineManager.h"
-#include "Engine/StructuredBuffer/StructuredBuffer.h"
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
 
 #include "Utils/Math/Vector3.h"

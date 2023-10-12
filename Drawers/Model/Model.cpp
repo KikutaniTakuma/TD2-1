@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <numbers>
+#include <climits>
 #include <filesystem>
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/ShaderManager/ShaderManager.h"
@@ -100,7 +101,7 @@ Model::Model() :
 	pos(),
 	rotate(),
 	scale(Vector3::identity),
-	color(0xffffffff),
+	color(std::numeric_limits<uint32_t>::max()),
 	parent(nullptr),
 	mesh(nullptr),
 	data(),
@@ -116,14 +117,13 @@ Model::Model() :
 
 
 	dirLig.shaderRegister = 1;
-	dirLig->ligDirection = { 1.0f,-1.0f,-1.0f };
-	dirLig->ligDirection = dirLig->ligDirection.Normalize();
-	Vector4 colorTmp = UintToVector4(0xffffadff);
-	dirLig->ligColor = colorTmp.GetVector3();
+	light.ligDirection = { 1.0f,-1.0f,-1.0f };
+	light.ligDirection = dirLig->ligDirection.Normalize();
+	light.ligColor = UintToVector4(0xffffadff).GetVector3();
 
-	dirLig->ptPos = { 5.0f,5.0f,5.0f };
-	dirLig->ptColor = { 15.0f,15.0f,15.0f };
-	dirLig->ptRange = 10.0f;
+	light.ptPos = Vector3::zero;
+	light.ptColor = Vector3::zero;
+	light.ptRange = 0.0f;
 
 	colorBuf.shaderRegister = 2;
 	*colorBuf = UintToVector4(color);
@@ -236,7 +236,7 @@ void Model::LoadObj(const std::string& fileName) {
 }
 
 void Model::Update() {
-	/*drawIndexNumber = 0;*/
+	*dirLig = light;
 }
 
 void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {

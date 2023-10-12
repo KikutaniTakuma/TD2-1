@@ -1,4 +1,7 @@
 #include "ConvertString.h"
+#include <Windows.h>
+#undef max
+#undef min
 
 /// 
 /// string to wstring
