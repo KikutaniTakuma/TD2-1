@@ -1,8 +1,14 @@
 #pragma once
 #include <cstdint>
 namespace UtilsLib {
-	int32_t Random(int32_t min, int32_t max);
-	float Random(float min, float max);
+	template<typename T>
+	T Random(T min, T max) {
+		static std::random_device seed;
+		static std::mt19937_64 rnd(seed());
+		std::uniform_int_distribution<> dist{ min, max };
+
+		return dist(rnd);
+	}
 
 	class Flg {
 	public:
