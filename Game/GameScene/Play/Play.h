@@ -10,6 +10,7 @@
 #include "Game/Enemy/Enemy.h"
 #include "Game/ShockWave/ShockWave.h"
 #include "Game/Layer/Layer.h"
+#include "Game/Scaffolding/Scaffolding.h"
 
 #include "GlobalVariables/GlobalVariables.h"
 
@@ -20,6 +21,13 @@ public:
 	// ImGuiで設定するエネミーのパラメータ
 	enum class EnemyParameter {
 		kPos, // ポジション
+		kEnd, // 末尾。要素数を取り出すよう。
+	};
+
+	// ImGuiで設定するあしばのパラメータ
+	enum class ScaffoldingParameter {
+		kPos, // ポジション
+		kScale, // スケール
 		kEnd, // 末尾。要素数を取り出すよう。
 	};
 
@@ -88,6 +96,16 @@ private:
 	void SetEnemyParametar();
 
 	/// <summary>
+	/// 足場の生成
+	/// </summary>
+	void ScaffoldingGeneration();
+
+	/// <summary>
+	/// ImGuiで変えた足場の座標などをセットする。
+	/// </summary>
+	void SetScaffoldingParametar();
+
+	/// <summary>
 	/// 層の生成
 	/// </summary>
 	void CreateLayer();
@@ -120,6 +138,12 @@ private:
 		"Pos", // 座標
 	};
 
+	const std::string scaffoldingGruoopName_ = "Scaffolding";
+
+	const std::string scaffoldingParameter[static_cast<uint16_t>(ScaffoldingParameter::kEnd)] = {
+		"Pos", // 座標
+		"Scale", // スケール
+	};
 	const std::string layerGruoopName_ = "Layer";
 
 	const std::string layerParameter[static_cast<uint16_t>(LayerParameter::kEnd)] = {
@@ -135,7 +159,11 @@ private:
 
 	std::list<std::unique_ptr<Enemy>> enemies_;
 
-	std::vector<int> enemyNums_;
+	std::vector<std::vector<int>> enemyNums_;
+
+	std::list<std::unique_ptr<Scaffolding>> scaffoldings_;
+
+	std::vector<std::vector<int>> scaffoldingNums_;
 
 	std::list<std::unique_ptr<ShockWave>> shockWaves_;
 
@@ -148,7 +176,9 @@ private:
 	std::vector<int> kLayerNums_;
 
 	// 今のステージ。０が1ステージ目
-	int stageNum_;
+	int stage_;
+
+	int preStage_;
 
 	// ステージ数
 	int kMaxStageNum_;
@@ -157,11 +187,20 @@ private:
 	int preMaxStageNum_;
 
 	// フラグ用
-	std::vector<int> preEnemyNums_;
+	std::vector<std::vector<int>> preEnemyNums_;
+
+	// フラグ用
+	std::vector<std::vector<int>> preScaffoldingNums_;
 
 	// フラグ用
 	std::vector<int> preLayerNums_;
 
-	// ステージ毎の、層毎の、それぞれのエネミーのポジション
+	// ステージ毎の、それぞれのエネミーのポジション
 	std::vector<std::vector<Vector3>> enemyPoses_;
+
+	// ステージ毎の、それぞれの足場のポジション
+	std::vector<std::vector<Vector3>> scaffoldingPoses_;
+
+	// ステージ毎の、それぞれの足場のスケール
+	std::vector<std::vector<Vector2>> scaffoldingScales_;
 };

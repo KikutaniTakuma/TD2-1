@@ -15,9 +15,29 @@
             300.0,
             0.0
         ],
-        "EnemyNum": 3,
+        "Enemy3Pos": [
+            -300.0,
+            0.0,
+            0.0
+        ],
+        "Layer0EnemyNum": 3,
         "Layer0HP": 1,
-        "Layer1HP": 2,
-        "LayerNum": 2
+        "Layer0ScaffoldingNum": 1,
+        "Layer1EnemyNum": 4,
+        "Layer1HP": 1,
+        "Layer1ScaffoldingNum": 1,
+        "Layer2EnemyNum": 1,
+        "Layer2HP": 1,
+        "Layer2ScaffoldingNum": 1,
+        "LayerNum": 2,
+        "Scaffolding0Pos": [
+            200.0,
+            50.0,
+            0.0
+        ],
+        "Scaffolding0Scale": [
+            100.0,
+            10.0
+        ]
     }
 }

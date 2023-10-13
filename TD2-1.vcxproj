@@ -184,6 +184,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Game\Gauge\Gauge.cpp" />
     <ClCompile Include="Game\Layer\Layer.cpp" />
     <ClCompile Include="Game\Player\Player.cpp" />
+    <ClCompile Include="Game\Scaffolding\Scaffolding.cpp" />
     <ClCompile Include="Game\ShockWave\ShockWave.cpp" />
     <ClCompile Include="GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Input\Gamepad\Gamepad.cpp" />
@@ -251,6 +252,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Game\Gauge\Gauge.h" />
     <ClInclude Include="Game\Layer\Layer.h" />
     <ClInclude Include="Game\Player\Player.h" />
+    <ClInclude Include="Game\Scaffolding\Scaffolding.h" />
     <ClInclude Include="Game\ShockWave\ShockWave.h" />
     <ClInclude Include="GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Input\Gamepad\Gamepad.h" />
