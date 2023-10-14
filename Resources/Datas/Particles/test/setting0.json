@@ -1,0 +1,64 @@
+{
+    "setting0": {
+        "colorFirst": 4294967295,
+        "colorSecond": 0,
+        "deathFirst": 2000,
+        "deathSecond": 3000,
+        "emitter_CircleSize": 0.0,
+        "emitter_ParticleMaxNum": 3000,
+        "emitter_Pos": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "emitter_RotateFirst": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "emitter_RotateSecond": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "emitter_Size": [
+            100.0,
+            100.0,
+            0.0
+        ],
+        "emitter_Type": 0,
+        "freqFirst": 500,
+        "freqSecond": 1000,
+        "particleNumFirst": 2,
+        "particleNumSecond": 6,
+        "rotateFirst": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "rotateSecond": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "sizeFirst": [
+            50.0,
+            50.0
+        ],
+        "sizeSecond": [
+            50.0,
+            50.0
+        ],
+        "vaildTime": 10000,
+        "velocityFirst": [
+            120.0,
+            -3.0,
+            0.0
+        ],
+        "velocitySecond": [
+            180.0,
+            3.0,
+            0.0
+        ]
+    }
+}

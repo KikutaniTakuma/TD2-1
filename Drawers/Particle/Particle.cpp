@@ -5,6 +5,11 @@
 #include "Engine/FrameInfo/FrameInfo.h"
 #include <numeric>
 
+#include "externals/nlohmann/json.hpp"
+#include <cassert>
+#include <filesystem>
+#include <fstream>
+
 /// <summary>
 /// 静的変数のインスタンス化
 /// </summary>
@@ -208,6 +213,177 @@ void Particle::ThreadLoadTexture(const std::string& fileName) {
 	isLoad = false;
 }
 
+
+void Particle::LopadSettingDirectory(const std::string& directoryName) {
+	const std::filesystem::path kDirectoryPath = "./Resources/Datas/Particles/" + directoryName + "/";
+	dataDirectoryName = kDirectoryPath.string();
+
+	if (!std::filesystem::exists(kDirectoryPath)) {
+		std::filesystem::create_directories(kDirectoryPath);
+	}
+
+	std::filesystem::directory_iterator dirItr(kDirectoryPath);
+	
+	// directory内のファイルをすべて読み込む
+	for (const auto& entry : dirItr) {
+		const auto& filePath = entry.path();
+
+
+		// jsonファイルじゃなかったら飛ばす
+		if (filePath.extension() != L".json") {
+			continue;
+		}
+
+		// jsonファイルを読み込む
+		LopadSettingFile(filePath.string());
+	}
+}
+
+void Particle::LopadSettingFile(const std::string& jsonName) {
+	std::ifstream file(jsonName);
+
+	if (file.fail()) {
+		return;
+	}
+
+	nlohmann::json root;
+
+	file >> root;
+
+	file.close();
+
+	std::filesystem::path groupName = jsonName;
+	groupName = groupName.stem();
+
+	nlohmann::json::iterator groupItr = root.find(groupName);
+
+	assert(groupItr != root.end());
+
+	for (auto itemItr = groupItr->begin(); itemItr != groupItr->end(); itemItr++) {
+		const std::string& itemName = itemItr.key();
+
+		if (itemItr->is_number_integer()) {
+			uint32_t value = itemItr->get<uint32_t>();
+			auto& gruop = datas[groupName.string()];
+			Item item = value;
+			gruop[itemName] = value;
+		}
+		else if (itemItr->is_number_float()) {
+			float value = itemItr->get<float>();
+			auto& gruop = datas[groupName.string()];
+			Item item = value;
+			gruop[itemName] = value;
+		}
+		else if (itemItr->is_array() && itemItr->size() == 2) {
+			Vector2 value = { itemItr->at(0),itemItr->at(1) };
+			auto& gruop = datas[groupName.string()];
+			Item item = value;
+			gruop[itemName] = value;
+		}
+		else if (itemItr->is_array() && itemItr->size() == 3) {
+			Vector3 value = { itemItr->at(0),itemItr->at(1),itemItr->at(2) };
+			auto& gruop = datas[groupName.string()];
+			Item item = value;
+			gruop[itemName] = value;
+		}
+		else if (itemItr->is_string()) {
+			std::string value = itemItr->get<std::string>();
+			auto& gruop = datas[groupName.string()];
+			Item item = value;
+			gruop[itemName] = value;
+		}
+	}
+
+	settings.push_back(Setting{});
+	auto& setting = settings.back();
+
+	setting.emitter.pos = std::get<Vector3>(datas[groupName.string()]["emitter_Pos"]);
+	setting.emitter.size = std::get<Vector3>(datas[groupName.string()]["emitter_Size"]);
+	setting.emitter.type = static_cast<EmitterType>(std::get<uint32_t>(datas[groupName.string()]["emitter_Type"]));
+	setting.emitter.circleSize = std::get<float>(datas[groupName.string()]["emitter_CircleSize"]);
+	setting.emitter.rotate.first = std::get<Vector3>(datas[groupName.string()]["emitter_RotateFirst"]);
+	setting.emitter.rotate.second = std::get<Vector3>(datas[groupName.string()]["emitter_RotateSecond"]);
+	setting.emitter.particleMaxNum = std::get<uint32_t>(datas[groupName.string()]["emitter_ParticleMaxNum"]);
+
+	setting.size.first = std::get<Vector2>(datas[groupName.string()]["sizeFirst"]);
+	setting.size.second = std::get<Vector2>(datas[groupName.string()]["sizeSecond"]);
+	setting.velocity.first = std::get<Vector3>(datas[groupName.string()]["velocityFirst"]);
+	setting.velocity.second = std::get<Vector3>(datas[groupName.string()]["velocitySecond"]);
+	setting.rotate.first = std::get<Vector3>(datas[groupName.string()]["rotateFirst"]);
+	setting.rotate.second = std::get<Vector3>(datas[groupName.string()]["rotateSecond"]);
+	setting.particleNum.first = std::get<uint32_t>(datas[groupName.string()]["particleNumFirst"]);
+	setting.particleNum.second = std::get<uint32_t>(datas[groupName.string()]["particleNumSecond"]);
+	setting.freq.first = std::get<uint32_t>(datas[groupName.string()]["freqFirst"]);
+	setting.freq.second = std::get<uint32_t>(datas[groupName.string()]["freqSecond"]);
+	setting.death.first = std::get<uint32_t>(datas[groupName.string()]["deathFirst"]);
+	setting.death.second = std::get<uint32_t>(datas[groupName.string()]["deathSecond"]);
+	setting.color.first = std::get<uint32_t>(datas[groupName.string()]["colorFirst"]);
+	setting.color.second = std::get<uint32_t>(datas[groupName.string()]["colorSecond"]);
+	setting.validTime = std::chrono::milliseconds(std::get<uint32_t>(datas[groupName.string()]["vaildTime"]));
+}
+
+void Particle::SaveSettingFile(const std::string& groupName) {
+	auto itrGroup = datas.find(groupName);
+	assert(itrGroup != datas.end());
+
+	nlohmann::json root;
+
+	root = nlohmann::json::object();
+
+	root[groupName] = nlohmann::json::object();
+
+	for (auto itemItr = itrGroup->second.begin(); itemItr != itrGroup->second.end(); itemItr++) {
+		const std::string& itemName = itemItr->first;
+
+		auto& item = itemItr->second;
+
+		if (std::holds_alternative<uint32_t>(item)) {
+			root[groupName][itemName] = std::get<uint32_t>(item);
+		}
+		else if (std::holds_alternative<float>(item)) {
+			root[groupName][itemName] = std::get<float>(item);
+		}
+		else if (std::holds_alternative<Vector2>(item)) {
+			auto tmp = std::get<Vector2>(item);
+			root[groupName][itemName] = nlohmann::json::array({ tmp.x, tmp.y });
+		}
+		else if (std::holds_alternative<Vector3>(item)) {
+			auto tmp = std::get<Vector3>(item);
+			root[groupName][itemName] = nlohmann::json::array({ tmp.x, tmp.y, tmp.z });
+		}
+		else if (std::holds_alternative<std::string>(item)) {
+			root[groupName][itemName] = std::get<std::string>(item);
+		}
+	}
+
+	const std::filesystem::path kDirectoryPath = dataDirectoryName;
+
+	if (!std::filesystem::exists(kDirectoryPath)) {
+		std::filesystem::create_directory(kDirectoryPath);
+	}
+
+	std::string groupNameTmp;
+	for (auto& i : groupName) {
+		if (i == '\0') {
+			break;
+		}
+		groupNameTmp += i;
+	}
+	auto filePath = (kDirectoryPath.string() + groupNameTmp) + std::string(".json");
+
+	std::ofstream file(filePath);
+
+	if (file.fail()) {
+		assert(!"fileSaveFailed");
+		return;
+	}
+
+	file << std::setw(4) << root << std::endl;
+
+	file.close();
+}
+
+
 void Particle::Update() {
 	assert(wtfs.size() == wvpMat.Size());
 
@@ -302,6 +478,9 @@ void Particle::Update() {
 
 			// インデックスを更新
 			currentParticleIndex = currentParticleIndex + particleNum;
+			if (currentParticleIndex > wtfs.size()) {
+				currentParticleIndex = 0u;
+			}
 		}
 	}
 
@@ -386,81 +565,147 @@ void Particle::Draw(
 }
 
 void Particle::Debug(const std::string& guiName) {
-	ImGui::Begin(guiName.c_str());
+	if (!ImGui::Begin(guiName.c_str(), nullptr, ImGuiWindowFlags_MenuBar)) {
+		ImGui::End();
+		return;
+	}
+	if (!ImGui::BeginMenuBar()) {
+		return;
+	}
+
 	if (ImGui::Button("Setting Add")) {
 		settings.push_back(Setting{});
 	}
-	for (auto i = 0llu; i < settings.size();i++) {
-		if (ImGui::TreeNode(("setting : " + std::to_string(i)).c_str())) {
-			// エミッターの設定
-			if (ImGui::TreeNode("Emitter")) {
-				ImGui::DragFloat3("pos", &settings[i].emitter.pos.x, 0.01f);
-				ImGui::DragFloat3("size", &settings[i].emitter.size.x, 0.01f);
-				int32_t type = static_cast<int32_t>(settings[i].emitter.type);
-				ImGui::SliderInt("type", &type, 0, 1);
-				settings[i].emitter.type = static_cast<decltype(settings[i].emitter.type)>(type);
-				if (type == 1) {
-					ImGui::DragFloat("circleSize", &settings[i].emitter.circleSize, 0.01f);
-					ImGui::DragFloat3("rotate first", &settings[i].emitter.rotate.first.x, 0.01f);
-					ImGui::DragFloat3("rotate second", &settings[i].emitter.rotate.second.x, 0.01f);
+	if (ImGui::BeginMenu("Load")) {
+		const std::filesystem::path kDirectoryPath = "./Resources/Datas/Particles/";
+
+		if (std::filesystem::exists(kDirectoryPath)) {
+			std::filesystem::directory_iterator dirItr(kDirectoryPath);
+
+			// directory内のファイルをすべて読み込む
+			for (const auto& entry : dirItr) {
+				if (ImGui::Button(entry.path().string().c_str())) {
+					LopadSettingDirectory(entry.path().string());
 				}
-				int32_t particleMaxNum = static_cast<int32_t>(settings[i].emitter.particleMaxNum);
-				ImGui::DragInt("particleMaxNum", &particleMaxNum, 0.1f, 0);
-				settings[i].emitter.particleMaxNum = uint32_t(particleMaxNum);
-				ImGui::TreePop();
 			}
-			if (ImGui::TreeNode("Particle")) {
-				ImGui::DragFloat2("size first", &settings[i].size.first.x, 0.01f);
-				ImGui::DragFloat2("size second", &settings[i].size.second.x, 0.01f);
-				ImGui::DragFloat3("velocity first", &settings[i].velocity.first.x, 0.01f);
-				ImGui::DragFloat3("velocity second", &settings[i].velocity.second.x, 0.01f);
-				ImGui::DragFloat3("rotate first", &settings[i].rotate.first.x, 0.01f);
-				ImGui::DragFloat3("rotate second", &settings[i].rotate.second.x, 0.01f);
+		}
 
-				auto particleNumFirst = int32_t(settings[i].particleNum.first);
-				auto particleNumSecond = int32_t(settings[i].particleNum.second);
-				ImGui::DragInt("particleNum first", &particleNumFirst, 1.0f);
-				ImGui::DragInt("particleNum second", &particleNumSecond, 1.0f);
-				settings[i].particleNum.first = uint32_t(particleNumFirst);
-				settings[i].particleNum.second = uint32_t(particleNumSecond);
+		ImGui::EndMenu();
+	}
+	for (auto i = 0llu; i < settings.size(); i++) {
+		if (!ImGui::BeginMenu(("setting" + std::to_string(i)).c_str())) {
+			continue;
+		}
 
-				auto freqFirst = int32_t(settings[i].freq.first);
-				auto freqSecond = int32_t(settings[i].freq.second);
-				ImGui::DragInt("freq first", &freqFirst, 10.0f);
-				ImGui::DragInt("freq second", &freqSecond, 10.0f);
-				settings[i].freq.first = uint32_t(freqFirst);
-				settings[i].freq.second = uint32_t(freqSecond);
-
-				auto deathFirst = int32_t(settings[i].death.first);
-				auto deathSecond = int32_t(settings[i].death.second);
-				ImGui::DragInt("death first", &deathFirst, 10.0f);
-				ImGui::DragInt("death second", &deathSecond, 10.0f);
-				settings[i].death.first = uint32_t(deathFirst);
-				settings[i].death.second = uint32_t(deathSecond);
-
-				Vector4 colorFirst = UintToVector4(settings[i].color.first);
-				Vector4 colorSecond = UintToVector4(settings[i].color.second);
-				ImGui::ColorEdit4("color first", colorFirst.m.data());
-				ImGui::ColorEdit4("color second", colorSecond.m.data());
-				settings[i].color.first = Vector4ToUint(colorFirst);
-				settings[i].color.second = Vector4ToUint(colorSecond);
-
-				int32_t validTime = int32_t(settings[i].validTime.count());
-				ImGui::DragInt("vaild time", &validTime, 1.0f, 0);
-				settings[i].validTime = std::chrono::milliseconds(validTime);
-				ImGui::TreePop();
+		// エミッターの設定
+		if (ImGui::TreeNode("Emitter")) {
+			ImGui::DragFloat3("pos", &settings[i].emitter.pos.x, 0.01f);
+			ImGui::DragFloat3("size", &settings[i].emitter.size.x, 0.01f);
+			int32_t type = static_cast<int32_t>(settings[i].emitter.type);
+			ImGui::SliderInt("type", &type, 0, 1);
+			settings[i].emitter.type = static_cast<decltype(settings[i].emitter.type)>(type);
+			if (type == 1) {
+				ImGui::DragFloat("circleSize", &settings[i].emitter.circleSize, 0.01f);
+				ImGui::DragFloat3("rotate first", &settings[i].emitter.rotate.first.x, 0.01f);
+				ImGui::DragFloat3("rotate second", &settings[i].emitter.rotate.second.x, 0.01f);
 			}
+			int32_t particleMaxNum = static_cast<int32_t>(settings[i].emitter.particleMaxNum);
+			ImGui::DragInt("particleMaxNum", &particleMaxNum, 0.1f, 0);
+			settings[i].emitter.particleMaxNum = uint32_t(particleMaxNum);
+			settings[i].emitter.particleMaxNum = std::clamp(settings[i].emitter.particleMaxNum, 1u, std::numeric_limits<uint32_t>::max());
 
-			if (ImGui::Button("start")) {
-				settings[i].isValid.flg_ = true;
-			}
-			if (ImGui::Button("stop")) {
-				settings[i].isValid.flg_ = false;
-			}
 			ImGui::TreePop();
 		}
-	}
 
+		// パーティクルの設定
+		if (ImGui::TreeNode("Particle")) {
+			ImGui::DragFloat2("size first", &settings[i].size.first.x, 0.01f);
+			ImGui::DragFloat2("size second", &settings[i].size.second.x, 0.01f);
+			ImGui::DragFloat3("velocity first", &settings[i].velocity.first.x, 0.01f);
+			ImGui::DragFloat3("velocity second", &settings[i].velocity.second.x, 0.01f);
+			ImGui::DragFloat3("rotate first", &settings[i].rotate.first.x, 0.01f);
+			ImGui::DragFloat3("rotate second", &settings[i].rotate.second.x, 0.01f);
+
+			auto particleNumFirst = int32_t(settings[i].particleNum.first);
+			auto particleNumSecond = int32_t(settings[i].particleNum.second);
+			ImGui::DragInt("particleNum first", &particleNumFirst, 1.0f);
+			ImGui::DragInt("particleNum second", &particleNumSecond, 1.0f);
+			settings[i].particleNum.first = uint32_t(particleNumFirst);
+			settings[i].particleNum.second = uint32_t(particleNumSecond);
+
+			auto freqFirst = int32_t(settings[i].freq.first);
+			auto freqSecond = int32_t(settings[i].freq.second);
+			ImGui::DragInt("freq first", &freqFirst, 10.0f);
+			ImGui::DragInt("freq second", &freqSecond, 10.0f);
+			settings[i].freq.first = uint32_t(freqFirst);
+			settings[i].freq.second = uint32_t(freqSecond);
+
+			auto deathFirst = int32_t(settings[i].death.first);
+			auto deathSecond = int32_t(settings[i].death.second);
+			ImGui::DragInt("death first", &deathFirst, 10.0f);
+			ImGui::DragInt("death second", &deathSecond, 10.0f);
+			settings[i].death.first = uint32_t(deathFirst);
+			settings[i].death.second = uint32_t(deathSecond);
+
+			Vector4 colorFirst = UintToVector4(settings[i].color.first);
+			Vector4 colorSecond = UintToVector4(settings[i].color.second);
+			ImGui::ColorEdit4("color first", colorFirst.m.data());
+			ImGui::ColorEdit4("color second", colorSecond.m.data());
+			settings[i].color.first = Vector4ToUint(colorFirst);
+			settings[i].color.second = Vector4ToUint(colorSecond);
+
+			int32_t validTime = int32_t(settings[i].validTime.count());
+			ImGui::DragInt("vaild time", &validTime, 1.0f, 0);
+			settings[i].validTime = std::chrono::milliseconds(validTime);
+
+
+
+			ImGui::TreePop();
+		}
+
+		if (ImGui::Button("start")) {
+			settings[i].isValid.flg_ = true;
+		}
+		if (ImGui::Button("stop")) {
+			settings[i].isValid.flg_ = false;
+		}
+
+		const auto groupName = ("setting" + std::to_string(i));
+
+		datas[groupName]["emitter_Pos"] = settings[i].emitter.pos;
+		datas[groupName]["emitter_Size"] = settings[i].emitter.size;
+		datas[groupName]["emitter_Type"] = static_cast<uint32_t>(settings[i].emitter.type);
+		datas[groupName]["emitter_CircleSize"] = settings[i].emitter.circleSize;
+		datas[groupName]["emitter_CircleSize"] = settings[i].emitter.circleSize;
+		datas[groupName]["emitter_RotateFirst"] = settings[i].emitter.rotate.first;
+		datas[groupName]["emitter_RotateSecond"] = settings[i].emitter.rotate.second;
+		datas[groupName]["emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
+
+		datas[groupName]["sizeFirst"] = settings[i].size.first;
+		datas[groupName]["sizeSecond"] = settings[i].size.second;
+		datas[groupName]["velocityFirst"] = settings[i].velocity.first;
+		datas[groupName]["velocitySecond"] = settings[i].velocity.second;
+		datas[groupName]["rotateFirst"] = settings[i].rotate.first;
+		datas[groupName]["rotateSecond"] = settings[i].rotate.second;
+		datas[groupName]["particleNumFirst"] = settings[i].particleNum.first;
+		datas[groupName]["particleNumSecond"] = settings[i].particleNum.second;
+		datas[groupName]["freqFirst"] = settings[i].freq.first;
+		datas[groupName]["freqSecond"] = settings[i].freq.second;
+		datas[groupName]["deathFirst"] = settings[i].death.first;
+		datas[groupName]["deathSecond"] = settings[i].death.second;
+		datas[groupName]["colorFirst"] = settings[i].color.first;
+		datas[groupName]["colorSecond"] = settings[i].color.second;
+		datas[groupName]["vaildTime"] = static_cast<uint32_t>(settings[i].validTime.count());
+
+
+		if (ImGui::Button("save")) {
+			SaveSettingFile(("setting" + std::to_string(i)).c_str());
+		}
+
+
+		ImGui::EndMenu();
+	}
+	ImGui::EndMenuBar();
 	ImGui::End();
 }
 

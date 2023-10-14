@@ -11,8 +11,13 @@
 #include "Utils/UtilsLib/UtilsLib.h"
 
 #include <array>
+#include <variant>
 
 class Particle {
+public:
+	using Item = std::variant<uint32_t, float, Vector2, Vector3, std::string>;
+	using Group = std::unordered_map<std::string, Item>;
+
 public:
 	struct MatrixData {
 		Mat4x4 wvpMat;
@@ -156,6 +161,16 @@ private:
 	static D3D12_INDEX_BUFFER_VIEW indexView;
 	static Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
 
+public:
+	void LopadSettingDirectory(const std::string& directoryName);
+
+	void SaveSettingFile(const std::string& groupName);
+private:
+	void LopadSettingFile(const std::string& jsonName);
+private:
+	std::unordered_map<std::string, Group> datas;
+	std::string dataDirectoryName;
+
 
 public:
 	void LoadTexture(const std::string& fileName);
@@ -225,9 +240,10 @@ public:
 	Vector2 uvPibot;
 	Vector2 uvSize;
 
-	std::deque<Setting> settings;
 
 private:
+	std::deque<Setting> settings;
+
 	// ループするか
 	UtilsLib::Flg isLoop_;
 
