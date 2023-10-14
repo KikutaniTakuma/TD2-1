@@ -3,6 +3,7 @@
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/FrameInfo/FrameInfo.h"
+#include "Engine/WinApp/WinApp.h"
 #include <numeric>
 
 #include "externals/nlohmann/json.hpp"
@@ -237,6 +238,15 @@ void Particle::LopadSettingDirectory(const std::string& directoryName) {
 		// jsonファイルを読み込む
 		LopadSettingFile(filePath.string());
 	}
+
+	std::ifstream file{ dataDirectoryName + "loop.txt" };
+
+	if (!file.fail()) {
+		bool isLoop = false;
+		file >> isLoop;
+		isLoop_ = isLoop;
+		file.close();
+	}
 }
 
 void Particle::LopadSettingFile(const std::string& jsonName) {
@@ -297,29 +307,29 @@ void Particle::LopadSettingFile(const std::string& jsonName) {
 	settings.push_back(Setting{});
 	auto& setting = settings.back();
 
-	setting.emitter.pos = std::get<Vector3>(datas[groupName.string()]["emitter_Pos"]);
-	setting.emitter.size = std::get<Vector3>(datas[groupName.string()]["emitter_Size"]);
-	setting.emitter.type = static_cast<EmitterType>(std::get<uint32_t>(datas[groupName.string()]["emitter_Type"]));
-	setting.emitter.circleSize = std::get<float>(datas[groupName.string()]["emitter_CircleSize"]);
-	setting.emitter.rotate.first = std::get<Vector3>(datas[groupName.string()]["emitter_RotateFirst"]);
-	setting.emitter.rotate.second = std::get<Vector3>(datas[groupName.string()]["emitter_RotateSecond"]);
-	setting.emitter.particleMaxNum = std::get<uint32_t>(datas[groupName.string()]["emitter_ParticleMaxNum"]);
+	setting.emitter.pos = std::get<Vector3>(datas[groupName.string()]["Emitter_Pos"]);
+	setting.emitter.size = std::get<Vector3>(datas[groupName.string()]["Emitter_Size"]);
+	setting.emitter.type = static_cast<EmitterType>(std::get<uint32_t>(datas[groupName.string()]["Emitter_Type"]));
+	setting.emitter.circleSize = std::get<float>(datas[groupName.string()]["Emitter_CircleSize"]);
+	setting.emitter.rotate.first = std::get<Vector3>(datas[groupName.string()]["Emitter_RotateFirst"]);
+	setting.emitter.rotate.second = std::get<Vector3>(datas[groupName.string()]["Emitter_RotateSecond"]);
+	setting.emitter.particleMaxNum = std::get<uint32_t>(datas[groupName.string()]["Emitter_ParticleMaxNum"]);
+	setting.emitter.validTime = std::chrono::milliseconds(std::get<uint32_t>(datas[groupName.string()]["Emitter_vaildTime"]));
 
-	setting.size.first = std::get<Vector2>(datas[groupName.string()]["sizeFirst"]);
-	setting.size.second = std::get<Vector2>(datas[groupName.string()]["sizeSecond"]);
-	setting.velocity.first = std::get<Vector3>(datas[groupName.string()]["velocityFirst"]);
-	setting.velocity.second = std::get<Vector3>(datas[groupName.string()]["velocitySecond"]);
-	setting.rotate.first = std::get<Vector3>(datas[groupName.string()]["rotateFirst"]);
-	setting.rotate.second = std::get<Vector3>(datas[groupName.string()]["rotateSecond"]);
-	setting.particleNum.first = std::get<uint32_t>(datas[groupName.string()]["particleNumFirst"]);
-	setting.particleNum.second = std::get<uint32_t>(datas[groupName.string()]["particleNumSecond"]);
-	setting.freq.first = std::get<uint32_t>(datas[groupName.string()]["freqFirst"]);
-	setting.freq.second = std::get<uint32_t>(datas[groupName.string()]["freqSecond"]);
-	setting.death.first = std::get<uint32_t>(datas[groupName.string()]["deathFirst"]);
-	setting.death.second = std::get<uint32_t>(datas[groupName.string()]["deathSecond"]);
-	setting.color.first = std::get<uint32_t>(datas[groupName.string()]["colorFirst"]);
-	setting.color.second = std::get<uint32_t>(datas[groupName.string()]["colorSecond"]);
-	setting.validTime = std::chrono::milliseconds(std::get<uint32_t>(datas[groupName.string()]["vaildTime"]));
+	setting.size.first = std::get<Vector2>(datas[groupName.string()]["Particle_sizeFirst"]);
+	setting.size.second = std::get<Vector2>(datas[groupName.string()]["Particle_sizeSecond"]);
+	setting.velocity.first = std::get<Vector3>(datas[groupName.string()]["Particle_velocityFirst"]);
+	setting.velocity.second = std::get<Vector3>(datas[groupName.string()]["Particle_velocitySecond"]);
+	setting.rotate.first = std::get<Vector3>(datas[groupName.string()]["Particle_rotateFirst"]);
+	setting.rotate.second = std::get<Vector3>(datas[groupName.string()]["Particle_rotateSecond"]);
+	setting.particleNum.first = std::get<uint32_t>(datas[groupName.string()]["Particle_particleNumFirst"]);
+	setting.particleNum.second = std::get<uint32_t>(datas[groupName.string()]["Particle_particleNumSecond"]);
+	setting.freq.first = std::get<uint32_t>(datas[groupName.string()]["Particle_freqFirst"]);
+	setting.freq.second = std::get<uint32_t>(datas[groupName.string()]["Particle_freqSecond"]);
+	setting.death.first = std::get<uint32_t>(datas[groupName.string()]["Particle_deathFirst"]);
+	setting.death.second = std::get<uint32_t>(datas[groupName.string()]["Particle_deathSecond"]);
+	setting.color.first = std::get<uint32_t>(datas[groupName.string()]["Particle_colorFirst"]);
+	setting.color.second = std::get<uint32_t>(datas[groupName.string()]["Particle_colorSecond"]);
 }
 
 void Particle::SaveSettingFile(const std::string& groupName) {
@@ -426,6 +436,11 @@ void Particle::Update() {
 
 			// パーティクルの設定
 			for (uint32_t i = currentParticleIndex; i < currentParticleIndex + particleNum; i++) {
+				if (i >= wtfs.size()) {
+					currentParticleIndex = 0u;
+					break;
+				}
+
 				// ポジションランダム
 				Vector3 maxPos = settings[currentSettingIndex].emitter.pos + settings[currentSettingIndex].emitter.size;
 				Vector3 minPos = settings[currentSettingIndex].emitter.pos - settings[currentSettingIndex].emitter.size;
@@ -478,26 +493,12 @@ void Particle::Update() {
 
 			// インデックスを更新
 			currentParticleIndex = currentParticleIndex + particleNum;
-			if (currentParticleIndex > wtfs.size()) {
+			if (currentParticleIndex >= wtfs.size()) {
 				currentParticleIndex = 0u;
 			}
 		}
 	}
 
-	// もし今の設定の有効時間を過ぎていたら終了
-	if (settings[currentSettingIndex].isValid.flg_&& 
-		settings[currentSettingIndex].validTime <
-		std::chrono::duration_cast<std::chrono::milliseconds>(
-			nowTime - settings[currentSettingIndex].startTime
-		))
-	{
-		settings[currentSettingIndex].isValid.flg_ = false;
-
-		currentSettingIndex++;
-		if (currentSettingIndex >= settings.size()) {
-			currentSettingIndex = 0;
-		}
-	}
 
 	for (auto& wtf : wtfs) {
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - wtf.startTime);
@@ -506,20 +507,40 @@ void Particle::Update() {
 				wtf.isActive = false;
 			}
 			else {
+				float colorT =static_cast<float>(duration.count()) / static_cast<float>(wtf.deathTime.count());
 				wtf.pos += wtf.movePos * FrameInfo::GetInstance()->GetDelta();
+				wtf.color = ColorLerp(settings[currentSettingIndex].color.first, settings[currentSettingIndex].color.second, colorT);
 			}
 		}
 
 	}
 
 	settings[currentSettingIndex].isValid.Update();
+
+	// もし今の設定の有効時間を過ぎていたら終了
+	if (settings[currentSettingIndex].isValid && 
+		settings[currentSettingIndex].emitter.validTime <
+		std::chrono::duration_cast<std::chrono::milliseconds>(
+			nowTime - settings[currentSettingIndex].startTime
+		))
+	{
+		settings[currentSettingIndex].isValid = false;
+
+		currentSettingIndex++;
+		if (currentSettingIndex >= settings.size()) {
+			currentSettingIndex = 0;
+			if (isLoop_) {
+				settings[currentSettingIndex].isValid = true;
+			}
+		}
+	}
 }
 
 void Particle::Draw(
 	const Mat4x4& viewProjection,
 	Pipeline::Blend blend
 ) {
-	if (tex && isLoad && !settings.empty() && settings[currentSettingIndex].isValid.flg_) {
+	if (tex && isLoad && !settings.empty() && settings[currentSettingIndex].isValid) {
 		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
 		const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
 
@@ -573,9 +594,6 @@ void Particle::Debug(const std::string& guiName) {
 		return;
 	}
 
-	if (ImGui::Button("Setting Add")) {
-		settings.push_back(Setting{});
-	}
 	if (ImGui::BeginMenu("Load")) {
 		const std::filesystem::path kDirectoryPath = "./Resources/Datas/Particles/";
 
@@ -591,6 +609,10 @@ void Particle::Debug(const std::string& guiName) {
 		}
 
 		ImGui::EndMenu();
+	}
+	if (ImGui::Button("Setting Add")) {
+		settings.push_back(Setting{});
+
 	}
 	for (auto i = 0llu; i < settings.size(); i++) {
 		if (!ImGui::BeginMenu(("setting" + std::to_string(i)).c_str())) {
@@ -614,6 +636,10 @@ void Particle::Debug(const std::string& guiName) {
 			settings[i].emitter.particleMaxNum = uint32_t(particleMaxNum);
 			settings[i].emitter.particleMaxNum = std::clamp(settings[i].emitter.particleMaxNum, 1u, std::numeric_limits<uint32_t>::max());
 
+			int32_t validTime = int32_t(settings[i].emitter.validTime.count());
+			ImGui::DragInt("vaild time(milliseconds)", &validTime, 1.0f, 0);
+			settings[i].emitter.validTime = std::chrono::milliseconds(validTime);
+
 			ImGui::TreePop();
 		}
 
@@ -635,15 +661,15 @@ void Particle::Debug(const std::string& guiName) {
 
 			auto freqFirst = int32_t(settings[i].freq.first);
 			auto freqSecond = int32_t(settings[i].freq.second);
-			ImGui::DragInt("freq first", &freqFirst, 10.0f);
-			ImGui::DragInt("freq second", &freqSecond, 10.0f);
+			ImGui::DragInt("freq first", &freqFirst, 1.0f);
+			ImGui::DragInt("freq second", &freqSecond, 1.0f);
 			settings[i].freq.first = uint32_t(freqFirst);
 			settings[i].freq.second = uint32_t(freqSecond);
 
 			auto deathFirst = int32_t(settings[i].death.first);
 			auto deathSecond = int32_t(settings[i].death.second);
-			ImGui::DragInt("death first", &deathFirst, 10.0f);
-			ImGui::DragInt("death second", &deathSecond, 10.0f);
+			ImGui::DragInt("death first(milliseconds)", &deathFirst, 10.0f);
+			ImGui::DragInt("death second(milliseconds)", &deathSecond, 10.0f);
 			settings[i].death.first = uint32_t(deathFirst);
 			settings[i].death.second = uint32_t(deathSecond);
 
@@ -654,58 +680,104 @@ void Particle::Debug(const std::string& guiName) {
 			settings[i].color.first = Vector4ToUint(colorFirst);
 			settings[i].color.second = Vector4ToUint(colorSecond);
 
-			int32_t validTime = int32_t(settings[i].validTime.count());
-			ImGui::DragInt("vaild time", &validTime, 1.0f, 0);
-			settings[i].validTime = std::chrono::milliseconds(validTime);
-
-
-
 			ImGui::TreePop();
 		}
 
 		if (ImGui::Button("start")) {
-			settings[i].isValid.flg_ = true;
+			settings[i].isValid = true;
+			currentParticleIndex = uint32_t(i);
 		}
 		if (ImGui::Button("stop")) {
-			settings[i].isValid.flg_ = false;
+			settings[i].isValid = false;
 		}
 
 		const auto groupName = ("setting" + std::to_string(i));
 
-		datas[groupName]["emitter_Pos"] = settings[i].emitter.pos;
-		datas[groupName]["emitter_Size"] = settings[i].emitter.size;
-		datas[groupName]["emitter_Type"] = static_cast<uint32_t>(settings[i].emitter.type);
-		datas[groupName]["emitter_CircleSize"] = settings[i].emitter.circleSize;
-		datas[groupName]["emitter_CircleSize"] = settings[i].emitter.circleSize;
-		datas[groupName]["emitter_RotateFirst"] = settings[i].emitter.rotate.first;
-		datas[groupName]["emitter_RotateSecond"] = settings[i].emitter.rotate.second;
-		datas[groupName]["emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
+		datas[groupName]["Emitter_Pos"] = settings[i].emitter.pos;
+		datas[groupName]["Emitter_Size"] = settings[i].emitter.size;
+		datas[groupName]["Emitter_Type"] = static_cast<uint32_t>(settings[i].emitter.type);
+		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
+		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
+		datas[groupName]["Emitter_RotateFirst"] = settings[i].emitter.rotate.first;
+		datas[groupName]["Emitter_RotateSecond"] = settings[i].emitter.rotate.second;
+		datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
+		datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
 
-		datas[groupName]["sizeFirst"] = settings[i].size.first;
-		datas[groupName]["sizeSecond"] = settings[i].size.second;
-		datas[groupName]["velocityFirst"] = settings[i].velocity.first;
-		datas[groupName]["velocitySecond"] = settings[i].velocity.second;
-		datas[groupName]["rotateFirst"] = settings[i].rotate.first;
-		datas[groupName]["rotateSecond"] = settings[i].rotate.second;
-		datas[groupName]["particleNumFirst"] = settings[i].particleNum.first;
-		datas[groupName]["particleNumSecond"] = settings[i].particleNum.second;
-		datas[groupName]["freqFirst"] = settings[i].freq.first;
-		datas[groupName]["freqSecond"] = settings[i].freq.second;
-		datas[groupName]["deathFirst"] = settings[i].death.first;
-		datas[groupName]["deathSecond"] = settings[i].death.second;
-		datas[groupName]["colorFirst"] = settings[i].color.first;
-		datas[groupName]["colorSecond"] = settings[i].color.second;
-		datas[groupName]["vaildTime"] = static_cast<uint32_t>(settings[i].validTime.count());
+		datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
+		datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
+		datas[groupName]["Particle_velocityFirst"] = settings[i].velocity.first;
+		datas[groupName]["Particle_velocitySecond"] = settings[i].velocity.second;
+		datas[groupName]["Particle_rotateFirst"] = settings[i].rotate.first;
+		datas[groupName]["Particle_rotateSecond"] = settings[i].rotate.second;
+		datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
+		datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
+		datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
+		datas[groupName]["Particle_freqSecond"] = settings[i].freq.second;
+		datas[groupName]["Particle_deathFirst"] = settings[i].death.first;
+		datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
+		datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
+		datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
 
 
-		if (ImGui::Button("save")) {
+		if (ImGui::Button("this setting save")) {
 			SaveSettingFile(("setting" + std::to_string(i)).c_str());
+			MessageBoxA(
+				WinApp::GetInstance()->GetHwnd(),
+				"save success", "Particle",
+				MB_OK
+			);
 		}
 
 
 		ImGui::EndMenu();
 	}
 	ImGui::EndMenuBar();
+
+	ImGui::Checkbox("isLoop", isLoop_.Data());
+	if (ImGui::Button("all setting save")) {
+		for (auto i = 0llu; i < settings.size(); i++) {
+			const auto groupName = ("setting" + std::to_string(i));
+
+			datas[groupName]["Emitter_Pos"] = settings[i].emitter.pos;
+			datas[groupName]["Emitter_Size"] = settings[i].emitter.size;
+			datas[groupName]["Emitter_Type"] = static_cast<uint32_t>(settings[i].emitter.type);
+			datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
+			datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
+			datas[groupName]["Emitter_RotateFirst"] = settings[i].emitter.rotate.first;
+			datas[groupName]["Emitter_RotateSecond"] = settings[i].emitter.rotate.second;
+			datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
+			datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
+
+			datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
+			datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
+			datas[groupName]["Particle_velocityFirst"] = settings[i].velocity.first;
+			datas[groupName]["Particle_velocitySecond"] = settings[i].velocity.second;
+			datas[groupName]["Particle_rotateFirst"] = settings[i].rotate.first;
+			datas[groupName]["Particle_rotateSecond"] = settings[i].rotate.second;
+			datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
+			datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
+			datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
+			datas[groupName]["Particle_freqSecond"] = settings[i].freq.second;
+			datas[groupName]["Particle_deathFirst"] = settings[i].death.first;
+			datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
+			datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
+			datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
+			SaveSettingFile(("setting" + std::to_string(i)).c_str());
+		}
+
+		std::ofstream file{ dataDirectoryName+"loop.txt"};
+
+		if (!file.fail()) {
+			file << static_cast<bool>(isLoop_);
+			file.close();
+			MessageBoxA(
+				WinApp::GetInstance()->GetHwnd(),
+				"save success", "Particle",
+				MB_OK
+			);
+		}
+	}
+
 	ImGui::End();
 }
 

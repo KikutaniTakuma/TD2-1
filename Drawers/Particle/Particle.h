@@ -67,6 +67,9 @@ private:
 		std::pair<Vector3, Vector3> rotate;
 
 		uint32_t particleMaxNum;
+
+		// 有効時間
+		std::chrono::milliseconds validTime;
 	};
 
 	struct Setting {
@@ -108,8 +111,6 @@ private:
 		// 前に出した時間
 		std::chrono::steady_clock::time_point durationTime;
 
-		// 有効時間
-		std::chrono::milliseconds validTime;
 
 		// 今有効か
 		UtilsLib::Flg isValid;
