@@ -2,6 +2,8 @@
 #include <cstdint>
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector3.h"
+#include <vector>
+#include <filesystem>
 
 namespace UtilsLib {
 	int8_t Random(int8_t min, int8_t max);
@@ -91,4 +93,15 @@ namespace UtilsLib {
 		bool flg_;
 		bool preFlg_;
 	};
+
+	/// <summary>
+	/// 特定のファイルの特定の拡張子のファイルをすべて探して返す
+	/// </summary>
+	/// <param name="directoryName">ディレクトリ名(例 : "./Resources/")</param>
+	/// <param name="extension">拡張子(例 : ".png")</param>
+	/// <returns>ファイルのパスを格納したコンテナ</returns>
+	std::vector<std::filesystem::path> GetFilePahtFormDir(
+		const std::filesystem::path& directoryName,
+		const std::filesystem::path& extension
+	);
 }
