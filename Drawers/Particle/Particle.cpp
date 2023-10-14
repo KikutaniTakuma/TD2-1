@@ -84,6 +84,68 @@ void Particle::CreateGraphicsPipeline() {
 	PipelineManager::StateReset();
 }
 
+Particle::Particle() :
+	wtfs(),
+	uvPibot(),
+	uvSize(Vector2::identity),
+	tex(nullptr),
+	isLoad(false),
+	wvpMat(1),
+	colorBuf(1),
+	aniStartTime_(),
+	aniCount_(0.0f),
+	uvPibotSpd_(0.0f),
+	isAnimation_(0.0f),
+	settings(),
+	currentSettingIndex(0u),
+	currentParticleIndex(0u)
+{
+	for (uint32_t i = 0; i < wvpMat.Size(); i++) {
+		wvpMat[i] = MakeMatrixIndentity();
+	}
+
+	for (uint32_t i = 0; i < colorBuf.Size(); i++) {
+		colorBuf[i] = Vector4::identity;
+	}
+
+	if (vertexResource) { vertexResource->Release(); }
+
+	vertexResource = Engine::CreateBufferResuorce(sizeof(VertexData) * 4);
+
+	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	vertexView.SizeInBytes = sizeof(VertexData) * 4;
+	vertexView.StrideInBytes = sizeof(VertexData);
+
+	wtfs.resize(1);
+
+	for (size_t i = 0; i < wtfs.size(); i++) {
+		wtfs[i].scale = Vector2::identity * 512.0f;
+		wtfs[i].pos.x = 10.0f * i;
+		wtfs[i].pos.y = 10.0f * i;
+		wtfs[i].pos.z += 0.3f;
+	}
+
+	const std::filesystem::path kDirectoryPath = "./Resources/Datas/Particles/";
+
+	if (!std::filesystem::exists(kDirectoryPath)) {
+		std::filesystem::create_directories(kDirectoryPath);
+	}
+
+	std::filesystem::directory_iterator dirItr(kDirectoryPath);
+
+	dataDirectoryName = "particle0";
+
+	uint32_t dirCount = 0u;
+
+	// directory内のファイルをすべて読み込む
+	for (const auto& entry : dirItr) {
+		if (dataDirectoryName == entry.path().string()) {
+			dataDirectoryName = "particle" + std::to_string(dirCount);
+		}
+		dirCount++;
+	}
+}
+
 Particle::Particle(uint32_t indexNum) :
 	wtfs(),
 	uvPibot(),
@@ -123,6 +185,26 @@ Particle::Particle(uint32_t indexNum) :
 		wtfs[i].pos.x = 10.0f * i;
 		wtfs[i].pos.y = 10.0f * i;
 		wtfs[i].pos.z += 0.3f;
+	}
+
+	const std::filesystem::path kDirectoryPath = "./Resources/Datas/Particles/";
+
+	if (!std::filesystem::exists(kDirectoryPath)) {
+		std::filesystem::create_directories(kDirectoryPath);
+	}
+
+	std::filesystem::directory_iterator dirItr(kDirectoryPath);
+
+	dataDirectoryName = "particle0";
+
+	uint32_t dirCount = 0u;
+
+	// directory内のファイルをすべて読み込む
+	for (const auto& entry : dirItr) {
+		if (dataDirectoryName == entry.path().string()) {
+			dataDirectoryName = "particle" + std::to_string(dirCount);
+		}
+		dirCount++;
 	}
 }
 
@@ -242,9 +324,20 @@ void Particle::LopadSettingDirectory(const std::string& directoryName) {
 	std::ifstream file{ dataDirectoryName + "loop.txt" };
 
 	if (!file.fail()) {
-		bool isLoop = false;
-		file >> isLoop;
-		isLoop_ = isLoop;
+		std::string lineBuf;
+		if (std::getline(file, lineBuf)) {
+			isLoop_ = static_cast<bool>(std::atoi(lineBuf.c_str()));
+		}
+		else {
+			isLoop_ = false;
+		}
+
+		if (std::getline(file, lineBuf)) {
+			this->LoadTexture(lineBuf);
+		}
+		else {
+			tex = TextureManager::GetInstance()->GetWhiteTex();
+		}
 		file.close();
 	}
 }
@@ -380,6 +473,67 @@ void Particle::SaveSettingFile(const std::string& groupName) {
 		groupNameTmp += i;
 	}
 	auto filePath = (kDirectoryPath.string() + groupNameTmp) + std::string(".json");
+
+	std::ofstream file(filePath);
+
+	if (file.fail()) {
+		assert(!"fileSaveFailed");
+		return;
+	}
+
+	file << std::setw(4) << root << std::endl;
+
+	file.close();
+}
+
+void Particle::BackUpSettingFile(const std::string& groupName) {
+	auto itrGroup = datas.find(groupName);
+	assert(itrGroup != datas.end());
+
+	nlohmann::json root;
+
+	root = nlohmann::json::object();
+
+	root[groupName] = nlohmann::json::object();
+
+	for (auto itemItr = itrGroup->second.begin(); itemItr != itrGroup->second.end(); itemItr++) {
+		const std::string& itemName = itemItr->first;
+
+		auto& item = itemItr->second;
+
+		if (std::holds_alternative<uint32_t>(item)) {
+			root[groupName][itemName] = std::get<uint32_t>(item);
+		}
+		else if (std::holds_alternative<float>(item)) {
+			root[groupName][itemName] = std::get<float>(item);
+		}
+		else if (std::holds_alternative<Vector2>(item)) {
+			auto tmp = std::get<Vector2>(item);
+			root[groupName][itemName] = nlohmann::json::array({ tmp.x, tmp.y });
+		}
+		else if (std::holds_alternative<Vector3>(item)) {
+			auto tmp = std::get<Vector3>(item);
+			root[groupName][itemName] = nlohmann::json::array({ tmp.x, tmp.y, tmp.z });
+		}
+		else if (std::holds_alternative<std::string>(item)) {
+			root[groupName][itemName] = std::get<std::string>(item);
+		}
+	}
+
+	const std::filesystem::path kDirectoryPath = dataDirectoryName + "BackUp/";
+
+	if (!std::filesystem::exists(kDirectoryPath)) {
+		std::filesystem::create_directory(kDirectoryPath);
+	}
+
+	std::string groupNameTmp;
+	for (auto& i : groupName) {
+		if (i == '\0') {
+			break;
+		}
+		groupNameTmp += i;
+	}
+	auto filePath = (kDirectoryPath.string() + "delete_" + groupNameTmp) + std::string(".json");
 
 	std::ofstream file(filePath);
 
@@ -724,8 +878,25 @@ void Particle::Debug(const std::string& guiName) {
 			MessageBoxA(
 				WinApp::GetInstance()->GetHwnd(),
 				"save success", "Particle",
-				MB_OK
+				MB_OK | MB_ICONINFORMATION
 			);
+		}
+
+		if (ImGui::Button("this setting delete")) {
+			int32_t id =  MessageBoxA(
+				WinApp::GetInstance()->GetHwnd(),
+				"Are you sure you wanna delete this setting?", "Particle",
+				MB_OKCANCEL | MB_ICONINFORMATION
+			);
+
+			if (id == IDOK) {
+				BackUpSettingFile(groupName);
+
+				settings.erase(settings.begin() + i);
+				datas.erase(groupName);
+				ImGui::EndMenu();
+				break;
+			}
 		}
 
 
@@ -765,16 +936,31 @@ void Particle::Debug(const std::string& guiName) {
 			SaveSettingFile(("setting" + std::to_string(i)).c_str());
 		}
 
-		std::ofstream file{ dataDirectoryName+"loop.txt"};
+		std::ofstream file{ dataDirectoryName+"otherSetting.txt"};
 
-		if (!file.fail()) {
-			file << static_cast<bool>(isLoop_);
+		if (!file.fail() && isLoad) {
+			file << static_cast<bool>(isLoop_) << std::endl
+				<< tex->GetFileName();
 			file.close();
 			MessageBoxA(
 				WinApp::GetInstance()->GetHwnd(),
 				"save success", "Particle",
-				MB_OK
+				MB_OK | MB_ICONINFORMATION
 			);
+		}
+	}
+
+	auto fileNames = UtilsLib::GetFilePahtFormDir("./Resources", ".png");
+
+	if (isLoad) {
+		if (ImGui::TreeNode("png files Load")) {
+			ImGui::Text(("now Texture is : " + tex->GetFileName()).c_str());
+			for (auto& fileName : fileNames) {
+				if (ImGui::Button(fileName.string().c_str())) {
+					this->ThreadLoadTexture(fileName.string());
+				}
+			}
+			ImGui::TreePop();
 		}
 	}
 

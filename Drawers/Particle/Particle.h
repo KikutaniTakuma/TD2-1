@@ -117,7 +117,7 @@ private:
 	};
 
 public:
-	Particle() = delete;
+	Particle();
 	Particle(uint32_t indexNum);
 	Particle(const Particle&);
 	Particle(Particle&&) noexcept;
@@ -168,6 +168,8 @@ public:
 	void SaveSettingFile(const std::string& groupName);
 private:
 	void LopadSettingFile(const std::string& jsonName);
+
+	void BackUpSettingFile(const std::string& groupName);
 private:
 	std::unordered_map<std::string, Group> datas;
 	std::string dataDirectoryName;
