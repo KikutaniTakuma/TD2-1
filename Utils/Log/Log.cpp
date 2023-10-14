@@ -2,6 +2,9 @@
 #include <fstream>
 #include <filesystem>
 #include <cassert>
+#include <Windows.h>
+#undef max
+#undef min
 
 namespace Log {
 	bool AddLog(const std::string& text) {
@@ -28,5 +31,9 @@ namespace Log {
 		isOpned = true;
 
 		return true;
+	}
+
+	void DebugLog(const std::string& text) {
+		OutputDebugStringA(text.c_str());
 	}
 }
