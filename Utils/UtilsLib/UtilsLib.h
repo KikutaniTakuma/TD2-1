@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <random>
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector3.h"
 
@@ -17,8 +16,8 @@ namespace UtilsLib {
 	float Random(float min, float max);
 	double Random(double min, double max);
 
-	Vector2 Random(Vector2 min, Vector2 max);
-	Vector3 Random(Vector3 min, Vector3 max);
+	Vector2 Random(const Vector2& min, const Vector2& max);
+	Vector3 Random(const Vector3& min, const Vector3& max);
 
 	class Flg {
 	public:
@@ -27,27 +26,69 @@ namespace UtilsLib {
 		Flg(Flg&&) = default;
 		~Flg() = default;
 
+		Flg& operator=(const Flg&) = default;
+		Flg& operator=(Flg&&) = default;
+
+		inline Flg& operator=(bool flg) {
+			flg_ = flg;
+			return *this;
+		}
+
+		/// <summary>
+		/// 暗黙型定義
+		/// </summary>
+		inline explicit operator bool() const {
+			return flg_;
+		}
+
+		bool operator!() const {
+			return !flg_;
+		}
+
+		inline bool operator==(const Flg& other) const {
+			return flg_ == other.flg_ && preFlg_ == other.preFlg_;
+		}
+
+		inline bool operator!=(const Flg& other) const {
+			return flg_ != other.flg_ || preFlg_ != other.preFlg_;
+		}
+
+		inline bool* Data() {
+			return &flg_;
+		}
+
 	public:
+		/// <summary>
+		/// アップデート(基本的に更新処理の一番最初か終わりにする)
+		/// </summary>
 		void Update();
 
-		// trueになった瞬間
+		/// <summary>
+		/// trueになった瞬間を返す
+		/// </summary>
+		/// <returns>trueになった瞬間にtrue</returns>
 		bool OnEnter() const {
 			return flg_ && !preFlg_;
 		}
 
-		// trueなっているとき
+		/// <summary>
+		/// trueになっている間
+		/// </summary>
+		/// <returns>trueになっている間はtrue</returns>
 		bool OnStay() const {
 			return flg_ && preFlg_;
 		}
 
-		// falseになった瞬間
+		/// <summary>
+		/// falseになった瞬間
+		/// </summary>
+		/// <returns>falseになった瞬間にtrue</returns>
 		bool OnExit() const {
 			return !flg_ && preFlg_;
 		}
 
-	public:
-		bool flg_;
 	private:
+		bool flg_;
 		bool preFlg_;
 	};
 }
