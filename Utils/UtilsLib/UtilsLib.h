@@ -43,6 +43,14 @@ namespace UtilsLib {
 			return flg_;
 		}
 
+		inline explicit operator int32_t() const {
+			return static_cast<int32_t>(flg_);
+		}
+
+		inline explicit operator uint32_t() const {
+			return static_cast<uint32_t>(flg_);
+		}
+
 		bool operator!() const {
 			return !flg_;
 		}

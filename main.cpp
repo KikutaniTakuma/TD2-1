@@ -32,7 +32,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	auto input = Input::GetInstance();
 
 	Particle hoge;
-	hoge.LopadSettingDirectory("test");
+	hoge.LopadSettingDirectory("smoke");
 
 	Camera camera;
 	camera.pos.z = -3.0f;
@@ -71,7 +71,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		camera.Update();
 
-		hoge.Draw(camera.GetViewOthographics(), Pipeline::None);
+		hoge.Draw(camera.GetViewOthographics());
 
 		///
 		/// 描画処理ここまで

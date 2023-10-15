@@ -36,6 +36,7 @@ private:
 		uint32_t color;
 		
 		Vector3 movePos;
+		Vector3 movePosSecond;
 		bool isActive;
 
 		// スタートした時間
@@ -111,9 +112,12 @@ private:
 		// 前に出した時間
 		std::chrono::steady_clock::time_point durationTime;
 
-
 		// 今有効か
 		UtilsLib::Flg isValid;
+
+
+		// 今有効か
+		UtilsLib::Flg isSameHW;
 	};
 
 public:
@@ -184,7 +188,7 @@ public:
 
 	void Draw(
 		const Mat4x4& viewProjection,
-		Pipeline::Blend blend = Pipeline::Blend::None
+		Pipeline::Blend blend = Pipeline::Blend::Normal
 	);
 
 	void Debug(const std::string& guiName);

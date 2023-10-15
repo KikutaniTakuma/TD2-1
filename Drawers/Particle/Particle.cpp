@@ -284,6 +284,7 @@ Particle::~Particle() {
 		datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
 		datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
 
+		datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
 		datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
 		datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
 		datas[groupName]["Particle_velocityFirst"] = settings[i].velocity.first;
@@ -378,6 +379,11 @@ void Particle::LopadSettingDirectory(const std::string& directoryName) {
 		}
 		file.close();
 	}
+
+	tex = TextureManager::GetInstance()->GetWhiteTex();
+	if (tex) {
+		isLoad = true;
+	}
 }
 
 void Particle::LopadSettingFile(const std::string& jsonName) {
@@ -447,6 +453,7 @@ void Particle::LopadSettingFile(const std::string& jsonName) {
 	setting.emitter.particleMaxNum = std::get<uint32_t>(datas[groupName.string()]["Emitter_ParticleMaxNum"]);
 	setting.emitter.validTime = std::chrono::milliseconds(std::get<uint32_t>(datas[groupName.string()]["Emitter_vaildTime"]));
 
+	setting.isSameHW = static_cast<bool>(std::get<uint32_t>(datas[groupName.string()]["Particle_isSameHW"]));
 	setting.size.first = std::get<Vector2>(datas[groupName.string()]["Particle_sizeFirst"]);
 	setting.size.second = std::get<Vector2>(datas[groupName.string()]["Particle_sizeSecond"]);
 	setting.velocity.first = std::get<Vector3>(datas[groupName.string()]["Particle_velocityFirst"]);
@@ -657,6 +664,9 @@ void Particle::Update() {
 
 				// 大きさランダム
 				Vector2 size = UtilsLib::Random(settings[currentSettingIndex].size.first, settings[currentSettingIndex].size.second);
+				if (settings[currentSettingIndex].isSameHW) {
+					size.y = size.x;
+				}
 
 				// 速度ランダム
 				Vector3 velocity = UtilsLib::Random(settings[currentSettingIndex].velocity.first, settings[currentSettingIndex].velocity.second);
@@ -837,8 +847,15 @@ void Particle::Debug(const std::string& guiName) {
 
 		// パーティクルの設定
 		if (ImGui::TreeNode("Particle")) {
-			ImGui::DragFloat2("size first", &settings[i].size.first.x, 0.01f);
-			ImGui::DragFloat2("size second", &settings[i].size.second.x, 0.01f);
+			ImGui::Checkbox("Same height and width", settings[i].isSameHW.Data());
+			if (settings[i].isSameHW) {
+				ImGui::DragFloat("size first", &settings[i].size.first.x, 0.01f);
+				ImGui::DragFloat("size second", &settings[i].size.second.x, 0.01f);
+			}
+			else {
+				ImGui::DragFloat2("size first", &settings[i].size.first.x, 0.01f);
+				ImGui::DragFloat2("size second", &settings[i].size.second.x, 0.01f);
+			}
 			ImGui::DragFloat3("velocity first", &settings[i].velocity.first.x, 0.01f);
 			ImGui::DragFloat3("velocity second", &settings[i].velocity.second.x, 0.01f);
 			ImGui::DragFloat3("rotate first", &settings[i].rotate.first.x, 0.01f);
@@ -895,6 +912,7 @@ void Particle::Debug(const std::string& guiName) {
 		datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
 		datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
 
+		datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
 		datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
 		datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
 		datas[groupName]["Particle_velocityFirst"] = settings[i].velocity.first;
@@ -957,6 +975,7 @@ void Particle::Debug(const std::string& guiName) {
 			datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
 			datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
 
+			datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
 			datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
 			datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
 			datas[groupName]["Particle_velocityFirst"] = settings[i].velocity.first;
