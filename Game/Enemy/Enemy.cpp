@@ -146,7 +146,7 @@ void Enemy::Update(Layer* layer, const float& y) {
 		FallingUpdate(y);
 		break;
 	case Enemy::Status::kFaint:
-		FaintUpdate();
+		FaintUpdate(y);
 		break;
 	case Enemy::Status::kDeath:
 		DeathUpdate();
@@ -213,10 +213,18 @@ void Enemy::FaintInitialize() {
 
 }
 
-void Enemy::FaintUpdate() {
+void Enemy::FaintUpdate(const float& y) {
 
-	// 仮で落ちたら初期値に戻るようにしている
-	//statusRequest_ = Status::kNormal;
+	velocity_.y += kFallingSpeed_ * FrameInfo::GetInstance()->GetDelta();
+
+	tex_->pos += velocity_;
+
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
+
+		Collision(y);
+		velocity_.y = 0.0f;
+		
+	}
 
 }
 

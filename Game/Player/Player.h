@@ -188,6 +188,7 @@ private:
 	float kGravity_ ;
 
 	bool isFallingGravity_;
+	bool isHipdropJamp_;
 	// 降下中の重力加速度。切り替えのお試し。
 	float kFallingGravity_;
 

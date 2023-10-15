@@ -4,6 +4,8 @@
 #include "Game/GameScene/Play/Play.h"
 #include "Game/ShockWave/ShockWave.h"
 
+#include "externals/imgui/imgui.h"
+
 Player::Player() {
 	
 	input_ = Input::GetInstance();
@@ -26,7 +28,11 @@ Player::Player() {
 	// 重力加速度
 	kGravity_ = -9.8f;
 
+	// 降下中の重力加速度
+	kFallingGravity_ = -20.0f;
 
+	isFallingGravity_ = false;
+	isHipdropJamp_ = false;
 }
 
 void Player::SetGlobalVariable() {
@@ -37,6 +43,7 @@ void Player::SetGlobalVariable() {
 	globalVariables_->AddItem(groupName_, "kMoveSpeed", kMoveSpeed_);
 	globalVariables_->AddItem(groupName_, "kGravity", kGravity_);
 	globalVariables_->AddItem(groupName_, "kHipDropSpeed", kHipDropSpeed_);
+	globalVariables_->AddItem(groupName_, "kFallingGravity", kFallingGravity_);
 
 	globalVariables_->LoadFile(groupName_);
 	ApplyGlobalVariable();
@@ -48,7 +55,7 @@ void Player::ApplyGlobalVariable() {
 	kMoveSpeed_ = globalVariables_->GetFloatValue(groupName_, "kMoveSpeed");
 	kGravity_ = globalVariables_->GetFloatValue(groupName_, "kGravity");
 	kHipDropSpeed_ = globalVariables_->GetFloatValue(groupName_, "kHipDropSpeed");
-
+	kFallingGravity_ = globalVariables_->GetFloatValue(groupName_, "kFallingGravity");
 }
 
 void Player::EnemyStep(bool step) {
@@ -82,6 +89,13 @@ void Player::Initialize() {
 }
 
 void Player::Update(const float& y) {
+
+#ifdef _DEBUG
+	ImGui::Begin("PlayerFlag");
+	ImGui::Checkbox("ChangeGravityType", &isFallingGravity_);
+	ImGui::Checkbox("ChangeIsHipdropJamp", &isHipdropJamp_);
+	ImGui::End();
+#endif // _DEBUG
 
 	globalVariables_->Update();
 	ApplyGlobalVariable();
@@ -173,14 +187,24 @@ void Player::NormalUpdate(const float& y) {
 		}*/
 	}
 
-	velocity_.y += kGravity_ * deletaTime;
-
 	// ジャンプ入力
 	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) || input_->GetKey()->Pushed(DIK_UP)))) {
 		isFly_ = true;
 		isStep_ = false;
 		// 初速を与える
 		velocity_.y = kJampInitialVelocity_;
+	}
+
+	if (isFallingGravity_) {
+		if (velocity_.y < 0) {
+			velocity_.y += kFallingGravity_ * deletaTime;
+		}
+		else {
+			velocity_.y += kGravity_ * deletaTime;
+		}
+	}
+	else {
+		velocity_.y += kGravity_ * deletaTime;
 	}
 
 	// 横の移動距離
@@ -212,6 +236,16 @@ void Player::HipDropUpdate(const float& y) {
 
 	velocity_.y += kHipDropSpeed_ * FrameInfo::GetInstance()->GetDelta();
 	tex_->pos += velocity_;
+
+	if (isHipdropJamp_) {
+		if (isStep_) {
+			isFly_ = true;
+			isStep_ = false;
+			// 初速を与える
+			velocity_.y = kJampInitialVelocity_;
+			statusRequest_ = Status::kNormal;
+		}
+	}
 
 	if (tex_->pos.y - tex_->scale.y / 2.0f <= y && isFly_) {
 
@@ -295,7 +329,14 @@ void Player::FallingInitialize(const float& y) {
 
 void Player::FallingUpdate(const float& y) {
 
-	velocity_.y += kGravity_ * FrameInfo::GetInstance()->GetDelta();
+	float deletaTime = FrameInfo::GetInstance()->GetDelta();
+
+	if (isFallingGravity_) {
+		velocity_.y += kFallingGravity_ * deletaTime;
+	}
+	else {
+		velocity_.y += kGravity_ * deletaTime;
+	}
 	tex_->pos += velocity_;
 
 	// 地面との当たり判定。

@@ -142,7 +142,7 @@ private:
 	/// <summary>
 	/// 落ち切った時のアップデート
 	/// </summary>
-	void FaintUpdate();
+	void FaintUpdate(const float& y);
 
 	/// <summary>
 	/// 死んだときの初期化
@@ -153,6 +153,9 @@ private:
 	/// </summary>
 	void DeathUpdate();
 
+	/// <summary>
+	/// 層との当たり判定
+	/// </summary>
 	void Collision(const float& y);
 
 private:
