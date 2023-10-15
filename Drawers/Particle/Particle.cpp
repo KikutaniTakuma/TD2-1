@@ -271,6 +271,44 @@ Particle& Particle::operator=(Particle&& right) noexcept {
 }
 
 Particle::~Particle() {
+	for (auto i = 0llu; i < settings.size(); i++) {
+		const auto groupName = ("setting" + std::to_string(i));
+
+		datas[groupName]["Emitter_Pos"] = settings[i].emitter.pos;
+		datas[groupName]["Emitter_Size"] = settings[i].emitter.size;
+		datas[groupName]["Emitter_Type"] = static_cast<uint32_t>(settings[i].emitter.type);
+		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
+		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
+		datas[groupName]["Emitter_RotateFirst"] = settings[i].emitter.rotate.first;
+		datas[groupName]["Emitter_RotateSecond"] = settings[i].emitter.rotate.second;
+		datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
+		datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
+
+		datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
+		datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
+		datas[groupName]["Particle_velocityFirst"] = settings[i].velocity.first;
+		datas[groupName]["Particle_velocitySecond"] = settings[i].velocity.second;
+		datas[groupName]["Particle_rotateFirst"] = settings[i].rotate.first;
+		datas[groupName]["Particle_rotateSecond"] = settings[i].rotate.second;
+		datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
+		datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
+		datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
+		datas[groupName]["Particle_freqSecond"] = settings[i].freq.second;
+		datas[groupName]["Particle_deathFirst"] = settings[i].death.first;
+		datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
+		datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
+		datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
+		BackUpSettingFile("setting" + std::to_string(i));
+	}
+
+	std::ofstream file{ dataDirectoryName + "BackUp/" + "delete_otherSetting.txt" };
+
+	if (!file.fail() && isLoad) {
+		file << static_cast<bool>(isLoop_) << std::endl
+			<< tex->GetFileName();
+		file.close();
+	}
+
 	if (vertexResource) {
 		vertexResource->Release();
 		indexResource.Reset();

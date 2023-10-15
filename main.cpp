@@ -31,7 +31,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto input = Input::GetInstance();
 
-	Particle hoge{1000};
+	Particle hoge;
 	hoge.LopadSettingDirectory("test");
 
 	Camera camera;
