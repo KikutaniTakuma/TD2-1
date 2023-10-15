@@ -617,9 +617,21 @@ void Particle::BackUpSettingFile(const std::string& groupName) {
 }
 
 void Particle::ParticleStart() {
-	currentParticleIndex = 0;
-	settings[currentParticleIndex].isValid = true;
+	if (!settings.empty()) {
+		currentParticleIndex = 0;
+		settings[currentParticleIndex].isValid = true;
+		emitterPos_ = settings[currentParticleIndex].emitter.pos;
+	}
 }
+
+void Particle::ParticleStart(const Vector3& emitterPos) {
+	if (!settings.empty()) {
+		currentParticleIndex = 0;
+		settings[currentParticleIndex].isValid = true;
+		emitterPos_ = emitterPos;
+	}
+}
+
 
 void Particle::Update() {
 	assert(wtfs.size() == wvpMat.Size());
@@ -638,6 +650,9 @@ void Particle::Update() {
 	}
 	auto nowTime = std::chrono::steady_clock::now();
 
+	if (settings[currentSettingIndex].isValid) {
+		settings[currentSettingIndex].emitter.pos = emitterPos_;
+	}
 
 	// 有効になった瞬間始めた瞬間を保存
 	if (settings[currentSettingIndex].isValid.OnEnter()) {

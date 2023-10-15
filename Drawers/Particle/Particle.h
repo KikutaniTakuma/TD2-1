@@ -192,17 +192,42 @@ public:
 	void ThreadLoadTexture(const std::string& fileName);
 
 public:
+	/// <summary>
+	/// パーティクルスタート関数
+	/// </summary>
 	void ParticleStart();
 
+	/// <summary>
+	/// パーティクルスタート関数
+	/// </summary>
+	/// <param name="emitterPos">Emitterの位置</param>
+	void ParticleStart(const Vector3& emitterPos);
+
+	/// <summary>
+	/// 更新処理
+	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// 描画関数
+	/// </summary>
+	/// <param name="viewProjection">カメラの行列/param>
+	/// <param name="blend">ブレンドモード</param>
 	void Draw(
 		const Mat4x4& viewProjection,
 		Pipeline::Blend blend = Pipeline::Blend::Normal
 	);
 
+	/// <summary>
+	/// この関数で設定及び保存等を行う
+	/// </summary>
+	/// <param name="guiName">ImGuiの名前</param>
 	void Debug(const std::string& guiName);
 
+	/// <summary>
+	/// テクスチャのサイズ取得
+	/// </summary>
+	/// <returns></returns>
 	Vector2 GetTexSize() const {
 		if (tex) {
 			return tex->getSize();
@@ -245,6 +270,10 @@ public:
 		return isAnimation_;
 	}
 
+	/// <summary>
+	/// パーティクルの量を返る
+	/// </summary>
+	/// <param name="index">particleのインデックス</param>
 	void Resize(uint32_t index) {
 		wvpMat.Resize(index);
 		srvHeap.CreateStructuredBufferView(wvpMat, 1);
@@ -257,6 +286,7 @@ public:
 	Vector2 uvPibot;
 	Vector2 uvSize;
 
+	Vector3 emitterPos_;
 
 private:
 	std::deque<Setting> settings;
