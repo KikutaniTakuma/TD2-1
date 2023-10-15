@@ -3,7 +3,11 @@
 #include <string>
 #include <algorithm>
 #include <cassert>
+#include <type_traits>
 #include "Utils/Math/Vector3.h"
+
+template<class T>
+concept IsInt = std::is_integral_v<T>;
 
 class Easeing {
 public:
@@ -86,6 +90,134 @@ private:
 	float t_;
 
 	float spdT_;
+
+public:
+	template<IsInt T>
+	static std::function<float(float)> GetFunction(T typeNum) {
+		std::function<float(float)> ease;
+
+		switch (typeNum)
+		{
+		default:
+		case 0:
+			ease = [](float t) {
+				return t;
+				};
+			break;
+
+
+		case 1:
+			ease = InSine;
+			break;
+		case 2:
+			ease = OutSine;
+			break;
+		case 3:
+			ease = InOutSine;
+			break;
+
+
+		case 4:
+			ease = InQuad;
+			break;
+		case 5:
+			ease = OutQuad;
+			break;
+		case 6:
+			ease = InOutQuad;
+			break;
+
+
+		case 7:
+			ease = InCubic;
+			break;
+		case 8:
+			ease = OutCubic;
+			break;
+		case 9:
+			ease = InOutCubic;
+			break;
+
+
+		case 10:
+			ease = InQuart;
+			break;
+		case 11:
+			ease = OutQuart;
+			break;
+		case 12:
+			ease = InOutQuart;
+			break;
+
+
+		case 13:
+			ease = InQuint;
+			break;
+		case 14:
+			ease = OutQuint;
+			break;
+		case 15:
+			ease = InOutQuint;
+			break;
+
+
+		case 16:
+			ease = InExpo;
+			break;
+		case 17:
+			ease = OutExpo;
+			break;
+		case 18:
+			ease = InOutExpo;
+			break;
+
+
+		case 19:
+			ease = InCirc;
+			break;
+		case 20:
+			ease = OutCirc;
+			break;
+		case 21:
+			ease = InOutCirc;
+			break;
+
+
+		case 22:
+			ease = InBack;
+			break;
+		case 23:
+			ease = OutBack;
+			break;
+		case 24:
+			ease = InOutBack;
+			break;
+
+
+		case 25:
+			ease = InElastic;
+			break;
+		case 26:
+			ease = OutElastic;
+			break;
+		case 27:
+			ease = InOutElastic;
+			break;
+
+
+		case 28:
+			ease = InBounce;
+			break;
+		case 29:
+			ease = OutBounce;
+			break;
+		case 30:
+			ease = InOutBounce;
+			break;
+		}
+
+		return ease;
+	}
 
 /// <summary>
 ///	Easing関数 参照 : https://easings.net/ja
