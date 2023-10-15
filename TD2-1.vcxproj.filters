@@ -170,6 +170,9 @@
     <ClCompile Include="Game\Scaffolding\Scaffolding.cpp">
       <Filter>Scaffolding</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Background\Background.cpp">
+      <Filter>Background</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -327,6 +330,9 @@
     </Filter>
     <Filter Include="Scaffolding">
       <UniqueIdentifier>{a3fdfb5d-9622-4618-baf2-fe2ddd042e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Background">
+      <UniqueIdentifier>{1543e0fc-cea3-46d5-b886-35a93e0945b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -506,6 +512,9 @@
     </ClInclude>
     <ClInclude Include="Game\Scaffolding\Scaffolding.h">
       <Filter>Scaffolding</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Background\Background.h">
+      <Filter>Background</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

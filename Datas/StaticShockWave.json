@@ -3,9 +3,9 @@
         "kDeleteFrameMajor": 300,
         "kDeleteFrameMiddle": 200,
         "kDeleteFrameSmall": 100,
-        "kHighCriteriaMajor": 350.0,
-        "kHighCriteriaMiddle": 200.0,
-        "kHighCriteriaSmall": 100.0,
+        "kHighCriteriaMajor": 600.0,
+        "kHighCriteriaMiddle": 400.0,
+        "kHighCriteriaSmall": 200.0,
         "kSizeMajor": [
             80.0,
             80.0

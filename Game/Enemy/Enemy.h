@@ -13,20 +13,29 @@ public:
 
 	// 状態
 	enum class Status {
+		kGeneration, // 生成
 		kNormal, // 通常時
 		kFalling, // 落ちている
 		kFaint, // 気絶
 		kDeath, // 死亡
 	};
 
+	enum class Type {
+		kFly, // 浮いてる
+		kWalk, // 歩く
+
+		kEnd, // 末尾
+	};
+
 
 	/// <summary>
 	/// 生成
 	/// </summary>
+	/// /// <param name="type">エネミーのタイプ</param>
 	/// <param name="pos">初期座標</param>
 	/// <param name="layerY">層の上のY座標</param>
 	/// <param name="scale">スケール</param>
-	Enemy(const Vector3& pos, const float& layerY, float scale = 40.0f);
+	Enemy(int type, const Vector3& pos, const float& layerY, float scale = 40.0f);
 	~Enemy() = default;
 	
 
@@ -84,7 +93,7 @@ public:
 	/// <summary>
 	/// 初期座標などのパラメーターをいれる
 	/// </summary>
-	void SetParametar(const Vector3& pos, const float& y = 0);
+	void SetParametar(int type, const Vector3& pos, const float& y = 0);
 
 private:
 
@@ -97,6 +106,16 @@ private:
 	/// jsonファイルからの呼び出し
 	/// </summary>
 	void ApplyGlobalVariable();
+
+	/// <summary>
+	/// 生成の初期化。登場時のパーティクルとか
+	/// </summary>
+	void GenerationInitialize();
+
+	/// <summary>
+	/// 生成の更新
+	/// </summary>
+	void GenerationUpdate();
 
 	/// <summary>
 	/// 通常の初期化
@@ -155,8 +174,10 @@ private:
 	// 初期座標の保存用。倒した敵を生成するのに使うイメージ。
 	Vector3 firstPos_;
 
+	Type type_;
+
 	// 今のエネミーの状態
-	Status status_ = Status::kNormal;
+	Status status_ = Status::kGeneration;
 
 	// エネミーの状態のリクエスト
 	std::optional<Status> statusRequest_ = std::nullopt;

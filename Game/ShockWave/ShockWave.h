@@ -5,6 +5,8 @@
 
 #include "GlobalVariables/GlobalVariables.h"
 
+#include <algorithm>
+
 class ShockWave
 {
 public:
@@ -73,24 +75,24 @@ public:
 	/// </summary>
 	static void GlobalVariablesUpdate() { globalVariables_->Update(); }
 
-private:
+	static float GetHighCriteria(int num) { return kHighCriteria_[std::clamp<int>(num, 0, static_cast<int>(Size::kEnd))]; }
+
 
 	/// <summary>
 	/// jsonファイルへの書き込み
 	/// </summary>
-	void SetGlobalVariable();
+	static void SetGlobalVariable();
 
 	/// <summary>
 	/// jsonファイルからの呼び出し
 	/// </summary>
-	void ApplyGlobalVariable();
+	static void ApplyGlobalVariable();
+
+private:
+
 
 	void Collision(const float& y);
 
-public:
-
-	// 高さの基準
-	static float kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
 
 private:
 
@@ -114,6 +116,11 @@ private:
 
 	// 消えるまでのフレーム数
 	static int kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)];
+
+	// 高さの基準
+	static float kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
+
+	//static std::vector<float> kHighCriteria_;
 
 private:
 

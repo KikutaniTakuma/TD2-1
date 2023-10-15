@@ -10,23 +10,54 @@ float Enemy::kFallingSpeed_ = -9.8f;
 
 const std::string Enemy::groupName_ = "StaticEnemy";
 
-Enemy::Enemy(const Vector3& pos, const float& layerY, float scale) {
+Enemy::Enemy(int type, const Vector3& pos, const float& layerY, float scale) {
 
 	tex_ = std::make_unique<Texture2D>();
 	tex_->LoadTexture("./Resources/Enemy/usabom.png");
-
-	firstPos_ = pos;
-	firstPos_.y += layerY;
-	velocity_ = {};
-
-	tex_->pos = pos;
-	tex_->scale *= scale;
+	
+	if (type == static_cast<int>(Type::kFly)) {
+		type_ = Type::kFly;
+	}
+	else if (type == static_cast<int>(Type::kWalk)) {
+		type_ = Type::kWalk;
+	}
+	else {
+		type_ = Type::kFly;
+	}
 
 	status_ = Status::kNormal;
 
 	statusRequest_ = std::nullopt;
 	
 	SetGlobalVariable();
+
+	switch (type_)
+	{
+	case Enemy::Type::kFly:
+
+		firstPos_ = pos;
+		
+		velocity_ = {};
+
+		tex_->pos = pos;
+		tex_->scale *= scale;
+		break;
+	case Enemy::Type::kWalk:
+
+		tex_->scale *= scale;
+		firstPos_ = pos;
+		firstPos_.y = layerY + tex_->scale.y / 2.0f;
+		velocity_ = {};
+
+		tex_->pos = pos;
+		tex_->rotate.z = 3.14f;
+
+		break;
+	case Enemy::Type::kEnd:
+		break;
+	default:
+		break;
+	}
 
 	tex_->Update();
 }
@@ -47,10 +78,23 @@ void Enemy::ApplyGlobalVariable() {
 
 }
 
-void Enemy::SetParametar(const Vector3& pos, const float& y) {
+void Enemy::SetParametar(int type, const Vector3& pos, const float& y) {
 
-	firstPos_ = pos;
-	firstPos_.y += y;
+	if (type == static_cast<int>(Type::kFly)) {
+		type_ = Type::kFly;
+		firstPos_ = pos;
+		
+	}
+	else if (type == static_cast<int>(Type::kWalk)) {
+		type_ = Type::kWalk;
+		firstPos_ = pos;
+		firstPos_.y = y + tex_->scale.y / 2.0f;
+	}
+	else {
+		type_ = Type::kFly;
+		firstPos_ = pos;
+		
+	}
 }
 
 
@@ -68,6 +112,9 @@ void Enemy::Update(Layer* layer, const float& y) {
 
 		switch (status_)
 		{
+		case Enemy::Status::kGeneration:
+			GenerationInitialize();
+			break;
 		case Enemy::Status::kNormal:
 			NormalInitialize();
 			break;
@@ -89,6 +136,9 @@ void Enemy::Update(Layer* layer, const float& y) {
 
 	switch (status_)
 	{
+	case Enemy::Status::kGeneration:
+		GenerationUpdate();
+		break;
 	case Enemy::Status::kNormal:
 		NormalUpdate();
 		break;
@@ -116,9 +166,19 @@ void Enemy::Collision(const float& y) {
 	}
 }
 
+void Enemy::GenerationInitialize() {
+	tex_->pos = firstPos_;
+}
+
+void Enemy::GenerationUpdate() {
+
+
+	statusRequest_ = Status::kNormal;
+}
+
 void Enemy::NormalInitialize() {
 
-	tex_->pos = firstPos_;
+	//tex_->pos = firstPos_;
 
 }
 
@@ -166,7 +226,7 @@ void Enemy::DeathInitialize(Layer* layer) {
 
 void Enemy::DeathUpdate() {
 
-	statusRequest_ = Status::kNormal;
+	statusRequest_ = Status::kGeneration;
 }
 
 //void Enemy::Draw(const Mat4x4& viewProjection) {

@@ -25,6 +25,10 @@ Play::Play() {
 
 	scaffoldingNums_.push_back(std::vector<int>());
 
+	ShockWave::SetGlobalVariable();
+
+	background_ = std::make_unique<Background>();
+
 	preMaxStageNum_ = kMaxStageNum_;
 	preEnemyNums_ = enemyNums_;
 	preScaffoldingNums_ = scaffoldingNums_;
@@ -36,7 +40,7 @@ Play::Play() {
 
 	SetGlobalVariable();
 
-	InitializeGlobalVariable();
+	//InitializeGlobalVariable();
 
 
 	layer_ = std::make_unique<Layer>(kLayerNums_[stage_], kLayerHitPoints_[stage_]);
@@ -130,6 +134,7 @@ void Play::InitializeGlobalVariable() {
 
 			if (enemyPoses_.size() <= stageNum) {
 				enemyPoses_.push_back(std::vector<Vector3>());
+				enemyType_.push_back(std::vector<int>());
 			}
 
 			if (scaffoldingPoses_.size() <= stageNum) {
@@ -142,6 +147,7 @@ void Play::InitializeGlobalVariable() {
 
 				if (enemyPoses_[stageNum].size() <= enemyNum) {
 					enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
+					enemyType_[stageNum].push_back(0);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -150,6 +156,10 @@ void Play::InitializeGlobalVariable() {
 
 				//globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 				enemyPoses_[stageNum][enemyNum] = globalVariables_->GetVector3Value(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kType)];
+
+				enemyType_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -226,10 +236,20 @@ void Play::SetGlobalVariable() {
 
 
 			if (enemyNums_[stageNum].size() <= layerNum) {
-				enemyNums_[stageNum].push_back(enemyNums_[stageNum][layerNum - 1]);
+				if (layerNum == 0) {
+					enemyNums_[stageNum].push_back(1);
+				}
+				else {
+					enemyNums_[stageNum].push_back(enemyNums_[stageNum][layerNum - 1]);
+				}
 			}
 			if (scaffoldingNums_[stageNum].size() <= layerNum) {
-				scaffoldingNums_[stageNum].push_back(scaffoldingNums_[stageNum][layerNum - 1]);
+				if (layerNum == 0) {
+					scaffoldingNums_[stageNum].push_back(0);
+				}
+				else {
+					scaffoldingNums_[stageNum].push_back(scaffoldingNums_[stageNum][layerNum - 1]);
+				}
 			}
 
 			i = layerGruoopName_ + layer + std::string("EnemyNum");
@@ -242,6 +262,7 @@ void Play::SetGlobalVariable() {
 
 			if (enemyPoses_.size() <= stageNum) {
 				enemyPoses_.push_back(std::vector<Vector3>());
+				enemyType_.push_back(std::vector<int>());
 			}
 
 			if (scaffoldingPoses_.size() <= stageNum) {
@@ -253,6 +274,7 @@ void Play::SetGlobalVariable() {
 
 				if (enemyPoses_[stageNum].size() <= enemyNum) {
 					enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
+					enemyType_[stageNum].push_back(0);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -260,6 +282,10 @@ void Play::SetGlobalVariable() {
 				std::string item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kPos)];
 
 				globalVariables_->AddItem(g, item, enemyPoses_[stageNum][enemyNum]);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kType)];
+
+				globalVariables_->AddItem(g, item, enemyType_[stageNum][enemyNum]);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -328,6 +354,7 @@ void Play::ApplyGlobalVariable() {
 
 		if (enemyPoses_.size() <= stageNum) {
 			enemyPoses_.push_back(std::vector<Vector3>());
+			enemyType_.push_back(std::vector<int>());
 		}
 
 		if (scaffoldingNums_.size() <= stageNum) {
@@ -403,6 +430,7 @@ void Play::ApplyGlobalVariable() {
 
 				if (enemyPoses_[stageNum].size() <= enemyNum) {
 					enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
+					enemyType_[stageNum].push_back(0);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -420,6 +448,20 @@ void Play::ApplyGlobalVariable() {
 				}
 				//globalVariables_->AddItem(g, i, enemyPoses_[stageNum][enemyNum]);
 				enemyPoses_[stageNum][enemyNum] = globalVariables_->GetVector3Value(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kType)];
+
+				if (preMaxStageNum_ < kMaxStageNum_) {
+					globalVariables_->AddItem(g, item, enemyType_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_.size() > preEnemyNums_.size()) {
+					globalVariables_->AddItem(g, item, enemyType_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+					globalVariables_->AddItem(g, item, enemyType_[stageNum][enemyNum]);
+				}
+
+				enemyType_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -479,7 +521,7 @@ void Play::EnemyGeneration() {
 		for (int num = 0; num < enemyNums_[stage_][layer_->GetNowLayer()]; num++) {
 			if (num >= size) {
 
-				enemies_.push_back(std::make_unique<Enemy>(enemyPoses_[stage_][num], layer_->GetHighestPosY()));
+				enemies_.push_back(std::make_unique<Enemy>(enemyType_[stage_][num], enemyPoses_[stage_][num], layer_->GetHighestPosY()));
 
 			}
 		}
@@ -499,7 +541,7 @@ void Play::SetEnemyParametar() {
 		if (enemyNums_[stage_][layer_->GetNowLayer()] == i) {
 			break;
 		}
-		enemy->SetParametar(enemyPoses_[stage_][i], layer_->GetHighestPosY());
+		enemy->SetParametar(enemyType_[stage_][i], enemyPoses_[stage_][i], layer_->GetHighestPosY());
 		i++;
 	}
 }
@@ -597,6 +639,17 @@ void Play::Collision() {
 			}
 		}
 	}
+
+	i = 0;
+
+	for (const std::unique_ptr<Scaffolding>& scaff : scaffoldings_) {
+		if (scaffoldingNums_[stage_][layer_->GetNowLayer()] == i) {
+			break;
+		}
+		i++;
+
+		player_->CollisionScaffolding(scaff->GetTex());
+	}
 }
 
 
@@ -619,6 +672,7 @@ void Play::Update() {
 	//SetGlobalVariable();
 	Enemy::GlobalVariablesUpdate();
 	ShockWave::GlobalVariablesUpdate();
+	ShockWave::ApplyGlobalVariable();
 	Layer::GlobalVariablesUpdate();
 
 #endif // _DEBUG
@@ -640,6 +694,9 @@ void Play::Update() {
 	SetLayerParametar();
 
 #endif // _DEBUG
+
+	background_->Update();
+
 	player_->Update(layer_->GetHighestPosY());
 
 	int i = 0;
@@ -666,6 +723,8 @@ void Play::Update() {
 }
 
 void Play::Draw() {
+
+	background_->Draw2D(camera2D_->GetViewOthographics());
 
 	layer_->Draw2D(camera2D_->GetViewOthographics());
 

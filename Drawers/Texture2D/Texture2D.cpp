@@ -350,8 +350,8 @@ bool Texture2D::Collision(const Texture2D& tex2D) const {
 
 
 	for (auto& i : tex2D.worldPos) {
-		if (min.x < i.x && i.x < max.x) {
-			if (min.y < i.y && i.y < max.y) {
+		if (min.x <= i.x && i.x <= max.x) {
+			if (min.y <= i.y && i.y <= max.y) {
 				return true;
 			}
 		}

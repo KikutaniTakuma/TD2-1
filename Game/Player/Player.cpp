@@ -13,6 +13,8 @@ Player::Player() {
 
 	globalVariables_ = std::make_unique<GlobalVariables>();
 
+	tex_->pos = {};
+
 	tex_->scale *= 50.0f;
 
 	// ジャンプ時の初速
@@ -95,6 +97,9 @@ void Player::Update(const float& y) {
 		case Player::Status::kHipDrop:
 			HipDropInitialize();
 			break;
+		case Player::Status::kOnScaffolding:
+			OnScaffoldingInitialize();
+			break;
 		case Player::Status::kLanding:
 			LandingInitialize(y);
 			break;
@@ -116,6 +121,9 @@ void Player::Update(const float& y) {
 	case Player::Status::kHipDrop:
 		HipDropUpdate(y);
 		break;
+	case Player::Status::kOnScaffolding:
+		OnScaffoldingUpdate();
+		break;
 	case Player::Status::kLanding:
 		LandingUpdate(y);
 		break;
@@ -131,7 +139,7 @@ void Player::Update(const float& y) {
 
 void Player::NormalInitialize(const float& y) {
 
-	velocity_ = {};
+	//velocity_ = {};
 	highest_ = 0.0f;
 	Collision(y);
 	
@@ -215,15 +223,60 @@ void Player::HipDropUpdate(const float& y) {
 
 }
 
+void Player::OnScaffoldingInitialize()
+{
+	velocity_ = {};
+	isFly_ = false;
+	isSteped_ = false;
+	isStep_ = false;
+}
+
+void Player::OnScaffoldingUpdate()
+{
+	float deletaTime = FrameInfo::GetInstance()->GetDelta();
+
+	// 移動の単位ベクトル
+	Vector3 move = {};
+
+	// 左右移動
+	if (input_->GetKey()->LongPush(DIK_A) || input_->GetKey()->LongPush(DIK_LEFT)) {
+		move.x--;
+	}
+	if (input_->GetKey()->LongPush(DIK_D) || input_->GetKey()->LongPush(DIK_RIGHT)) {
+		move.x++;
+	}
+
+	if ((!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) || input_->GetKey()->Pushed(DIK_UP)))) {
+		isFly_ = true;
+		isStep_ = false;
+		// 初速を与える
+		velocity_.y = kJampInitialVelocity_;
+
+		statusRequest_ = Status::kNormal;
+	}
+
+	velocity_.y += kGravity_ * deletaTime;
+
+	// 横の移動距離
+	velocity_.x = move.x * kMoveSpeed_ * deletaTime;
+
+	tex_->pos += velocity_;
+
+	MemoHighest();
+
+}
+
 void Player::LandingInitialize(const float& y) {
 
 	velocity_ = {};
 
 	Collision(y);
 
-	if (highest_ > ShockWave::kHighCriteria_[static_cast<uint16_t>(ShockWave::Size::kSmall)] - y) {
+	play_->CreatShockWave(tex_->pos, highest_, y);
+
+	/*if (highest_ > ShockWave::kHighCriteria_[static_cast<uint16_t>(ShockWave::Size::kSmall)] - y) {
 		play_->CreatShockWave(tex_->pos, highest_, y);
-	}
+	}*/
 }
 
 void Player::LandingUpdate(const float& y) {
@@ -255,12 +308,39 @@ void Player::FallingUpdate(const float& y) {
 	}
 }
 
+void Player::CollisionScaffolding(const Texture2D* tex)
+{
+
+	if (velocity_.y < 0 &&
+		tex_->pos.y - velocity_.y - tex_->scale.y/2.0f >= tex->pos.y + tex->scale.y / 2.0f &&
+		tex->pos.x - tex->scale.x / 2.0f <= tex_->pos.x + tex_->scale.x / 2.0f &&
+		tex->pos.x + tex->scale.x / 2.0f >= tex_->pos.x - tex_->scale.x / 2.0f &&
+		tex->pos.y + tex->scale.y / 2.0f >= tex_->pos.y - tex_->scale.y / 2.0f) {
+
+		tex_->pos.y = tex->pos.y + tex->scale.y / 2.0f + tex_->scale.y / 2.0f + 0.1f;
+		velocity_.y = 0.0f;
+
+		tex_->Update();
+		
+		highest_ = tex_->pos.y;
+
+		statusRequest_ = Status::kOnScaffolding;
+	}
+	else {
+		if (status_ == Status::kOnScaffolding) {
+			statusRequest_ = Status::kNormal;
+			isFly_ = true;
+		}
+	}
+}
+
 void Player::Collision(const float& y) {
 
 	float posY = tex_->pos.y - tex_->scale.y / 2.0f;
 
 	if (y > posY) {
 		tex_->pos.y += y - posY;
+		velocity_.y = 0;
 	}
 
 }

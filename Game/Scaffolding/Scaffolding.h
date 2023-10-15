@@ -33,7 +33,11 @@ public:
 
 public:
 
+	const Texture2D* GetTex() { return tex_.get(); }
+
 	const float GetHighestPosY() { return (tex_->pos.y + tex_->scale.y / 2.0f); }
+
+	const Vector3 GetVelocity() { return velocity; }
 
 	/// <summary>
 	/// 初期座標などのパラメーターをいれる
@@ -45,5 +49,6 @@ private:
 	// テクスチャ
 	std::unique_ptr<Texture2D> tex_;
 
+	Vector3 velocity;
 	
 };

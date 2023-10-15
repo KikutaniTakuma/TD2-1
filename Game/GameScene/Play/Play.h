@@ -11,6 +11,7 @@
 #include "Game/ShockWave/ShockWave.h"
 #include "Game/Layer/Layer.h"
 #include "Game/Scaffolding/Scaffolding.h"
+#include "Game/Background/Background.h"
 
 #include "GlobalVariables/GlobalVariables.h"
 
@@ -20,6 +21,7 @@ public:
 
 	// ImGuiで設定するエネミーのパラメータ
 	enum class EnemyParameter {
+		kType, // タイプ
 		kPos, // ポジション
 		kEnd, // 末尾。要素数を取り出すよう。
 	};
@@ -135,6 +137,7 @@ private:
 	const std::string enemyGruoopName_ = "Enemy";
 
 	const std::string enemyParameter[static_cast<uint16_t>(EnemyParameter::kEnd)] = {
+		"Type", // タイプ
 		"Pos", // 座標
 	};
 
@@ -156,6 +159,8 @@ private:
 	std::unique_ptr<Camera> camera3D_;
 
 	std::unique_ptr<Player> player_;
+
+	std::unique_ptr<Background> background_;
 
 	std::list<std::unique_ptr<Enemy>> enemies_;
 
@@ -197,6 +202,9 @@ private:
 
 	// ステージ毎の、それぞれのエネミーのポジション
 	std::vector<std::vector<Vector3>> enemyPoses_;
+
+	// ステージ毎の、それぞれのエネミーのタイプ
+	std::vector<std::vector<int>> enemyType_;
 
 	// ステージ毎の、それぞれの足場のポジション
 	std::vector<std::vector<Vector3>> scaffoldingPoses_;

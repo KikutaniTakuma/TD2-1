@@ -5,6 +5,7 @@
             300.0,
             0.0
         ],
+        "Enemy0Type": 0,
         "Layer0EnemyNum": 1,
         "Layer0HP": 1,
         "Layer0ScaffoldingNum": 1,

@@ -16,6 +16,7 @@ public:
 	enum class Status {
 		kNormal, // 通常時
 		kHipDrop, // ヒップドロップ
+		kOnScaffolding, // 足場の上に乗っている時
 		kLanding, // 着地
 		kFalling, // 落ちている
 	};
@@ -83,6 +84,8 @@ public:
 	/// <param name="play">プレイシーンのポインタ</param>
 	void SetPlayScene(Play* play) { play_ = play; }
 
+	void CollisionScaffolding(const Texture2D* tex);
+
 private:
 
 	/// <summary>
@@ -112,6 +115,15 @@ private:
 	/// ヒップドロップ時のアップデート
 	/// </summary>
 	void HipDropUpdate(const float& y);
+
+	/// <summary>
+	/// 足場の上に乗っている時
+	/// </summary>
+	void OnScaffoldingInitialize();
+	/// <summary>
+	/// 足場の上に乗っている時
+	/// </summary>
+	void OnScaffoldingUpdate();
 
 	/// <summary>
 	/// 着地時の初期化
@@ -174,6 +186,10 @@ private:
 
 	// 重力加速度
 	float kGravity_ ;
+
+	bool isFallingGravity_;
+	// 降下中の重力加速度。切り替えのお試し。
+	float kFallingGravity_;
 
 	// ヒップドロップ中の加速度
 	float kHipDropSpeed_;

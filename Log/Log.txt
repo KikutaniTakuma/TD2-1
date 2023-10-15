@@ -9,6 +9,6 @@ Begin CompilerShader, path:./Resources/Shaders/ParticleShader/Particle.VS.hlsl, 
 Compile Succeeded, path:./Resources/Shaders/ParticleShader/Particle.VS.hlsl, profile:vs_6_0
 Begin CompilerShader, path:./Resources/Shaders/ParticleShader/Particle.PS.hlsl, profile:ps_6_0
 Compile Succeeded, path:./Resources/Shaders/ParticleShader/Particle.PS.hlsl, profile:ps_6_0
-Average Fps : 53.69
+Average Fps : 55.34
 Max Fps : 60.00
-Min Fps : 0.95
+Min Fps : 30.99
