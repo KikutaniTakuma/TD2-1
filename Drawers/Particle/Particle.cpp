@@ -311,7 +311,7 @@ Particle::~Particle() {
 
 	if (vertexResource) {
 		vertexResource->Release();
-		indexResource.Reset();
+		vertexResource.Reset();
 	}
 }
 
