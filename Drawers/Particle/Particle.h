@@ -9,6 +9,7 @@
 #include "Utils/Math/Vector4.h"
 
 #include "Utils/UtilsLib/UtilsLib.h"
+#include "Utils/Easeing/Easeing.h"
 
 #include <array>
 #include <variant>
@@ -85,6 +86,11 @@ private:
 
 		// 移動(速度)
 		std::pair<Vector3, Vector3> velocity;
+		std::pair<Vector3, Vector3> velocitySecond;
+
+		// 移動ラープのタイプ
+		int32_t easeType;
+		std::function<float(float)> ease;
 
 		// 移動方向
 		std::pair<Vector3, Vector3> rotate;
@@ -101,6 +107,8 @@ private:
 
 		// 色
 		std::pair<uint32_t, uint32_t> color;
+		int32_t colorEaseType;
+		std::function<float(float)> colorEase;
 
 		///
 		/// 
@@ -184,6 +192,8 @@ public:
 	void ThreadLoadTexture(const std::string& fileName);
 
 public:
+	void ParticleStart();
+
 	void Update();
 
 	void Draw(

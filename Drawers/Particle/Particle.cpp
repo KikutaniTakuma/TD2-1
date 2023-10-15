@@ -82,6 +82,13 @@ void Particle::CreateGraphicsPipeline() {
 	}
 
 	PipelineManager::StateReset();
+
+	for (auto& i : graphicsPipelineState) {
+		if (!i) {
+			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Particle");
+			return;
+		}
+	}
 }
 
 Particle::Particle() :
@@ -287,8 +294,11 @@ Particle::~Particle() {
 		datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
 		datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
 		datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
-		datas[groupName]["Particle_velocityFirst"] = settings[i].velocity.first;
-		datas[groupName]["Particle_velocitySecond"] = settings[i].velocity.second;
+		datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
+		datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
+		datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
+		datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
+		datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].easeType);
 		datas[groupName]["Particle_rotateFirst"] = settings[i].rotate.first;
 		datas[groupName]["Particle_rotateSecond"] = settings[i].rotate.second;
 		datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
@@ -299,6 +309,7 @@ Particle::~Particle() {
 		datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
 		datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
 		datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
+		datas[groupName]["Particle_colorEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
 		BackUpSettingFile("setting" + std::to_string(i));
 	}
 
@@ -360,7 +371,7 @@ void Particle::LopadSettingDirectory(const std::string& directoryName) {
 		LopadSettingFile(filePath.string());
 	}
 
-	std::ifstream file{ dataDirectoryName + "loop.txt" };
+	std::ifstream file{ dataDirectoryName + "otherSetting.txt" };
 
 	if (!file.fail()) {
 		std::string lineBuf;
@@ -380,9 +391,15 @@ void Particle::LopadSettingDirectory(const std::string& directoryName) {
 		file.close();
 	}
 
-	tex = TextureManager::GetInstance()->GetWhiteTex();
+	if (!tex) {
+		tex = TextureManager::GetInstance()->GetWhiteTex();
+	}
 	if (tex) {
 		isLoad = true;
+		srvHeap.InitializeReset(3);
+		srvHeap.CreateTxtureView(tex);
+		srvHeap.CreateStructuredBufferView(wvpMat);
+		srvHeap.CreateStructuredBufferView(colorBuf);
 	}
 }
 
@@ -456,8 +473,10 @@ void Particle::LopadSettingFile(const std::string& jsonName) {
 	setting.isSameHW = static_cast<bool>(std::get<uint32_t>(datas[groupName.string()]["Particle_isSameHW"]));
 	setting.size.first = std::get<Vector2>(datas[groupName.string()]["Particle_sizeFirst"]);
 	setting.size.second = std::get<Vector2>(datas[groupName.string()]["Particle_sizeSecond"]);
-	setting.velocity.first = std::get<Vector3>(datas[groupName.string()]["Particle_velocityFirst"]);
-	setting.velocity.second = std::get<Vector3>(datas[groupName.string()]["Particle_velocitySecond"]);
+	setting.velocity.first = std::get<Vector3>(datas[groupName.string()]["Particle_velocity1"]);
+	setting.velocity.second = std::get<Vector3>(datas[groupName.string()]["Particle_velocity2"]);
+	setting.velocitySecond.first =std::get<Vector3>(datas[groupName.string()]["Particle_velocitySecond1"]);
+	setting.velocitySecond.second  =std::get<Vector3>(datas[groupName.string()]["Particle_velocitySecond2"]);
 	setting.rotate.first = std::get<Vector3>(datas[groupName.string()]["Particle_rotateFirst"]);
 	setting.rotate.second = std::get<Vector3>(datas[groupName.string()]["Particle_rotateSecond"]);
 	setting.particleNum.first = std::get<uint32_t>(datas[groupName.string()]["Particle_particleNumFirst"]);
@@ -468,6 +487,247 @@ void Particle::LopadSettingFile(const std::string& jsonName) {
 	setting.death.second = std::get<uint32_t>(datas[groupName.string()]["Particle_deathSecond"]);
 	setting.color.first = std::get<uint32_t>(datas[groupName.string()]["Particle_colorFirst"]);
 	setting.color.second = std::get<uint32_t>(datas[groupName.string()]["Particle_colorSecond"]);
+	setting.colorEaseType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_colorEase"]));
+	switch (setting.colorEaseType)
+	{
+	default:
+	case 0:
+		setting.colorEase = [](float t) {
+			return t;
+			};
+		break;
+
+
+	case 1:
+		setting.colorEase = Easeing::InSine;
+		break;
+	case 2:
+		setting.colorEase = Easeing::OutSine;
+		break;
+	case 3:
+		setting.colorEase = Easeing::InOutSine;
+		break;
+
+
+	case 4:
+		setting.colorEase = Easeing::InQuad;
+		break;
+	case 5:
+		setting.colorEase = Easeing::OutQuad;
+		break;
+	case 6:
+		setting.colorEase = Easeing::InOutQuad;
+		break;
+
+
+	case 7:
+		setting.colorEase = Easeing::InCubic;
+		break;
+	case 8:
+		setting.colorEase = Easeing::OutCubic;
+		break;
+	case 9:
+		setting.colorEase = Easeing::InOutCubic;
+		break;
+
+
+	case 10:
+		setting.colorEase = Easeing::InQuart;
+		break;
+	case 11:
+		setting.colorEase = Easeing::OutQuart;
+		break;
+	case 12:
+		setting.colorEase = Easeing::InOutQuart;
+		break;
+
+
+	case 13:
+		setting.colorEase = Easeing::InQuint;
+		break;
+	case 14:
+		setting.colorEase = Easeing::OutQuint;
+		break;
+	case 15:
+		setting.colorEase = Easeing::InOutQuint;
+		break;
+
+
+	case 16:
+		setting.colorEase = Easeing::InExpo;
+		break;
+	case 17:
+		setting.colorEase = Easeing::OutExpo;
+		break;
+	case 18:
+		setting.colorEase = Easeing::InOutExpo;
+		break;
+
+
+	case 19:
+		setting.colorEase = Easeing::InCirc;
+		break;
+	case 20:
+		setting.colorEase = Easeing::OutCirc;
+		break;
+	case 21:
+		setting.colorEase = Easeing::InOutCirc;
+		break;
+
+
+	case 22:
+		setting.colorEase = Easeing::InBack;
+		break;
+	case 23:
+		setting.colorEase = Easeing::OutBack;
+		break;
+	case 24:
+		setting.colorEase = Easeing::InOutBack;
+		break;
+
+
+	case 25:
+		setting.colorEase = Easeing::InElastic;
+		break;
+	case 26:
+		setting.colorEase = Easeing::OutElastic;
+		break;
+	case 27:
+		setting.colorEase = Easeing::InOutElastic;
+		break;
+
+
+	case 28:
+		setting.colorEase = Easeing::InBounce;
+		break;
+	case 29:
+		setting.colorEase = Easeing::OutBounce;
+		break;
+	case 30:
+		setting.colorEase = Easeing::InOutBounce;
+		break;
+	}
+
+	setting.easeType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_ease"]));
+	switch (setting.easeType)
+	{
+	default:
+	case 0:
+		setting.ease = [](float t) {
+			return t;
+			};
+		break;
+
+
+	case 1:
+		setting.ease = Easeing::InSine;
+		break;
+	case 2:
+		setting.ease = Easeing::OutSine;
+		break;
+	case 3:
+		setting.ease = Easeing::InOutSine;
+		break;
+
+
+	case 4:
+		setting.ease = Easeing::InQuad;
+		break;
+	case 5:
+		setting.ease = Easeing::OutQuad;
+		break;
+	case 6:
+		setting.ease = Easeing::InOutQuad;
+		break;
+
+
+	case 7:
+		setting.ease = Easeing::InCubic;
+		break;
+	case 8:
+		setting.ease = Easeing::OutCubic;
+		break;
+	case 9:
+		setting.ease = Easeing::InOutCubic;
+		break;
+
+
+	case 10:
+		setting.ease = Easeing::InQuart;
+		break;
+	case 11:
+		setting.ease = Easeing::OutQuart;
+		break;
+	case 12:
+		setting.ease = Easeing::InOutQuart;
+		break;
+
+
+	case 13:
+		setting.ease = Easeing::InQuint;
+		break;
+	case 14:
+		setting.ease = Easeing::OutQuint;
+		break;
+	case 15:
+		setting.ease = Easeing::InOutQuint;
+		break;
+
+
+	case 16:
+		setting.ease = Easeing::InExpo;
+		break;
+	case 17:
+		setting.ease = Easeing::OutExpo;
+		break;
+	case 18:
+		setting.ease = Easeing::InOutExpo;
+		break;
+
+
+	case 19:
+		setting.ease = Easeing::InCirc;
+		break;
+	case 20:
+		setting.ease = Easeing::OutCirc;
+		break;
+	case 21:
+		setting.ease = Easeing::InOutCirc;
+		break;
+
+
+	case 22:
+		setting.ease = Easeing::InBack;
+		break;
+	case 23:
+		setting.ease = Easeing::OutBack;
+		break;
+	case 24:
+		setting.ease = Easeing::InOutBack;
+		break;
+
+
+	case 25:
+		setting.ease = Easeing::InElastic;
+		break;
+	case 26:
+		setting.ease = Easeing::OutElastic;
+		break;
+	case 27:
+		setting.ease = Easeing::InOutElastic;
+		break;
+
+
+	case 28:
+		setting.ease = Easeing::InBounce;
+		break;
+	case 29:
+		setting.ease = Easeing::OutBounce;
+		break;
+	case 30:
+		setting.ease = Easeing::InOutBounce;
+		break;
+	}
 }
 
 void Particle::SaveSettingFile(const std::string& groupName) {
@@ -592,6 +852,10 @@ void Particle::BackUpSettingFile(const std::string& groupName) {
 	file.close();
 }
 
+void Particle::ParticleStart() {
+	currentParticleIndex = 0;
+	settings[currentParticleIndex].isValid = true;
+}
 
 void Particle::Update() {
 	assert(wtfs.size() == wvpMat.Size());
@@ -615,7 +879,7 @@ void Particle::Update() {
 	if (settings[currentSettingIndex].isValid.OnEnter()) {
 		settings[currentSettingIndex].startTime = nowTime;
 		settings[currentSettingIndex].durationTime = nowTime;
-		// パーティクルの最大数を保存
+		// パーティクルの最大数にリサイズ
 		this->Resize(settings[currentSettingIndex].emitter.particleMaxNum);
 	}
 	// 有効中
@@ -670,6 +934,7 @@ void Particle::Update() {
 
 				// 速度ランダム
 				Vector3 velocity = UtilsLib::Random(settings[currentSettingIndex].velocity.first, settings[currentSettingIndex].velocity.second);
+				Vector3 velocitySecond = UtilsLib::Random(settings[currentSettingIndex].velocitySecond.first, settings[currentSettingIndex].velocitySecond.second);
 
 				// 移動方向ランダム
 				Vector3 rotate = UtilsLib::Random(settings[currentSettingIndex].rotate.first, settings[currentSettingIndex].rotate.second);
@@ -680,13 +945,14 @@ void Particle::Update() {
 				// 死ぬ時間ランダム
 				uint32_t deathTime = UtilsLib::Random(settings[currentSettingIndex].death.first, settings[currentSettingIndex].death.second);
 
-				// カラー(今後ラープさせる予定)
+				// カラー
 				uint32_t color = settings[currentSettingIndex].color.first;
 
 				// ステータスセット
 				wtfs[i].pos = pos;
 				wtfs[i].scale = size;
 				wtfs[i].movePos = velocity;
+				wtfs[i].movePosSecond = velocitySecond;
 				wtfs[i].deathTime = std::chrono::milliseconds(deathTime);
 				wtfs[i].startTime = nowTime;
 				wtfs[i].isActive = true;
@@ -710,8 +976,9 @@ void Particle::Update() {
 			}
 			else {
 				float colorT =static_cast<float>(duration.count()) / static_cast<float>(wtf.deathTime.count());
-				wtf.pos += wtf.movePos * FrameInfo::GetInstance()->GetDelta();
-				wtf.color = ColorLerp(settings[currentSettingIndex].color.first, settings[currentSettingIndex].color.second, colorT);
+				Vector3 moveVec = Vector3::Lerp(wtf.movePos, wtf.movePosSecond, settings[currentSettingIndex].ease(colorT));
+				wtf.pos += moveVec * FrameInfo::GetInstance()->GetDelta();
+				wtf.color = ColorLerp(settings[currentSettingIndex].color.first, settings[currentSettingIndex].color.second, settings[currentSettingIndex].colorEase(colorT));
 			}
 		}
 
@@ -742,7 +1009,7 @@ void Particle::Draw(
 	const Mat4x4& viewProjection,
 	Pipeline::Blend blend
 ) {
-	if (tex && isLoad && !settings.empty() && settings[currentSettingIndex].isValid) {
+	if (tex && isLoad && !settings.empty()) {
 		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
 		const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
 
@@ -758,10 +1025,12 @@ void Particle::Draw(
 		std::copy(pv.begin(), pv.end(), mappedData);
 		vertexResource->Unmap(0, nullptr);
 
+		bool isDraw = false;
 		for (uint32_t i = 0; i < wvpMat.Size();i++) {
 			if (wtfs[i].isActive) {
 				wvpMat[i] = viewProjection * VertMakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos);
 				colorBuf[i] = UintToVector4(wtfs[i].color);
+				isDraw = true;
 			}
 			else {
 				wvpMat[i] = Mat4x4();
@@ -769,21 +1038,16 @@ void Particle::Draw(
 			}
 		}
 
-		auto commandlist = Engine::GetCommandList();
 
-		for (auto& i : graphicsPipelineState) {
-			if (!i) {
-				ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Particle");
-				return;
-			}
+		if (isDraw) {
+			auto commandlist = Engine::GetCommandList();
+			// 各種描画コマンドを積む
+			graphicsPipelineState[blend]->Use();
+			srvHeap.Use();
+			commandlist->IASetVertexBuffers(0, 1, &vertexView);
+			commandlist->IASetIndexBuffer(&indexView);
+			commandlist->DrawIndexedInstanced(6, wvpMat.Size(), 0, 0, 0);
 		}
-
-		// 各種描画コマンドを積む
-		graphicsPipelineState[blend]->Use();
-		srvHeap.Use();
-		commandlist->IASetVertexBuffers(0, 1, &vertexView);
-		commandlist->IASetIndexBuffer(&indexView);
-		commandlist->DrawIndexedInstanced(6, wvpMat.Size(), 0, 0, 0);
 	}
 }
 
@@ -856,38 +1120,290 @@ void Particle::Debug(const std::string& guiName) {
 				ImGui::DragFloat2("size first", &settings[i].size.first.x, 0.01f);
 				ImGui::DragFloat2("size second", &settings[i].size.second.x, 0.01f);
 			}
-			ImGui::DragFloat3("velocity first", &settings[i].velocity.first.x, 0.01f);
-			ImGui::DragFloat3("velocity second", &settings[i].velocity.second.x, 0.01f);
+			if (ImGui::TreeNode("spd")) {
+				ImGui::DragFloat3("velocity first", &settings[i].velocity.first.x, 0.01f);
+				ImGui::DragFloat3("velocity second", &settings[i].velocity.second.x, 0.01f);
+				ImGui::DragFloat3("velocitySecond first", &settings[i].velocitySecond.first.x, 0.01f);
+				ImGui::DragFloat3("velocitySecond second", &settings[i].velocitySecond.second.x, 0.01f);
+
+				ImGui::SliderInt("easeType", &settings[i].easeType, 0, 30);
+				switch (settings[i].easeType)
+				{
+				default:
+				case 0:
+					settings[i].ease = [](float t) {
+						return t;
+						};
+					break;
+
+
+				case 1:
+					settings[i].ease = Easeing::InSine;
+					break;
+				case 2:
+					settings[i].ease = Easeing::OutSine;
+					break;
+				case 3:
+					settings[i].ease = Easeing::InOutSine;
+					break;
+
+
+				case 4:
+					settings[i].ease = Easeing::InQuad;
+					break;
+				case 5:
+					settings[i].ease = Easeing::OutQuad;
+					break;
+				case 6:
+					settings[i].ease = Easeing::InOutQuad;
+					break;
+
+
+				case 7:
+					settings[i].ease = Easeing::InCubic;
+					break;
+				case 8:
+					settings[i].ease = Easeing::OutCubic;
+					break;
+				case 9:
+					settings[i].ease = Easeing::InOutCubic;
+					break;
+
+
+				case 10:
+					settings[i].ease = Easeing::InQuart;
+					break;
+				case 11:
+					settings[i].ease = Easeing::OutQuart;
+					break;
+				case 12:
+					settings[i].ease = Easeing::InOutQuart;
+					break;
+
+
+				case 13:
+					settings[i].ease = Easeing::InQuint;
+					break;
+				case 14:
+					settings[i].ease = Easeing::OutQuint;
+					break;
+				case 15:
+					settings[i].ease = Easeing::InOutQuint;
+					break;
+
+
+				case 16:
+					settings[i].ease = Easeing::InExpo;
+					break;
+				case 17:
+					settings[i].ease = Easeing::OutExpo;
+					break;
+				case 18:
+					settings[i].ease = Easeing::InOutExpo;
+					break;
+
+
+				case 19:
+					settings[i].ease = Easeing::InCirc;
+					break;
+				case 20:
+					settings[i].ease = Easeing::OutCirc;
+					break;
+				case 21:
+					settings[i].ease = Easeing::InOutCirc;
+					break;
+
+
+				case 22:
+					settings[i].ease = Easeing::InBack;
+					break;
+				case 23:
+					settings[i].ease = Easeing::OutBack;
+					break;
+				case 24:
+					settings[i].ease = Easeing::InOutBack;
+					break;
+
+
+				case 25:
+					settings[i].ease = Easeing::InElastic;
+					break;
+				case 26:
+					settings[i].ease = Easeing::OutElastic;
+					break;
+				case 27:
+					settings[i].ease = Easeing::InOutElastic;
+					break;
+
+
+				case 28:
+					settings[i].ease = Easeing::InBounce;
+					break;
+				case 29:
+					settings[i].ease = Easeing::OutBounce;
+					break;
+				case 30:
+					settings[i].ease = Easeing::InOutBounce;
+					break;
+				}
+
+				ImGui::TreePop();
+			}
+
 			ImGui::DragFloat3("rotate first", &settings[i].rotate.first.x, 0.01f);
 			ImGui::DragFloat3("rotate second", &settings[i].rotate.second.x, 0.01f);
 
 			auto particleNumFirst = int32_t(settings[i].particleNum.first);
 			auto particleNumSecond = int32_t(settings[i].particleNum.second);
-			ImGui::DragInt("particleNum first", &particleNumFirst, 1.0f);
-			ImGui::DragInt("particleNum second", &particleNumSecond, 1.0f);
+			ImGui::DragInt("particleNum first", &particleNumFirst, 1.0f, 0);
+			ImGui::DragInt("particleNum second", &particleNumSecond, 1.0f, 0);
 			settings[i].particleNum.first = uint32_t(particleNumFirst);
 			settings[i].particleNum.second = uint32_t(particleNumSecond);
 
 			auto freqFirst = int32_t(settings[i].freq.first);
 			auto freqSecond = int32_t(settings[i].freq.second);
-			ImGui::DragInt("freq first", &freqFirst, 1.0f);
-			ImGui::DragInt("freq second", &freqSecond, 1.0f);
+			ImGui::DragInt("freq first(milliseconds)", &freqFirst, 1.0f, 0);
+			ImGui::DragInt("freq second(milliseconds)", &freqSecond, 1.0f,0);
 			settings[i].freq.first = uint32_t(freqFirst);
 			settings[i].freq.second = uint32_t(freqSecond);
 
 			auto deathFirst = int32_t(settings[i].death.first);
 			auto deathSecond = int32_t(settings[i].death.second);
-			ImGui::DragInt("death first(milliseconds)", &deathFirst, 10.0f);
-			ImGui::DragInt("death second(milliseconds)", &deathSecond, 10.0f);
+			ImGui::DragInt("death first(milliseconds)", &deathFirst, 10.0f,0);
+			ImGui::DragInt("death second(milliseconds)", &deathSecond, 10.0f,0);
 			settings[i].death.first = uint32_t(deathFirst);
 			settings[i].death.second = uint32_t(deathSecond);
 
-			Vector4 colorFirst = UintToVector4(settings[i].color.first);
-			Vector4 colorSecond = UintToVector4(settings[i].color.second);
-			ImGui::ColorEdit4("color first", colorFirst.m.data());
-			ImGui::ColorEdit4("color second", colorSecond.m.data());
-			settings[i].color.first = Vector4ToUint(colorFirst);
-			settings[i].color.second = Vector4ToUint(colorSecond);
+			if (ImGui::TreeNode("Color")) {
+				ImGui::SliderInt("easeType", &settings[i].colorEaseType, 0, 30);
+				switch (settings[i].colorEaseType)
+				{
+				default:
+				case 0:
+					settings[i].colorEase = [](float t) {
+						return t;
+						};
+					break;
+
+
+				case 1:
+					settings[i].colorEase = Easeing::InSine;
+					break;
+				case 2:
+					settings[i].colorEase = Easeing::OutSine;
+					break;
+				case 3:
+					settings[i].colorEase = Easeing::InOutSine;
+					break;
+
+
+				case 4:
+					settings[i].colorEase = Easeing::InQuad;
+					break;
+				case 5:
+					settings[i].colorEase = Easeing::OutQuad;
+					break;
+				case 6:
+					settings[i].colorEase = Easeing::InOutQuad;
+					break;
+
+
+				case 7:
+					settings[i].colorEase = Easeing::InCubic;
+					break;
+				case 8:
+					settings[i].colorEase = Easeing::OutCubic;
+					break;
+				case 9:
+					settings[i].colorEase = Easeing::InOutCubic;
+					break;
+
+
+				case 10:
+					settings[i].colorEase = Easeing::InQuart;
+					break;
+				case 11:
+					settings[i].colorEase = Easeing::OutQuart;
+					break;
+				case 12:
+					settings[i].colorEase = Easeing::InOutQuart;
+					break;
+
+
+				case 13:
+					settings[i].colorEase = Easeing::InQuint;
+					break;
+				case 14:
+					settings[i].colorEase = Easeing::OutQuint;
+					break;
+				case 15:
+					settings[i].colorEase = Easeing::InOutQuint;
+					break;
+
+
+				case 16:
+					settings[i].colorEase = Easeing::InExpo;
+					break;
+				case 17:
+					settings[i].colorEase = Easeing::OutExpo;
+					break;
+				case 18:
+					settings[i].colorEase = Easeing::InOutExpo;
+					break;
+
+
+				case 19:
+					settings[i].colorEase = Easeing::InCirc;
+					break;
+				case 20:
+					settings[i].colorEase = Easeing::OutCirc;
+					break;
+				case 21:
+					settings[i].colorEase = Easeing::InOutCirc;
+					break;
+
+
+				case 22:
+					settings[i].colorEase = Easeing::InBack;
+					break;
+				case 23:
+					settings[i].colorEase = Easeing::OutBack;
+					break;
+				case 24:
+					settings[i].colorEase = Easeing::InOutBack;
+					break;
+
+
+				case 25:
+					settings[i].colorEase = Easeing::InElastic;
+					break;
+				case 26:
+					settings[i].colorEase = Easeing::OutElastic;
+					break;
+				case 27:
+					settings[i].colorEase = Easeing::InOutElastic;
+					break;
+
+
+				case 28:
+					settings[i].colorEase = Easeing::InBounce;
+					break;
+				case 29:
+					settings[i].colorEase = Easeing::OutBounce;
+					break;
+				case 30:
+					settings[i].colorEase = Easeing::InOutBounce;
+					break;
+				}
+
+				Vector4 colorFirst = UintToVector4(settings[i].color.first);
+				Vector4 colorSecond = UintToVector4(settings[i].color.second);
+				ImGui::ColorEdit4("color first", colorFirst.m.data());
+				ImGui::ColorEdit4("color second", colorSecond.m.data());
+				settings[i].color.first = Vector4ToUint(colorFirst);
+				settings[i].color.second = Vector4ToUint(colorSecond);
+				ImGui::TreePop();
+			}
 
 			ImGui::TreePop();
 		}
@@ -915,8 +1431,11 @@ void Particle::Debug(const std::string& guiName) {
 		datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
 		datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
 		datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
-		datas[groupName]["Particle_velocityFirst"] = settings[i].velocity.first;
-		datas[groupName]["Particle_velocitySecond"] = settings[i].velocity.second;
+		datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
+		datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
+		datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
+		datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
+		datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].easeType);
 		datas[groupName]["Particle_rotateFirst"] = settings[i].rotate.first;
 		datas[groupName]["Particle_rotateSecond"] = settings[i].rotate.second;
 		datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
@@ -927,6 +1446,7 @@ void Particle::Debug(const std::string& guiName) {
 		datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
 		datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
 		datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
+		datas[groupName]["Particle_colorEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
 
 
 		if (ImGui::Button("this setting save")) {
@@ -978,8 +1498,11 @@ void Particle::Debug(const std::string& guiName) {
 			datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
 			datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
 			datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
-			datas[groupName]["Particle_velocityFirst"] = settings[i].velocity.first;
-			datas[groupName]["Particle_velocitySecond"] = settings[i].velocity.second;
+			datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
+			datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
+			datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
+			datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
+			datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].easeType);
 			datas[groupName]["Particle_rotateFirst"] = settings[i].rotate.first;
 			datas[groupName]["Particle_rotateSecond"] = settings[i].rotate.second;
 			datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
@@ -990,6 +1513,7 @@ void Particle::Debug(const std::string& guiName) {
 			datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
 			datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
 			datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
+			datas[groupName]["Particle_colorEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
 			SaveSettingFile(("setting" + std::to_string(i)).c_str());
 		}
 

@@ -197,6 +197,139 @@ void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 #endif // _DEBUG
 }
 
+void Easeing::DebugTreeNode([[maybe_unused]] const std::string& debugName) {
+#ifdef _DEBUG
+	easeTime_ = 1.0f / spdT_;
+	if (ImGui::TreeNode(debugName.c_str())) {
+		ImGui::SliderInt("easeType", &easeType_, 0, 30);
+		ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, 0.0f);
+		ImGui::Checkbox("isLoop", &isLoop_);
+
+		switch (easeType_)
+		{
+		default:
+		case 0:
+			ease_ = [](float t) {
+				return t;
+				};
+			break;
+
+
+		case 1:
+			ease_ = InSine;
+			break;
+		case 2:
+			ease_ = OutSine;
+			break;
+		case 3:
+			ease_ = InOutSine;
+			break;
+
+
+		case 4:
+			ease_ = InQuad;
+			break;
+		case 5:
+			ease_ = OutQuad;
+			break;
+		case 6:
+			ease_ = InOutQuad;
+			break;
+
+
+		case 7:
+			ease_ = InCubic;
+			break;
+		case 8:
+			ease_ = OutCubic;
+			break;
+		case 9:
+			ease_ = InOutCubic;
+			break;
+
+
+		case 10:
+			ease_ = InQuart;
+			break;
+		case 11:
+			ease_ = OutQuart;
+			break;
+		case 12:
+			ease_ = InOutQuart;
+			break;
+
+
+		case 13:
+			ease_ = InQuint;
+			break;
+		case 14:
+			ease_ = OutQuint;
+			break;
+		case 15:
+			ease_ = InOutQuint;
+			break;
+
+
+		case 16:
+			ease_ = InExpo;
+			break;
+		case 17:
+			ease_ = OutExpo;
+			break;
+		case 18:
+			ease_ = InOutExpo;
+			break;
+
+
+		case 19:
+			ease_ = InCirc;
+			break;
+		case 20:
+			ease_ = OutCirc;
+			break;
+		case 21:
+			ease_ = InOutCirc;
+			break;
+
+
+		case 22:
+			ease_ = InBack;
+			break;
+		case 23:
+			ease_ = OutBack;
+			break;
+		case 24:
+			ease_ = InOutBack;
+			break;
+
+
+		case 25:
+			ease_ = InElastic;
+			break;
+		case 26:
+			ease_ = OutElastic;
+			break;
+		case 27:
+			ease_ = InOutElastic;
+			break;
+
+
+		case 28:
+			ease_ = InBounce;
+			break;
+		case 29:
+			ease_ = OutBounce;
+			break;
+		case 30:
+			ease_ = InOutBounce;
+			break;
+		}
+
+		ImGui::TreePop();
+	}
+
+#endif // _DEBUG
+}
 
 
 float Easeing::InSine(float t) {

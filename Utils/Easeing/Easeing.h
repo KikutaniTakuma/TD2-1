@@ -70,6 +70,7 @@ public:
 	}
 
 	void Debug(const std::string& debugName);
+	void DebugTreeNode(const std::string& debugName);
 
 private:
 #ifdef _DEBUG
