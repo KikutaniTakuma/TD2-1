@@ -16,6 +16,7 @@ public:
 	enum class Status {
 		kNormal, // 通常時
 		kHipDrop, // ヒップドロップ
+		kOnScaffolding, // 足場の上に乗っている時
 		kLanding, // 着地
 		kFalling, // 落ちている
 	};
@@ -31,7 +32,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(const float& y);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
@@ -83,6 +84,8 @@ public:
 	/// <param name="play">プレイシーンのポインタ</param>
 	void SetPlayScene(Play* play) { play_ = play; }
 
+	void CollisionScaffolding(const Texture2D* tex);
+
 private:
 
 	/// <summary>
@@ -98,11 +101,11 @@ private:
 	/// <summary>
 	/// 通常の初期化
 	/// </summary>
-	void NormalInitialize();
+	void NormalInitialize(const float& y);
 	/// <summary>
 	/// 通常のアップデート
 	/// </summary>
-	void NormalUpdate();
+	void NormalUpdate(const float& y);
 
 	/// <summary>
 	/// ヒップドロップ時の初期化
@@ -111,25 +114,36 @@ private:
 	/// <summary>
 	/// ヒップドロップ時のアップデート
 	/// </summary>
-	void HipDropUpdate();
+	void HipDropUpdate(const float& y);
+
+	/// <summary>
+	/// 足場の上に乗っている時
+	/// </summary>
+	void OnScaffoldingInitialize();
+	/// <summary>
+	/// 足場の上に乗っている時
+	/// </summary>
+	void OnScaffoldingUpdate();
 
 	/// <summary>
 	/// 着地時の初期化
 	/// </summary>
-	void LandingInitialize();
+	void LandingInitialize(const float& y);
 	/// <summary>
 	/// 着地時のアップデート
 	/// </summary>
-	void LandingUpdate();
+	void LandingUpdate(const float& y);
 
 	/// <summary>
 	/// 落ちる時の初期化
 	/// </summary>
-	void FallingInitialize();
+	void FallingInitialize(const float& y);
 	/// <summary>
 	/// 落ちる時のアップデート
 	/// </summary>
-	void FallingUpdate();
+	void FallingUpdate(const float& y);
+
+	void Collision(const float& y);
 
 	/// <summary>
 	/// 最も高い位置の数値の保存
@@ -172,6 +186,11 @@ private:
 
 	// 重力加速度
 	float kGravity_ ;
+
+	bool isFallingGravity_;
+	bool isHipdropJamp_;
+	// 降下中の重力加速度。切り替えのお試し。
+	float kFallingGravity_;
 
 	// ヒップドロップ中の加速度
 	float kHipDropSpeed_;

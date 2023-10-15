@@ -5,25 +5,37 @@
 
 #include "GlobalVariables/GlobalVariables.h"
 
+class Layer;
+
 class Enemy
 {
 public:
 
 	// 状態
 	enum class Status {
+		kGeneration, // 生成
 		kNormal, // 通常時
 		kFalling, // 落ちている
 		kFaint, // 気絶
 		kDeath, // 死亡
 	};
 
+	enum class Type {
+		kFly, // 浮いてる
+		kWalk, // 歩く
+
+		kEnd, // 末尾
+	};
+
 
 	/// <summary>
 	/// 生成
 	/// </summary>
+	/// /// <param name="type">エネミーのタイプ</param>
 	/// <param name="pos">初期座標</param>
-	/// /// <param name="scale">スケール</param>
-	Enemy(const Vector3& pos, float scale = 40.0f);
+	/// <param name="layerY">層の上のY座標</param>
+	/// <param name="scale">スケール</param>
+	Enemy(int type, const Vector3& pos, const float& layerY, float scale = 40.0f);
 	~Enemy() = default;
 	
 
@@ -35,7 +47,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(Layer* layer, const float& y);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
@@ -54,7 +66,7 @@ public:
 	/// 状態のリクエスト
 	/// </summary>
 	/// <param name="status">したい状態</param>
-	void StatusRequest(Status status) { status_ = status; }
+	void StatusRequest(Status status) { statusRequest_ = status; }
 
 	/// <summary>
 	/// 今の状態の確認。あたり判定のフラグに使用。
@@ -69,6 +81,11 @@ public:
 	const Texture2D* GetTex() { return tex_.get(); }
 
 	/// <summary>
+	/// グローバル変数のロード
+	/// </summary>
+	static void GlobalVariablesLoad() { globalVariables_->LoadFile(groupName_); }
+
+	/// <summary>
 	/// 静的メンバ定数のImGui用
 	/// </summary>
 	static void GlobalVariablesUpdate(){ globalVariables_->Update(); }
@@ -76,7 +93,7 @@ public:
 	/// <summary>
 	/// 初期座標などのパラメーターをいれる
 	/// </summary>
-	void SetParametar(const Vector3& pos);
+	void SetParametar(int type, const Vector3& pos, const float& y = 0);
 
 private:
 
@@ -89,6 +106,16 @@ private:
 	/// jsonファイルからの呼び出し
 	/// </summary>
 	void ApplyGlobalVariable();
+
+	/// <summary>
+	/// 生成の初期化。登場時のパーティクルとか
+	/// </summary>
+	void GenerationInitialize();
+
+	/// <summary>
+	/// 生成の更新
+	/// </summary>
+	void GenerationUpdate();
 
 	/// <summary>
 	/// 通常の初期化
@@ -106,7 +133,7 @@ private:
 	/// <summary>
 	/// 落ちる時のアップデート
 	/// </summary>
-	void FallingUpdate();
+	void FallingUpdate(const float& y);
 
 	/// <summary>
 	/// 落ち切った時の初期化
@@ -115,16 +142,21 @@ private:
 	/// <summary>
 	/// 落ち切った時のアップデート
 	/// </summary>
-	void FaintUpdate();
+	void FaintUpdate(const float& y);
 
 	/// <summary>
 	/// 死んだときの初期化
 	/// </summary>
-	void DeathInitialize();
+	void DeathInitialize(Layer* layer);
 	/// <summary>
 	/// 死んだときのアップデート
 	/// </summary>
 	void DeathUpdate();
+
+	/// <summary>
+	/// 層との当たり判定
+	/// </summary>
+	void Collision(const float& y);
 
 private:
 
@@ -145,8 +177,10 @@ private:
 	// 初期座標の保存用。倒した敵を生成するのに使うイメージ。
 	Vector3 firstPos_;
 
+	Type type_;
+
 	// 今のエネミーの状態
-	Status status_ = Status::kNormal;
+	Status status_ = Status::kGeneration;
 
 	// エネミーの状態のリクエスト
 	std::optional<Status> statusRequest_ = std::nullopt;

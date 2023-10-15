@@ -5,21 +5,29 @@
 
 #include "GlobalVariables/GlobalVariables.h"
 
-class Layer
-{
+class Gauge {
+
 public:
-	Layer();
-	~Layer() = default;
+
+	enum class TextureNames {
+		kMostBack, // 一番後ろの矩形
+		kGaugeBack, // ゲージが減ったときに見える部分
+		kGaugeMain, // ゲージの部分
+		kEnd, // 末尾
+	};
+
+	Gauge();
+	~Gauge() = default;
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize(const int& num, const int& Max);
 
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(const int& num, const int& Max, const int& damage);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
@@ -33,16 +41,6 @@ public:
 	/// <param name="viewProjection">カメラのマトリックス</param>
 	void Draw2D(const Mat4x4& viewProjection);
 
-public:
-
-	/// <summary>
-	/// 静的メンバ定数のImGui用
-	/// </summary>
-	static void GlobalVariablesUpdate() { globalVariables_->Update(); }
-
-
-	const Texture2D* GetHighestTex() { return tex_[nowLayer_].get(); }
-
 private:
 
 	/// <summary>
@@ -55,25 +53,23 @@ private:
 	/// </summary>
 	void ApplyGlobalVariable();
 
-private:
-
-	// グローバル変数
-	static std::unique_ptr<GlobalVariables> globalVariables_;
-
-
+	void DamageUpdate(const int& damage);
 
 private:
 
 	// テクスチャ
-	std::vector<std::unique_ptr<Texture2D>> tex_;
+	std::vector<std::unique_ptr<Texture2D>> textures_;
 
-	// HP
-	std::vector<int> hitPoint_;
+	std::list<std::unique_ptr<Texture2D>> damageGaugeTextures_;
 
-	// HPの最大値
-	std::vector<int> kMaxHitPoint_;
+	// グローバル変数
+	std::unique_ptr<GlobalVariables> globalVariables_;
 
-	// 今の層
-	int nowLayer_;
+	// グローバル変数のグループネーム
+	const std::string groupName_ = "Gauge";
+
+	int num_;
+
+	int kMax_;
 
 };

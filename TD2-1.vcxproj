@@ -176,19 +176,22 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Game\Background\Background.cpp" />
     <ClCompile Include="Game\Enemy\Enemy.cpp" />
     <ClCompile Include="Game\GameScene\GameScene.cpp" />
     <ClCompile Include="Game\GameScene\Play\Play.cpp" />
     <ClCompile Include="Game\GameScene\Result\Result.cpp" />
     <ClCompile Include="Game\GameScene\Title\Title.cpp" />
+    <ClCompile Include="Game\Gauge\Gauge.cpp" />
+    <ClCompile Include="Game\Layer\Layer.cpp" />
     <ClCompile Include="Game\Player\Player.cpp" />
+    <ClCompile Include="Game\Scaffolding\Scaffolding.cpp" />
     <ClCompile Include="Game\ShockWave\ShockWave.cpp" />
     <ClCompile Include="GlobalVariables\GlobalVariables.cpp" />
     <ClCompile Include="Input\Gamepad\Gamepad.cpp" />
     <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="Input\KeyInput\KeyInput.cpp" />
     <ClCompile Include="Input\Mouse\Mouse.cpp" />
-    <ClCompile Include="Layer\Layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshManager\MeshManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -242,19 +245,22 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="Game\Background\Background.h" />
     <ClInclude Include="Game\Enemy\Enemy.h" />
     <ClInclude Include="Game\GameScene\GameScene.h" />
     <ClInclude Include="Game\GameScene\Play\Play.h" />
     <ClInclude Include="Game\GameScene\Result\Result.h" />
     <ClInclude Include="Game\GameScene\Title\Title.h" />
+    <ClInclude Include="Game\Gauge\Gauge.h" />
+    <ClInclude Include="Game\Layer\Layer.h" />
     <ClInclude Include="Game\Player\Player.h" />
+    <ClInclude Include="Game\Scaffolding\Scaffolding.h" />
     <ClInclude Include="Game\ShockWave\ShockWave.h" />
     <ClInclude Include="GlobalVariables\GlobalVariables.h" />
     <ClInclude Include="Input\Gamepad\Gamepad.h" />
     <ClInclude Include="Input\Input.h" />
     <ClInclude Include="Input\KeyInput\KeyInput.h" />
     <ClInclude Include="Input\Mouse\Mouse.h" />
-    <ClInclude Include="Layer\Layer.h" />
     <ClInclude Include="MeshManager\MeshManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

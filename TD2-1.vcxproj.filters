@@ -158,11 +158,20 @@
     <ClCompile Include="Game\Enemy\Enemy.cpp">
       <Filter>Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Layer\Layer.cpp">
-      <Filter>Layer</Filter>
-    </ClCompile>
     <ClCompile Include="Game\ShockWave\ShockWave.cpp">
       <Filter>ShockWave</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Layer\Layer.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Gauge\Gauge.cpp">
+      <Filter>Gauge</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scaffolding\Scaffolding.cpp">
+      <Filter>Scaffolding</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Background\Background.cpp">
+      <Filter>Background</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -315,6 +324,15 @@
     </Filter>
     <Filter Include="ShockWave">
       <UniqueIdentifier>{a5fcea7c-bf98-404c-bade-1143afafa2cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gauge">
+      <UniqueIdentifier>{547891f7-79bf-450e-8b63-579f512dfe29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scaffolding">
+      <UniqueIdentifier>{a3fdfb5d-9622-4618-baf2-fe2ddd042e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Background">
+      <UniqueIdentifier>{1543e0fc-cea3-46d5-b886-35a93e0945b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -483,11 +501,20 @@
     <ClInclude Include="Game\Enemy\Enemy.h">
       <Filter>Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Layer\Layer.h">
-      <Filter>Layer</Filter>
-    </ClInclude>
     <ClInclude Include="Game\ShockWave\ShockWave.h">
       <Filter>ShockWave</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Layer\Layer.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Gauge\Gauge.h">
+      <Filter>Gauge</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scaffolding\Scaffolding.h">
+      <Filter>Scaffolding</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Background\Background.h">
+      <Filter>Background</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

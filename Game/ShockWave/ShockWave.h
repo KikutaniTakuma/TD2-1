@@ -5,6 +5,8 @@
 
 #include "GlobalVariables/GlobalVariables.h"
 
+#include <algorithm>
+
 class ShockWave
 {
 public:
@@ -19,7 +21,7 @@ public:
 
 	/// <param name="pos">プレイヤーの座標</param>
 	/// <param name="highest">プレイヤーの最大の高さ</param>
-	ShockWave(const Vector3& pos, float highest);
+	ShockWave(const Vector3& pos, float highest, float layerY);
 	~ShockWave();
 
 	/// <summary>
@@ -64,26 +66,33 @@ public:
 	bool GetDeleteFlag() const { return isDelete_; }
 
 	/// <summary>
+	/// グローバル変数のロード
+	/// </summary>
+	static void GlobalVariablesLoad() { globalVariables_->LoadFile(groupName_); }
+
+	/// <summary>
 	/// 静的メンバ定数のImGui用
 	/// </summary>
 	static void GlobalVariablesUpdate() { globalVariables_->Update(); }
 
-private:
+	static float GetHighCriteria(int num) { return kHighCriteria_[std::clamp<int>(num, 0, static_cast<int>(Size::kEnd))]; }
+
 
 	/// <summary>
 	/// jsonファイルへの書き込み
 	/// </summary>
-	void SetGlobalVariable();
+	static void SetGlobalVariable();
 
 	/// <summary>
 	/// jsonファイルからの呼び出し
 	/// </summary>
-	void ApplyGlobalVariable();
+	static void ApplyGlobalVariable();
 
-public:
+private:
 
-	// 高さの基準
-	static float kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
+
+	void Collision(const float& y);
+
 
 private:
 
@@ -100,13 +109,18 @@ private:
 	static const std::string typeNames_[static_cast<uint16_t>(Size::kEnd)];
 
 	// サイズ(スケール)
-	static float kSize_[static_cast<uint16_t>(Size::kEnd)];
+	static Vector2 kSize_[static_cast<uint16_t>(Size::kEnd)];
 
 	// 移動スピード
 	static float kSpeed_[static_cast<uint16_t>(Size::kEnd)];
 
 	// 消えるまでのフレーム数
 	static int kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)];
+
+	// 高さの基準
+	static float kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
+
+	//static std::vector<float> kHighCriteria_;
 
 private:
 

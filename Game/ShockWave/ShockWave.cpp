@@ -4,13 +4,13 @@
 
 std::unique_ptr<GlobalVariables> ShockWave::globalVariables_ = std::make_unique<GlobalVariables>();
 
-float ShockWave::kSpeed_[static_cast<uint16_t>(Size::kEnd)];
+float ShockWave::kSpeed_[static_cast<uint16_t>(Size::kEnd)] = {};
 
-float ShockWave::kSize_[static_cast<uint16_t>(Size::kEnd)];
+Vector2 ShockWave::kSize_[static_cast<uint16_t>(Size::kEnd)] = {};
 
-float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
+float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kEnd)] = {};
 
-int ShockWave::kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)];
+int ShockWave::kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)] = {};
 
 const std::string ShockWave::typeNames_[static_cast<uint16_t>(Size::kEnd)] = {
 	"Small",
@@ -20,32 +20,45 @@ const std::string ShockWave::typeNames_[static_cast<uint16_t>(Size::kEnd)] = {
 
 const std::string ShockWave::groupName_ = "StaticShockWave";
 
-ShockWave::ShockWave(const Vector3& pos, float highest) {
+ShockWave::ShockWave(const Vector3& pos, float highest, float layerY) {
 
-	SetGlobalVariable();
+	//SetGlobalVariable();
 
 	for (int i = 0; i < kWaveNum_; i++) {
 		textures_.push_back(std::make_unique<Texture2D>());
 	}
-	if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kSmall)] && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)]) {
+
+	if (highest < kHighCriteria_[static_cast<uint16_t>(Size::kSmall)]) {
 		type_ = Size::kSmall;
 	}
-	else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)] && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMajor)]) {
+	else if (highest < kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)]) {
 		type_ = Size::kMiddle;
 	}
-	else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMajor)]) {
+	else {
+		type_ = Size::kMajor;
+	}
+
+	/*if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kSmall)] - layerY && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)] - layerY) {
+		type_ = Size::kSmall;
+	}
+	else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)] - layerY && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMajor)] - layerY) {
+		type_ = Size::kMiddle;
+	}
+	else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMajor)] - layerY) {
 		type_ = Size::kMajor;
 	}
 	else {
 		type_ = Size::kSmall;
-	}
+	}*/
 
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		tex->LoadTexture("./Resources/uvChecker.png");
+		tex->scale = kSize_[static_cast<uint16_t>(type_)];
 		tex->pos = pos;
-		tex->scale *= kSize_[static_cast<uint16_t>(type_)];
 		tex->Update();
 	}
+
+	Collision(layerY);
 
 	deleteCount_ = 0;
 	isDelete_ = false;
@@ -59,6 +72,15 @@ ShockWave::~ShockWave() {
 void ShockWave::Finalize() {
 
 	textures_.clear();
+}
+
+void ShockWave::Collision(const float& y) {
+
+	for (std::unique_ptr<Texture2D>& tex : textures_) {
+		float posY = tex->pos.y - tex->scale.y / 2.0f;
+
+		tex->pos.y += y - posY;
+	}
 }
 
 void ShockWave::SetGlobalVariable() {
@@ -112,7 +134,7 @@ void ShockWave::ApplyGlobalVariable() {
 
 		item = "kSize";
 		item = item + typeNames_[i];
-		kSize_[i] = globalVariables_->GetFloatValue(groupName_, item);
+		kSize_[i] = globalVariables_->GetVector2Value(groupName_, item);
 
 		item = "kHighCriteria";
 		item = item + typeNames_[i];
@@ -139,7 +161,7 @@ void ShockWave::ApplyGlobalVariable() {
 
 void ShockWave::Update() {
 
-	ApplyGlobalVariable();
+	//ApplyGlobalVariable();
 
 	deleteCount_++;
 
