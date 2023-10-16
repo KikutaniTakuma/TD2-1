@@ -7,13 +7,11 @@
 #include <type_traits>
 
 template<class T>
-concept IsNotPtr = !std::is_pointer_v<T>;
+concept IsNotPtrSB = !std::is_pointer_v<T>;
 
 // ポインタをテンプレートパラメータに設定してはいけない
-template<IsNotPtr T>
+template<IsNotPtrSB T>
 class StructuredBuffer {
-	static_assert(!std::is_pointer<T>::value, "Do not use pointer types");
-
 public:
 	StructuredBuffer() = delete;
 
