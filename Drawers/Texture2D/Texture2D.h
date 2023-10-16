@@ -10,6 +10,8 @@
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector4.h"
 
+#include "Utils/UtilsLib/UtilsLib.h"
+
 #include <array>
 
 class Texture2D {
@@ -68,7 +70,7 @@ public:
 
 	void Draw(
 		const Mat4x4& viewProjection,
-		Pipeline::Blend blend = Pipeline::Blend::None
+		Pipeline::Blend blend = Pipeline::Blend::Normal
 	);
 
 	void Debug(const std::string& guiName);
@@ -129,6 +131,8 @@ public:
 	std::array<Vector3, 4> worldPos;
 
 	uint32_t color;
+
+	UtilsLib::Flg isSameTexSize;
 
 private:
 	D3D12_VERTEX_BUFFER_VIEW vertexView;

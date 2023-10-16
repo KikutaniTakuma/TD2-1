@@ -1,5 +1,6 @@
 #include "FrameInfo.h"
 #include "Utils/Log/Log.h"
+#include "externals/imgui/imgui.h"
 
 #include <cmath>
 #include <thread>
@@ -111,4 +112,20 @@ void FrameInfo::SetFpsLimit(double fpsLimit) {
 
 	minTime = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_));
 	minCheckTime = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_) - 1282LLU);
+}
+
+void FrameInfo::Debug() {
+#ifdef _DEBUG
+	static float fpsLimit = static_cast<float>(fpsLimit_);
+	fpsLimit = static_cast<float>(fpsLimit_);
+
+	ImGui::Begin("fps");
+	ImGui::Text("Frame rate: %3.0lf fps", GetFps());
+	ImGui::Text("Delta Time: %.4lf", GetDelta());
+	ImGui::Text("Frame Count: %llu", GetFrameCount());
+	ImGui::DragFloat("fps limit", &fpsLimit, 1.0f, 10.0f, 165.0f);
+	fpsLimit_ = static_cast<double>(fpsLimit);
+	SetFpsLimit(fpsLimit_);
+	ImGui::End();
+#endif // _DEBUG
 }

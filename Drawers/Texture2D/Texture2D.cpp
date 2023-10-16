@@ -2,6 +2,7 @@
 #include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
+#include "Utils/UtilsLib/UtilsLib.h"
 #include <numeric>
 
 /// <summary>
@@ -28,7 +29,8 @@ Texture2D::Texture2D() :
 	aniStartTime_(),
 	aniCount_(0.0f),
 	uvPibotSpd_(0.0f),
-	isAnimation_(0.0f)
+	isAnimation_(0.0f),
+	isSameTexSize()
 {
 	*wvpMat = MakeMatrixIndentity();
 	*colorBuf = Vector4::identity;
@@ -40,6 +42,12 @@ Texture2D::Texture2D() :
 	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexView.SizeInBytes = sizeof(VertexData) * 4;
 	vertexView.StrideInBytes = sizeof(VertexData);
+
+	tex = TextureManager::GetInstance()->GetWhiteTex();
+
+	if (tex && !isLoad) {
+		isLoad = true;
+	}
 }
 
 Texture2D::Texture2D(const Texture2D& right) :
@@ -77,6 +85,8 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 	isAnimation_ = right.isAnimation_;
 	uvPibotSpd_ = right.uvPibotSpd_;
 
+	isSameTexSize = right.isSameTexSize;
+
 	return *this;
 }
 
@@ -103,6 +113,8 @@ Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
 	isAnimation_ = std::move(right.isAnimation_);
 	uvPibotSpd_ = std::move(right.uvPibotSpd_);
 
+	isSameTexSize = std::move(right.isSameTexSize);
+
 	return *this;
 }
 
@@ -114,7 +126,10 @@ Texture2D::~Texture2D() {
 }
 
 void Texture2D::Initialize(const std::string& vsFileName, const std::string& psFileName) {
-	if (indexResource) { indexResource->Release(); }
+	if (indexResource) { 
+		indexResource->Release();
+		indexResource.Reset();
+	}
 	
 	LoadShader(vsFileName, psFileName);
 
@@ -213,11 +228,20 @@ void Texture2D::ThreadLoadTexture(const std::string& fileName) {
 }
 
 void Texture2D::Update() {
+
 	if (tex && tex->CanUse() && !isLoad) {
 		isLoad = true;
 	}
 
 	if (tex && isLoad) {
+		if (isSameTexSize) {
+			scale = tex->getSize();
+		}
+		else if(isSameTexSize.OnExit()) {
+			scale.x /= tex->getSize().x;
+			scale.y /= tex->getSize().y;
+		}
+
 		static const std::array<Vector3, 4> pv{
 			Vector3{ -0.5f,  0.5f, 0.1f },
 			Vector3{  0.5f,  0.5f, 0.1f },
@@ -238,6 +262,7 @@ void Texture2D::Update() {
 
 		*colorBuf = UintToVector4(color);
 	}
+	isSameTexSize.Update();
 }
 
 void Texture2D::Draw(
@@ -276,8 +301,12 @@ void Texture2D::Draw(
 }
 
 void Texture2D::Debug(const std::string& guiName) {
+#ifdef _DEBUG
+
+
 	*colorBuf = UintToVector4(color);
 	ImGui::Begin(guiName.c_str());
+	ImGui::Checkbox("is same scale and Texture", isSameTexSize.Data());
 	ImGui::DragFloat2("scale", &scale.x, 1.0f);
 	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
 	ImGui::DragFloat3("pos", &pos.x, 1.0f);
@@ -285,7 +314,24 @@ void Texture2D::Debug(const std::string& guiName) {
 	ImGui::DragFloat2("uvSize", &uvSize.x, 0.01f);
 	ImGui::ColorEdit4("SphereColor", &colorBuf->color.r);
 	color = Vector4ToUint(*colorBuf);
+
+	if (ImGui::TreeNode("tex load")) {
+		if (isLoad) {
+		auto texures = UtilsLib::GetFilePahtFormDir("./Resources/", ".png");
+
+			for (auto& i : texures) {
+				if (ImGui::Button(i.string().c_str())) {
+					this->ThreadLoadTexture(i.string());
+					break;
+				}
+			}
+		}
+
+		ImGui::TreePop();
+	}
+
 	ImGui::End();
+#endif // _DEBUG
 }
 
 bool Texture2D::Colision(const Vector2& pos2D) const {

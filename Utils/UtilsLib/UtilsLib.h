@@ -26,6 +26,7 @@ namespace UtilsLib {
 		Flg();
 		Flg(const Flg&) = default;
 		Flg(Flg&&) = default;
+		Flg(bool right);
 		~Flg() = default;
 
 		Flg& operator=(const Flg&) = default;

@@ -19,9 +19,9 @@ private:
 /// </summary>
 public:
 	/// <summary>
-	/// 
+	/// インスタンス取得
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>インスタンスのポインタ(deleteしてはいけない)</returns>
 	static FrameInfo* const GetInstance();
 
 /// <summary>
@@ -67,6 +67,8 @@ public:
 	}
 
 	void SetFpsLimit(double fpsLimit);
+
+	void Debug();
 
 
 /// <summary>
