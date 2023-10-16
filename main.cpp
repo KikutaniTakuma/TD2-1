@@ -45,11 +45,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		Engine::FrameStart();
 
 		// fps
-		ImGui::Begin("fps");
-		ImGui::Text("Frame rate: %3.0lf fps", frameInfo->GetFps());
-		ImGui::Text("Delta Time: %.4lf", frameInfo->GetDelta());
-		ImGui::Text("Frame Count: %llu", frameInfo->GetFrameCount());
-		ImGui::End();
+		frameInfo->Debug();
 
 		// 入力処理
 		input->InputStart();
