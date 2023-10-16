@@ -190,6 +190,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="SceneManager\GameScene\GameScene.cpp" />
+    <ClCompile Include="SceneManager\SceneManager.cpp" />
     <ClCompile Include="TextureManager\TextureManager.cpp" />
     <ClCompile Include="TextureManager\Texture\Texture.cpp" />
     <ClCompile Include="Utils\Action\Frame\Frame.cpp" />
@@ -247,6 +249,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="SceneManager\GameScene\GameScene.h" />
+    <ClInclude Include="SceneManager\SceneManager.h" />
     <ClInclude Include="TextureManager\TextureManager.h" />
     <ClInclude Include="TextureManager\Texture\Texture.h" />
     <ClInclude Include="Utils\Action\Frame\Frame.h" />

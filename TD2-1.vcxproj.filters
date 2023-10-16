@@ -140,6 +140,12 @@
     <ClCompile Include="Utils\Easeing\Easeing.cpp">
       <Filter>Utils\Easeing</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager\SceneManager.cpp">
+      <Filter>SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager\GameScene\GameScene.cpp">
+      <Filter>SceneManager\GameScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -267,6 +273,12 @@
     </Filter>
     <Filter Include="Utils\Easeing">
       <UniqueIdentifier>{f16e45ab-4143-42ad-8fd5-3f82c6326404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager">
+      <UniqueIdentifier>{6521f805-11ba-4c5b-8653-802d7d8002ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\GameScene">
+      <UniqueIdentifier>{daf1fd15-6380-419e-b6dc-ddc0b96c053d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -416,6 +428,12 @@
     </ClInclude>
     <ClInclude Include="Utils\Easeing\Easeing.h">
       <Filter>Utils\Easeing</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\SceneManager.h">
+      <Filter>SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\GameScene\GameScene.h">
+      <Filter>SceneManager\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
