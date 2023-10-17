@@ -1,4 +1,5 @@
 #include "SceneManager.h"
+#include "Engine/Engine.h"
 
 bool BaseScene::isPad_ = false;
 
@@ -21,14 +22,13 @@ SceneManager* const SceneManager::GetInstace() {
 	return &instance;
 }
 
-SceneManager::SceneManager() {
-	fade_ = std::make_unique<Fade>();
-	fadeCamera.Update();
-
-	assert(fade_);
-}
-
 void SceneManager::Initialize(BaseScene* firstScene) {
+	fade_ = std::make_unique<Fade>();
+	fadeCamera_.Update();
+
+	frameInfo_ = FrameInfo::GetInstance();
+	input_ = Input::GetInstance();
+
 	assert(firstScene != nullptr);
 	scene_.reset(firstScene);
 	scene_->SceneInitialize(this);
@@ -72,5 +72,35 @@ void SceneManager::Draw() {
 		scene_->Draw();
 	}
 
-	fade_->Draw(fadeCamera.GetViewOthographics());
+	fade_->Draw(fadeCamera_.GetViewOthographics());
+}
+
+void SceneManager::Game() {
+	/// 
+	/// メインループ
+	/// 
+	while (Engine::WindowMassage()) {
+		// 描画開始処理
+		Engine::FrameStart();
+
+		// fps
+		frameInfo_->Debug();
+
+		// 入力処理
+		input_->InputStart();
+
+		// 更新処理
+		this->Update();
+
+		// 描画処理
+		this->Draw();
+
+		// フレーム終了処理
+		Engine::FrameEnd();
+
+		// Escapeが押されたら終了
+		if (input_->GetKey()->Pushed(DIK_ESCAPE) || input_->GetGamepad()->Pushed(Gamepad::Button::BACK)) {
+			break;
+		}
+	}
 }

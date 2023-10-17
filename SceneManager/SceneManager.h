@@ -51,7 +51,7 @@ protected:
 
 class SceneManager final {
 private:
-	SceneManager();
+	SceneManager() = default;
 	SceneManager(const SceneManager&) = delete;
 	SceneManager(SceneManager&&) = delete;
 	~SceneManager() = default;
@@ -71,11 +71,16 @@ public:
 
 	void Draw();
 
+	void Game();
+
 private:
 	std::unique_ptr<BaseScene> scene_;
 	std::unique_ptr<BaseScene> next_;
 
 	std::unique_ptr<Fade> fade_;
 
-	Camera fadeCamera;
+	Camera fadeCamera_;
+
+	FrameInfo* frameInfo_;
+	Input* input_;
 };

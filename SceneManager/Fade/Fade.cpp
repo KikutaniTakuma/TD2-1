@@ -6,7 +6,7 @@ Fade::Fade():
 	isInStart_(false),
 	isOutStart_(false),
 	tex_(),
-	fadeTime_(1.0f)
+	fadeTime_(0.75f)
 {
 	tex_.scale = WinApp::GetInstance()->GetWindowSize();
 }
@@ -64,5 +64,7 @@ void Fade::Update() {
 	ease_.Update();
 }
 void Fade::Draw(const Mat4x4& viewProjection) {
-	tex_.Draw(viewProjection, Pipeline::Blend::Normal, false);
+	if (isInStart_ || isOutStart_) {
+		tex_.Draw(viewProjection, Pipeline::Blend::Normal, false);
+	}
 }
