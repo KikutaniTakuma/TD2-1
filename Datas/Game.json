@@ -1,0 +1,10 @@
+{
+    "Game": {
+        "Camera2DPos": [
+            0.0,
+            100.0,
+            0.0
+        ],
+        "kMaxStageNum": 4
+    }
+}

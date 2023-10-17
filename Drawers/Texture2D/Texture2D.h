@@ -80,8 +80,8 @@ public:
 
 	void Debug(const std::string& guiName);
 
-	bool Colision(const Vector2& pos2D) const;
-	bool Colision(const Texture2D& tex2D) const;
+	bool Collision(const Vector2& pos2D) const;
+	bool Collision(const Texture2D& tex2D) const;
 
 	Vector2 GetTexSize() const {
 		if (tex) {

@@ -352,7 +352,7 @@ void Texture2D::Debug(const std::string& guiName) {
 #endif // _DEBUG
 }
 
-bool Texture2D::Colision(const Vector2& pos2D) const {
+bool Texture2D::Collision(const Vector2& pos2D) const {
 	Vector2 max;
 	Vector2 min;
 	max.x = std::max_element(worldPos.begin(), worldPos.end(),
@@ -381,7 +381,7 @@ bool Texture2D::Colision(const Vector2& pos2D) const {
 	return false;
 }
 
-bool Texture2D::Colision(const Texture2D& tex2D) const {
+bool Texture2D::Collision(const Texture2D& tex2D) const {
 	Vector3 max;
 	Vector3 min;
 	max.x = std::max_element(worldPos.begin(), worldPos.end(),
@@ -409,16 +409,46 @@ bool Texture2D::Colision(const Texture2D& tex2D) const {
 			return left.z < right.z;
 		})->z;
 
+	// 追加変更。by Korone
+	Vector3 max2;
+	Vector3 min2;
+	max2.x = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.x < right.x;
+		})->x;
+	max2.y = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.y < right.y;
+		})->y;
+	max2.z = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.z < right.z;
+		})->z;
+	min2.x = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.x < right.x;
+		})->x;
+	min2.y = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.y < right.y;
+		})->y;
+	min2.z = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
+		[](const Vector3& left, const Vector3& right) {
+			return left.z < right.z;
+		})->z;
 
-	for (auto& i : tex2D.worldPos) {
-		if (min.x < i.x && i.x < max.x) {
-			if (min.y < i.y && i.y < max.y) {
-				if (min.z < i.z && i.z < max.z) {
-					return true;
-				}
+	if (min.x <= max2.x && max.x >= min2.x &&
+		min.y <= max2.y && max.y >= min2.y) {
+		return true;
+	}
+
+	/*for (auto& i : tex2D.worldPos) {
+		if (min.x <= i.x && i.x <= max.x) {
+			if (min.y <= i.y && i.y <= max.y) {
+				return true;
 			}
 		}
-	}
+	}*/
 
 	return false;
 }
