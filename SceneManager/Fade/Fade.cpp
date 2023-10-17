@@ -64,5 +64,5 @@ void Fade::Update() {
 	ease_.Update();
 }
 void Fade::Draw(const Mat4x4& viewProjection) {
-	tex_.Draw(viewProjection);
+	tex_.Draw(viewProjection, Pipeline::Blend::Normal, false);
 }

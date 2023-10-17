@@ -9,7 +9,7 @@
 /// 静的変数のインスタンス化
 /// </summary>
 
-std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> Texture2D::graphicsPipelineState = {};
+std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum) * 2> Texture2D::graphicsPipelineState = {};
 Shader Texture2D::shader = {};
 
 D3D12_INDEX_BUFFER_VIEW Texture2D::indexView = {};
@@ -193,21 +193,20 @@ void Texture2D::CreateGraphicsPipeline() {
 	PipelineManager::SetShader(shader);
 	PipelineManager::SetVertexInput("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 	PipelineManager::SetVertexInput("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
-	//PipelineManager::IsDepth(false);
 
-	for (int32_t i = Pipeline::Blend::None; i < Pipeline::Blend::BlendTypeNum; i++) {
-		PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
-		graphicsPipelineState[i] = PipelineManager::Create();
+	for (int32_t i = Pipeline::Blend::None; i < graphicsPipelineState.size(); i++) {
+		if (i < Pipeline::Blend::BlendTypeNum) {
+			PipelineManager::SetState(Pipeline::Blend(i), Pipeline::SolidState::Solid);
+			graphicsPipelineState[i] = PipelineManager::Create();
+		}
+		else {
+			PipelineManager::IsDepth(false);
+			PipelineManager::SetState(Pipeline::Blend(i - Pipeline::Blend::BlendTypeNum), Pipeline::SolidState::Solid);
+			graphicsPipelineState[i] = PipelineManager::Create();
+		}
 	}
 
 	PipelineManager::StateReset();
-
-	for (auto& i : graphicsPipelineState) {
-		if (!i) {
-			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Texture2D");
-			return;
-		}
-	}
 }
 
 void Texture2D::LoadTexture(const std::string& fileName) {
@@ -273,7 +272,8 @@ void Texture2D::Update() {
 
 void Texture2D::Draw(
 	const Mat4x4& viewProjection,
-	Pipeline::Blend blend
+	Pipeline::Blend blend,
+	bool isDepth
 ) {
 	if (tex && isLoad) {
 		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
@@ -295,8 +295,20 @@ void Texture2D::Draw(
 
 		auto commandlist = Engine::GetCommandList();
 
+		for (auto& i : graphicsPipelineState) {
+			if (!i) {
+				ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Texture2D");
+				return;
+			}
+		}
+
 		// 各種描画コマンドを積む
-		graphicsPipelineState[blend]->Use();
+		if (isDepth) {
+			graphicsPipelineState[blend]->Use();
+		}
+		else {
+			graphicsPipelineState[blend + Pipeline::Blend::BlendTypeNum]->Use();
+		}
 		commandlist->SetGraphicsRootConstantBufferView(0, wvpMat.GetGPUVtlAdrs());
 		commandlist->SetGraphicsRootConstantBufferView(1, colorBuf.GetGPUVtlAdrs());
 		tex->Use(2);

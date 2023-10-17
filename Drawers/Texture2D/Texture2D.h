@@ -58,7 +58,7 @@ private:
 /// 静的メンバ変数
 /// </summary>
 private:
-	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)> graphicsPipelineState;
+	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum) * 2> graphicsPipelineState;
 	static Shader shader;
 
 	static D3D12_INDEX_BUFFER_VIEW indexView;
@@ -74,7 +74,8 @@ public:
 
 	void Draw(
 		const Mat4x4& viewProjection,
-		Pipeline::Blend blend = Pipeline::Blend::Normal
+		Pipeline::Blend blend = Pipeline::Blend::Normal,
+		bool isDepth = true
 	);
 
 	void Debug(const std::string& guiName);
