@@ -27,6 +27,7 @@ public:
 
 public:
 	Texture2D();
+	Texture2D(const std::string& fileName);
 	Texture2D(const Texture2D&);
 	Texture2D(Texture2D&&) noexcept;
 	~Texture2D();

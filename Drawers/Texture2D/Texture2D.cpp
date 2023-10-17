@@ -50,6 +50,12 @@ Texture2D::Texture2D() :
 	}
 }
 
+Texture2D::Texture2D(const std::string& fileName):
+	Texture2D()
+{
+	this->LoadTexture(fileName);
+}
+
 Texture2D::Texture2D(const Texture2D& right) :
 	Texture2D()
 {
