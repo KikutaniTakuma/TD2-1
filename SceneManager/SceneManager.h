@@ -12,6 +12,9 @@ public:
 	BaseScene(BaseScene&&) = delete;
 	virtual ~BaseScene() = default;
 
+	BaseScene& operator=(const BaseScene&) = delete;
+	BaseScene& operator=(BaseScene&&) = delete;
+
 public:
 	void SceneInitialize(class SceneManager* sceneManager);
 
