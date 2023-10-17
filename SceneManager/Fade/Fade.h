@@ -28,13 +28,25 @@ public:
 	/// フェードアウトが終わった瞬間を取得
 	/// </summary>
 	/// <returns>終わった瞬間true</returns>
-	bool OutEnd();
+	bool OutEnd() const;
+
+	/// <summary>
+	/// フェードアウト中
+	/// </summary>
+	/// <returns>フェードアウト中はtrue</returns>
+	bool OutStay() const;
 
 	/// <summary>
 	/// フェードインが終わった瞬間を取得
 	/// </summary>
 	/// <returns>終わった瞬間</returns>
-	bool InEnd();
+	bool InEnd() const;
+
+	/// <summary>
+	/// フェードイン中
+	/// </summary>
+	/// <returns>フェードイン中はtrue</returns>
+	bool InStay() const;
 
 	/// <summary>
 	/// 更新関数

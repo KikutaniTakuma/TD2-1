@@ -192,6 +192,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="SceneManager\Fade\Fade.cpp" />
     <ClCompile Include="SceneManager\GameScene\GameScene.cpp" />
+    <ClCompile Include="SceneManager\ResultScene\ResultScene.cpp" />
     <ClCompile Include="SceneManager\SceneManager.cpp" />
     <ClCompile Include="TextureManager\TextureManager.cpp" />
     <ClCompile Include="TextureManager\Texture\Texture.cpp" />
@@ -252,6 +253,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClInclude>
     <ClInclude Include="SceneManager\Fade\Fade.h" />
     <ClInclude Include="SceneManager\GameScene\GameScene.h" />
+    <ClInclude Include="SceneManager\ResultScene\ResultScene.h" />
     <ClInclude Include="SceneManager\SceneManager.h" />
     <ClInclude Include="TextureManager\TextureManager.h" />
     <ClInclude Include="TextureManager\Texture\Texture.h" />

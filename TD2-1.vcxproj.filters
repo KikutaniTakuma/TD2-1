@@ -149,6 +149,9 @@
     <ClCompile Include="SceneManager\Fade\Fade.cpp">
       <Filter>SceneManager\Fade</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager\ResultScene\ResultScene.cpp">
+      <Filter>SceneManager\ResultScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -285,6 +288,9 @@
     </Filter>
     <Filter Include="SceneManager\Fade">
       <UniqueIdentifier>{0275d580-d178-41c8-9359-014a9ab4a8ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\ResultScene">
+      <UniqueIdentifier>{3025218e-6088-4e77-a14e-ba3f9c984402}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -443,6 +449,9 @@
     </ClInclude>
     <ClInclude Include="SceneManager\Fade\Fade.h">
       <Filter>SceneManager\Fade</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\ResultScene\ResultScene.h">
+      <Filter>SceneManager\ResultScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

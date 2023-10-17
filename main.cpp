@@ -8,12 +8,8 @@
 
 #include "Input/Input.h"
 
-#include "Utils/Camera/Camera.h"
-#include "Drawers/Texture2D/Texture2D.h"
-#include "Drawers/Model/Model.h"
-#include "Drawers/Particle/Particle.h"
-
-#include "SceneManager/Fade/Fade.h"
+#include "SceneManager/SceneManager.h"
+#include "SceneManager/GameScene/GameScene.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
@@ -26,20 +22,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		return -1;
 	}
 
-	// フォントロード
-	Engine::LoadFont("./Resources/Font/fonttest.spritefont");
-
 	static auto* const frameInfo = FrameInfo::GetInstance();
-
-	auto input = Input::GetInstance();
-
-	/*Particle hoge;
-	hoge.LopadSettingDirectory("smoke");*/
-
-	Camera camera;
-	camera.pos.z = -3.0f;
-
-	Fade fade;
+	static auto* const input = Input::GetInstance();
+	static auto* const sceneManager = SceneManager::GetInstace();
+	sceneManager->Initialize(new GameScene{});
 
 	/// 
 	/// メインループ
@@ -59,10 +45,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 更新処理
 		/// 
 
-		/*hoge.Update();
-		hoge.Debug("particle test");*/
-
-		fade.Update();
+		sceneManager->Update();
 
 		///
 		/// 更新処理ここまで
@@ -71,11 +54,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		///
 		/// 描画処理
 		/// 
-		camera.Update();
 
-		fade.Draw(camera.GetViewOthographics());
-
-		//hoge.Draw(camera.GetViewOthographics());
+		sceneManager->Draw();
 
 		///
 		/// 描画処理ここまで

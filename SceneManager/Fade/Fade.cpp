@@ -29,12 +29,20 @@ void Fade::InStart() {
 		);
 	}
 }
-bool Fade::OutEnd() {
+bool Fade::OutEnd() const {
 	return isOutStart_.OnExit();
 }
-bool Fade::InEnd() {
+bool Fade::OutStay() const {
+	return isOutStart_.OnStay();
+}
+
+bool Fade::InEnd() const {
 	return isInStart_.OnExit();
 }
+bool Fade::InStay() const {
+	return isInStart_.OnStay();
+}
+
 void Fade::Update() {
 	isOutStart_.Update();
 	isInStart_.Update();

@@ -4,6 +4,12 @@
 #include <memory>
 #include "Utils/Camera/Camera.h"
 #include <vector>
+#include "Fade/Fade.h"
+#include "MeshManager/MeshManager.h"
+#include "TextureManager/TextureManager.h"
+#include "AudioManager/AudioManager.h"
+#include "Engine/FrameInfo/FrameInfo.h"
+#include "Input/Input.h"
 
 class BaseScene {
 public:
@@ -27,13 +33,15 @@ public:
 protected:
 	class SceneManager* sceneManager_;
 
-	class MeshManager* meshManager_;
+	MeshManager* meshManager_;
 
-	class AudioManager* audioManager_;
+	AudioManager* audioManager_;
 
-	class TextureManager* textureManager_;
+	TextureManager* textureManager_;
 
-	class FrameInfo* frameInfo_;
+	FrameInfo* frameInfo_;
+
+	Input* input_;
 
 	static bool isPad_;
 
@@ -55,6 +63,8 @@ public:
 	static SceneManager* const GetInstace();
 
 public:
+	void Initialize(BaseScene* firstScene);
+
 	void SceneChange(BaseScene* next);
 
 	void Update();
@@ -64,4 +74,8 @@ public:
 private:
 	std::unique_ptr<BaseScene> scene_;
 	std::unique_ptr<BaseScene> next_;
+
+	std::unique_ptr<Fade> fade_;
+
+	Camera fadeCamera;
 };

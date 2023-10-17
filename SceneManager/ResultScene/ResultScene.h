@@ -5,15 +5,15 @@
 #include "Drawers/Particle/Particle.h"
 #include "GlobalVariables/GlobalVariables.h"
 
-class GameScene : public BaseScene {
+class ResultScene : public BaseScene {
 public:
-	GameScene();
-	GameScene(const GameScene&) = delete;
-	GameScene(GameScene&&) = delete;
-	~GameScene() = default;
+	ResultScene() = default;
+	ResultScene(const ResultScene&) = delete;
+	ResultScene(ResultScene&&) = delete;
+	~ResultScene() = default;
 
-	GameScene& operator=(const GameScene&) = delete;
-	GameScene& operator=(GameScene&&) = delete;
+	ResultScene& operator=(const ResultScene&) = delete;
+	ResultScene& operator=(ResultScene&&) = delete;
 
 public:
 	void Initialize() override;
@@ -24,7 +24,7 @@ public:
 
 	void Draw() override;
 
-public:
+private:
 	std::vector<Model> models_;
 	std::vector<Texture2D> texs_;
 	std::vector<Particle> particles;
@@ -33,7 +33,7 @@ public:
 	///
 	/// ここに必要なメンバ変数を追加
 	/// 
-
+	
 
 
 
