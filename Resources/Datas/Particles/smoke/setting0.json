@@ -35,24 +35,54 @@
         "Particle_isSameHW": 1,
         "Particle_particleNumFirst": 4,
         "Particle_particleNumSecond": 6,
-        "Particle_rotateFirst": [
+        "Particle_moveRotateFirst": [
             0.0,
             0.0,
             0.0
         ],
-        "Particle_rotateSecond": [
+        "Particle_moveRotateSecond": [
             0.0,
             0.0,
             6.269999980926514
         ],
-        "Particle_sizeFirst": [
+        "Particle_rotate1": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Particle_rotate2": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Particle_rotateSecond1": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Particle_rotateSecond2": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Particle_rotateEase" : 0,
+        "Particle_size1": [
             20.0,
             20.0
         ],
-        "Particle_sizeSecond": [
+        "Particle_size2": [
             50.0,
             50.0
         ],
+        "Particle_sizeSecond1": [
+            20.0,
+            20.0
+        ],
+        "Particle_sizeSecond2": [
+            50.0,
+            50.0
+        ],
+       " Particle_sizeEase" : 0,
         "Particle_velocity1": [
             240.0,
             0.0,

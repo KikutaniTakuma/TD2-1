@@ -1,5 +1,6 @@
 {
     "setting0": {
+        " Particle_sizeEase": 0,
         "Emitter_CircleSize": 0.0,
         "Emitter_ParticleMaxNum": 1000,
         "Emitter_Pos": [
@@ -33,23 +34,53 @@
         "Particle_freqFirst": 80,
         "Particle_freqSecond": 160,
         "Particle_isSameHW": 1,
+        "Particle_moveRotateFirst": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Particle_moveRotateSecond": [
+            0.0,
+            0.0,
+            0.0
+        ],
         "Particle_particleNumFirst": 8,
         "Particle_particleNumSecond": 12,
-        "Particle_rotateFirst": [
+        "Particle_rotate1": [
             0.0,
             0.0,
             0.0
         ],
-        "Particle_rotateSecond": [
+        "Particle_rotate2": [
             0.0,
             0.0,
             0.0
         ],
-        "Particle_sizeFirst": [
+        "Particle_rotateEase": 0,
+        "Particle_rotateSecond1": [
+            0.0,
+            0.0,
+            -3.140000104904175
+        ],
+        "Particle_rotateSecond2": [
+            0.0,
+            0.0,
+            3.140000104904175
+        ],
+        "Particle_size1": [
             30.0,
             0.0
         ],
-        "Particle_sizeSecond": [
+        "Particle_size2": [
+            50.0,
+            0.0
+        ],
+        "Particle_sizeEase": 0,
+        "Particle_sizeSecond1": [
+            30.0,
+            0.0
+        ],
+        "Particle_sizeSecond2": [
             50.0,
             0.0
         ],

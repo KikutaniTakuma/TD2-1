@@ -316,16 +316,30 @@ Particle::~Particle() {
 		datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
 		datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
 
+		// 大きさ
 		datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
-		datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
-		datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
+		datas[groupName]["Particle_size1"] = settings[i].size.first;
+		datas[groupName]["Particle_size2"] = settings[i].size.second;
+		datas[groupName]["Particle_sizeSecond1"] = settings[i].sizeSecond.first;
+		datas[groupName]["Particle_sizeSecond2"] = settings[i].sizeSecond.second;
+		datas[groupName]["Particle_sizeEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
+
+		// 速度
 		datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
 		datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
 		datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
 		datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
-		datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].easeType);
-		datas[groupName]["Particle_rotateFirst"] = settings[i].rotate.first;
-		datas[groupName]["Particle_rotateSecond"] = settings[i].rotate.second;
+		datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].moveEaseType);
+		datas[groupName]["Particle_moveRotateFirst"] = settings[i].moveRotate.first;
+		datas[groupName]["Particle_moveRotateSecond"] = settings[i].moveRotate.second;
+		
+		// 回転
+		datas[groupName]["Particle_rotate1"] = settings[i].rotate.first;
+		datas[groupName]["Particle_rotate2"] = settings[i].rotate.second;
+		datas[groupName]["Particle_rotateSecond1"] = settings[i].rotateSecond.first;
+		datas[groupName]["Particle_rotateSecond2"] = settings[i].rotateSecond.second;
+		datas[groupName]["Particle_rotateEase"] = static_cast<uint32_t>(settings[i].rotateEaseType);
+
 		datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
 		datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
 		datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
@@ -496,14 +510,27 @@ void Particle::LopadSettingFile(const std::string& jsonName) {
 	setting.emitter.validTime = std::chrono::milliseconds(std::get<uint32_t>(datas[groupName.string()]["Emitter_vaildTime"]));
 
 	setting.isSameHW = static_cast<bool>(std::get<uint32_t>(datas[groupName.string()]["Particle_isSameHW"]));
-	setting.size.first = std::get<Vector2>(datas[groupName.string()]["Particle_sizeFirst"]);
-	setting.size.second = std::get<Vector2>(datas[groupName.string()]["Particle_sizeSecond"]);
+	setting.size.first = std::get<Vector2>(datas[groupName.string()]["Particle_size1"]);
+	setting.size.second = std::get<Vector2>(datas[groupName.string()]["Particle_size2"]);
+	setting.sizeSecond.first = std::get<Vector2>(datas[groupName.string()]["Particle_sizeSecond1"]);
+	setting.sizeSecond.second = std::get<Vector2>(datas[groupName.string()]["Particle_sizeSecond2"]);
+	setting.sizeEaseType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_sizeEase"]));
+	setting.sizeEase = Easeing::GetFunction(setting.sizeEaseType);
+
 	setting.velocity.first = std::get<Vector3>(datas[groupName.string()]["Particle_velocity1"]);
 	setting.velocity.second = std::get<Vector3>(datas[groupName.string()]["Particle_velocity2"]);
 	setting.velocitySecond.first =std::get<Vector3>(datas[groupName.string()]["Particle_velocitySecond1"]);
 	setting.velocitySecond.second  =std::get<Vector3>(datas[groupName.string()]["Particle_velocitySecond2"]);
-	setting.rotate.first = std::get<Vector3>(datas[groupName.string()]["Particle_rotateFirst"]);
-	setting.rotate.second = std::get<Vector3>(datas[groupName.string()]["Particle_rotateSecond"]);
+	setting.moveRotate.first = std::get<Vector3>(datas[groupName.string()]["Particle_moveRotateFirst"]);
+	setting.moveRotate.second = std::get<Vector3>(datas[groupName.string()]["Particle_moveRotateSecond"]);
+	
+	setting.rotate.first = std::get<Vector3>(datas[groupName.string()]["Particle_rotate1"]);
+	setting.rotate.second = std::get<Vector3>(datas[groupName.string()]["Particle_rotate2"]);
+	setting.rotateSecond.first = std::get<Vector3>(datas[groupName.string()]["Particle_rotateSecond1"]);
+	setting.rotateSecond.second = std::get<Vector3>(datas[groupName.string()]["Particle_rotateSecond2"]);
+	setting.rotateEaseType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_rotateEase"]));
+	setting.rotateEase = Easeing::GetFunction(setting.rotateEaseType);
+
 	setting.particleNum.first = std::get<uint32_t>(datas[groupName.string()]["Particle_particleNumFirst"]);
 	setting.particleNum.second = std::get<uint32_t>(datas[groupName.string()]["Particle_particleNumSecond"]);
 	setting.freq.first = std::get<uint32_t>(datas[groupName.string()]["Particle_freqFirst"]);
@@ -515,8 +542,8 @@ void Particle::LopadSettingFile(const std::string& jsonName) {
 	setting.colorEaseType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_colorEase"]));
 	setting.colorEase = Easeing::GetFunction(setting.colorEaseType);
 
-	setting.easeType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_ease"]));
-	setting.ease = Easeing::GetFunction(setting.easeType);
+	setting.moveEaseType = static_cast<int32_t>(std::get<uint32_t>(datas[groupName.string()]["Particle_ease"]));
+	setting.moveEase = Easeing::GetFunction(setting.moveEaseType);
 }
 
 void Particle::SaveSettingFile(const std::string& groupName) {
@@ -735,16 +762,24 @@ void Particle::Update() {
 				if (settings[currentSettingIndex].isSameHW) {
 					size.y = size.x;
 				}
+				Vector2 sizeSecond = UtilsLib::Random(settings[currentSettingIndex].sizeSecond.first, settings[currentSettingIndex].sizeSecond.second);
+				if (settings[currentSettingIndex].isSameHW) {
+					sizeSecond.y = sizeSecond.x;
+				}
 
 				// 速度ランダム
 				Vector3 velocity = UtilsLib::Random(settings[currentSettingIndex].velocity.first, settings[currentSettingIndex].velocity.second);
 				Vector3 velocitySecond = UtilsLib::Random(settings[currentSettingIndex].velocitySecond.first, settings[currentSettingIndex].velocitySecond.second);
 
 				// 移動方向ランダム
-				Vector3 rotate = UtilsLib::Random(settings[currentSettingIndex].rotate.first, settings[currentSettingIndex].rotate.second);
+				Vector3 moveRotate = UtilsLib::Random(settings[currentSettingIndex].moveRotate.first, settings[currentSettingIndex].moveRotate.second);
 
 				// 速度回転
-				velocity *= HoriMakeMatrixAffin(Vector3::identity, rotate, Vector3::zero);
+				velocity *= HoriMakeMatrixAffin(Vector3::identity, moveRotate, Vector3::zero);
+
+				// 回転
+				Vector3 rotate = UtilsLib::Random(settings[currentSettingIndex].rotate.first, settings[currentSettingIndex].rotate.second);
+				Vector3 rotateSecond = UtilsLib::Random(settings[currentSettingIndex].rotateSecond.first, settings[currentSettingIndex].rotateSecond.second);
 
 				// 死ぬ時間ランダム
 				uint32_t deathTime = UtilsLib::Random(settings[currentSettingIndex].death.first, settings[currentSettingIndex].death.second);
@@ -755,6 +790,11 @@ void Particle::Update() {
 				// ステータスセット
 				wtfs[i].pos = pos;
 				wtfs[i].scale = size;
+				wtfs[i].scaleStart = size;
+				wtfs[i].scaleSecond = sizeSecond;
+				wtfs[i].rotate = rotate;
+				wtfs[i].rotateStart = rotate;
+				wtfs[i].rotateSecond = rotateSecond;
 				wtfs[i].movePos = velocity;
 				wtfs[i].movePosSecond = velocitySecond;
 				wtfs[i].deathTime = std::chrono::milliseconds(deathTime);
@@ -779,10 +819,14 @@ void Particle::Update() {
 				wtf.isActive = false;
 			}
 			else {
-				float colorT =static_cast<float>(duration.count()) / static_cast<float>(wtf.deathTime.count());
-				Vector3 moveVec = Vector3::Lerp(wtf.movePos, wtf.movePosSecond, settings[currentSettingIndex].ease(colorT));
+				float wtfT =static_cast<float>(duration.count()) / static_cast<float>(wtf.deathTime.count());
+				Vector3 moveVec = Vector3::Lerp(wtf.movePos, wtf.movePosSecond, settings[currentSettingIndex].moveEase(wtfT));
 				wtf.pos += moveVec * FrameInfo::GetInstance()->GetDelta();
-				wtf.color = ColorLerp(settings[currentSettingIndex].color.first, settings[currentSettingIndex].color.second, settings[currentSettingIndex].colorEase(colorT));
+				wtf.color = ColorLerp(settings[currentSettingIndex].color.first, settings[currentSettingIndex].color.second, settings[currentSettingIndex].colorEase(wtfT));
+			
+				wtf.scale = Vector2::Lerp(wtf.scaleStart, wtf.scaleSecond, settings[currentSettingIndex].sizeEase(wtfT));
+				
+				wtf.rotate = Vector3::Lerp(wtf.rotateStart, wtf.rotateSecond, settings[currentSettingIndex].rotateEase(wtfT));
 			}
 		}
 
@@ -920,48 +964,64 @@ void Particle::Debug(const std::string& guiName) {
 			if (ImGui::TreeNode("size")) {
 				ImGui::Checkbox("Same height and width", settings[i].isSameHW.Data());
 				if (settings[i].isSameHW) {
-					ImGui::DragFloat("size first", &settings[i].size.first.x, 0.01f);
-					ImGui::DragFloat("size second", &settings[i].size.second.x, 0.01f);
+					ImGui::DragFloat("size min", &settings[i].size.first.x, 0.01f);
+					ImGui::DragFloat("size max", &settings[i].size.second.x, 0.01f);
+					ImGui::DragFloat("sizeSecond min", &settings[i].sizeSecond.first.x, 0.01f);
+					ImGui::DragFloat("sizeSecond max", &settings[i].sizeSecond.second.x, 0.01f);
 				}
 				else {
 					ImGui::DragFloat2("size first", &settings[i].size.first.x, 0.01f);
 					ImGui::DragFloat2("size second", &settings[i].size.second.x, 0.01f);
+					ImGui::DragFloat2("sizeSecond min", &settings[i].sizeSecond.first.x, 0.01f);
+					ImGui::DragFloat2("sizeSecond max", &settings[i].sizeSecond.second.x, 0.01f);
 				}
+				ImGui::SliderInt("easeType", &settings[i].sizeEaseType, 0, 30);
+				settings[i].sizeEase = Easeing::GetFunction(settings[i].sizeEaseType);
+
 				ImGui::TreePop();
 			}
 			if (ImGui::TreeNode("spd")) {
-				ImGui::DragFloat3("velocity first", &settings[i].velocity.first.x, 0.01f);
-				ImGui::DragFloat3("velocity second", &settings[i].velocity.second.x, 0.01f);
-				ImGui::DragFloat3("velocitySecond first", &settings[i].velocitySecond.first.x, 0.01f);
-				ImGui::DragFloat3("velocitySecond second", &settings[i].velocitySecond.second.x, 0.01f);
+				ImGui::DragFloat3("velocity min", &settings[i].velocity.first.x, 0.01f);
+				ImGui::DragFloat3("velocity max", &settings[i].velocity.second.x, 0.01f);
+				ImGui::DragFloat3("velocitySecond min", &settings[i].velocitySecond.first.x, 0.01f);
+				ImGui::DragFloat3("velocitySecond max", &settings[i].velocitySecond.second.x, 0.01f);
 
-				ImGui::SliderInt("easeType", &settings[i].easeType, 0, 30);
-				settings[i].ease = Easeing::GetFunction(settings[i].easeType);
+				ImGui::SliderInt("easeType", &settings[i].moveEaseType, 0, 30);
+				settings[i].moveEase = Easeing::GetFunction(settings[i].moveEaseType);
 
-				ImGui::DragFloat3("rotate first", &settings[i].rotate.first.x, 0.01f);
-				ImGui::DragFloat3("rotate second", &settings[i].rotate.second.x, 0.01f);
+				ImGui::DragFloat3("rotate min", &settings[i].moveRotate.first.x, 0.01f);
+				ImGui::DragFloat3("rotate max", &settings[i].moveRotate.second.x, 0.01f);
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("rotate")) {
+				ImGui::DragFloat3("rotate min", &settings[i].rotate.first.x, 0.01f);
+				ImGui::DragFloat3("rotate max", &settings[i].rotate.second.x, 0.01f);
+				ImGui::DragFloat3("rotateSecond min", &settings[i].rotateSecond.first.x, 0.01f);
+				ImGui::DragFloat3("rotateSecond max", &settings[i].rotateSecond.second.x, 0.01f);
+				ImGui::SliderInt("easeType", &settings[i].rotateEaseType, 0, 30);
+				settings[i].moveEase = Easeing::GetFunction(settings[i].rotateEaseType);
 				ImGui::TreePop();
 			}
 
 			if (ImGui::TreeNode("Appear")) {
 				auto particleNumFirst = int32_t(settings[i].particleNum.first);
 				auto particleNumSecond = int32_t(settings[i].particleNum.second);
-				ImGui::DragInt("particleNum first", &particleNumFirst, 0.1f, 0, int32_t(settings[i].emitter.particleMaxNum));
-				ImGui::DragInt("particleNum second", &particleNumSecond, 0.1f, 0, int32_t(settings[i].emitter.particleMaxNum));
+				ImGui::DragInt("particleNum min", &particleNumFirst, 0.1f, 0, int32_t(settings[i].emitter.particleMaxNum));
+				ImGui::DragInt("particleNum max", &particleNumSecond, 0.1f, 0, int32_t(settings[i].emitter.particleMaxNum));
 				settings[i].particleNum.first = uint32_t(particleNumFirst);
 				settings[i].particleNum.second = uint32_t(particleNumSecond);
 
 				auto freqFirst = int32_t(settings[i].freq.first);
 				auto freqSecond = int32_t(settings[i].freq.second);
-				ImGui::DragInt("freq first(milliseconds)", &freqFirst, 1.0f, 0, int32_t(settings[i].emitter.validTime.count()));
-				ImGui::DragInt("freq second(milliseconds)", &freqSecond, 1.0f, 0, int32_t(settings[i].emitter.validTime.count()));
+				ImGui::DragInt("freq min(milliseconds)", &freqFirst, 1.0f, 0, int32_t(settings[i].emitter.validTime.count()));
+				ImGui::DragInt("freq max(milliseconds)", &freqSecond, 1.0f, 0, int32_t(settings[i].emitter.validTime.count()));
 				settings[i].freq.first = uint32_t(freqFirst);
 				settings[i].freq.second = uint32_t(freqSecond);
 
 				auto deathFirst = int32_t(settings[i].death.first);
 				auto deathSecond = int32_t(settings[i].death.second);
-				ImGui::DragInt("death first(milliseconds)", &deathFirst, 10.0f, 0, std::numeric_limits<int32_t>::max());
-				ImGui::DragInt("death second(milliseconds)", &deathSecond, 10.0f, 0, std::numeric_limits<int32_t>::max());
+				ImGui::DragInt("death min(milliseconds)", &deathFirst, 10.0f, 0, std::numeric_limits<int32_t>::max());
+				ImGui::DragInt("death max(milliseconds)", &deathSecond, 10.0f, 0, std::numeric_limits<int32_t>::max());
 				settings[i].death.first = uint32_t(deathFirst);
 				settings[i].death.second = uint32_t(deathSecond);
 				ImGui::TreePop();
@@ -1003,16 +1063,31 @@ void Particle::Debug(const std::string& guiName) {
 		datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
 		datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
 
+		// 大きさ
 		datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
-		datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
-		datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
+		datas[groupName]["Particle_size1"] = settings[i].size.first;
+		datas[groupName]["Particle_size2"] = settings[i].size.second;
+		datas[groupName]["Particle_sizeSecond1"] = settings[i].sizeSecond.first;
+		datas[groupName]["Particle_sizeSecond2"] = settings[i].sizeSecond.second;
+		datas[groupName]["Particle_sizeEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
+
+		// 速度
 		datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
 		datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
 		datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
 		datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
-		datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].easeType);
-		datas[groupName]["Particle_rotateFirst"] = settings[i].rotate.first;
-		datas[groupName]["Particle_rotateSecond"] = settings[i].rotate.second;
+		datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].moveEaseType);
+		datas[groupName]["Particle_moveRotateFirst"] = settings[i].moveRotate.first;
+		datas[groupName]["Particle_moveRotateSecond"] = settings[i].moveRotate.second;
+
+		// 回転
+		datas[groupName]["Particle_rotate1"] = settings[i].rotate.first;
+		datas[groupName]["Particle_rotate2"] = settings[i].rotate.second;
+		datas[groupName]["Particle_rotateSecond1"] = settings[i].rotateSecond.first;
+		datas[groupName]["Particle_rotateSecond2"] = settings[i].rotateSecond.second;
+		datas[groupName]["Particle_rotateEase"] = static_cast<uint32_t>(settings[i].rotateEaseType);
+
+
 		datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
 		datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
 		datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
@@ -1070,16 +1145,30 @@ void Particle::Debug(const std::string& guiName) {
 			datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
 			datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
 
+			// 大きさ
 			datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
-			datas[groupName]["Particle_sizeFirst"] = settings[i].size.first;
-			datas[groupName]["Particle_sizeSecond"] = settings[i].size.second;
+			datas[groupName]["Particle_size1"] = settings[i].size.first;
+			datas[groupName]["Particle_size2"] = settings[i].size.second;
+			datas[groupName]["Particle_sizeSecond1"] = settings[i].sizeSecond.first;
+			datas[groupName]["Particle_sizeSecond2"] = settings[i].sizeSecond.second;
+			datas[groupName]["Particle_sizeEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
+
+			// 速度
 			datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
 			datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
 			datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
 			datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
-			datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].easeType);
-			datas[groupName]["Particle_rotateFirst"] = settings[i].rotate.first;
-			datas[groupName]["Particle_rotateSecond"] = settings[i].rotate.second;
+			datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].moveEaseType);
+			datas[groupName]["Particle_moveRotateFirst"] = settings[i].moveRotate.first;
+			datas[groupName]["Particle_moveRotateSecond"] = settings[i].moveRotate.second;
+
+			// 回転
+			datas[groupName]["Particle_rotate1"] = settings[i].rotate.first;
+			datas[groupName]["Particle_rotate2"] = settings[i].rotate.second;
+			datas[groupName]["Particle_rotateSecond1"] = settings[i].rotateSecond.first;
+			datas[groupName]["Particle_rotateSecond2"] = settings[i].rotateSecond.second;
+			datas[groupName]["Particle_rotateEase"] = static_cast<uint32_t>(settings[i].rotateEaseType);
+
 			datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
 			datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
 			datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
