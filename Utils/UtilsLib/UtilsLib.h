@@ -34,6 +34,7 @@ namespace UtilsLib {
 
 		inline Flg& operator=(bool flg) {
 			flg_ = flg;
+			//preFlg_ = !flg_;
 			return *this;
 		}
 

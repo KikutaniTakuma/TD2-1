@@ -7,13 +7,14 @@
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Vector4.h"
+#include"Utils/UtilsLib/UtilsLib.h"
 
 template<class T>
 concept IsInt = std::is_integral_v<T>;
 
 class Easeing {
 public:
-	Easeing() = default;
+	Easeing();
 	Easeing(const Easeing& right) = default;
 	Easeing(Easeing&& right) noexcept = default;
 	~Easeing() = default;
@@ -90,6 +91,18 @@ public:
 	void Debug(const std::string& debugName);
 	void DebugTreeNode(const std::string& debugName);
 
+	bool ActiveEnter() const {
+		return isActive_.OnEnter();
+	}
+
+	bool ActiveStay() const {
+		return isActive_.OnStay();
+	}
+
+	bool ActiveExit() const {
+		return isActive_.OnExit();
+	}
+
 private:
 #ifdef _DEBUG
 	int32_t easeType_;
@@ -98,8 +111,8 @@ private:
 
 	std::function<float(float)> ease_;
 
-	bool isActive_;
-	bool isLoop_;
+	UtilsLib::Flg isActive_;
+	UtilsLib::Flg isLoop_;
 
 	float t_;
 
