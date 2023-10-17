@@ -4,7 +4,9 @@
 #include <algorithm>
 #include <cassert>
 #include <type_traits>
+#include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector3.h"
+#include "Utils/Math/Vector4.h"
 
 template<class T>
 concept IsInt = std::is_integral_v<T>;
@@ -69,8 +71,20 @@ public:
 		return std::lerp<T>(start, end, ease_(t_));
 	}
 
+	Vector2 Get(const Vector2& start, const Vector2& end) {
+		return Vector2::Lerp(start, end, ease_(t_));
+	}
+
 	Vector3 Get(const Vector3& start, const Vector3& end) {
 		return Vector3::Lerp(start, end, ease_(t_));
+	}
+
+	Vector4 Get(const Vector4& start, const Vector4& end) {
+		return ColorLerp(start, end, ease_(t_));
+	}
+
+	float GetT() const {
+		return ease_(t_);
 	}
 
 	void Debug(const std::string& debugName);
