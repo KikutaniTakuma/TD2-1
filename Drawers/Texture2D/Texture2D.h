@@ -26,6 +26,9 @@ public:
 	};
 
 public:
+	/// <summary>
+	/// デフォルトのコンストラクタではwhite2x2.pngを読み込む
+	/// </summary>
 	Texture2D();
 	Texture2D(const std::string& fileName);
 	Texture2D(const Texture2D&);
