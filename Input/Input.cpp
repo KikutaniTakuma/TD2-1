@@ -15,7 +15,11 @@ void Input::Finalize() {
 	instance_ = nullptr;
 }
 
-Input::Input() {
+Input::Input():
+	gamepad_(nullptr),
+	key_(nullptr),
+	mouse_(nullptr)
+{
 	HRESULT hr = DirectInput8Create(WinApp::GetInstance()->getWNDCLASSEX().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8,
 		reinterpret_cast<void**>(directInput_.GetAddressOf()), nullptr);
 	assert(SUCCEEDED(hr));
