@@ -2,6 +2,7 @@
 
 #include "Utils/Math/Mat4x4.h"
 #include "Drawers/Texture2D/Texture2D.h"
+#include "Drawers/Model/Model.h"
 #include "Input/Input.h"
 
 #include "GlobalVariables/GlobalVariables.h"
@@ -21,6 +22,11 @@ public:
 		kFalling, // 落ちている
 	};
 
+	// モデルのパーツ
+	enum class Parts {
+		kMain, // 一番の親。本体 
+	};
+
 	Player();
 	~Player() = default;
 
@@ -38,7 +44,7 @@ public:
 	/// 3DモデルのDraw仮
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
-	void Draw(const Mat4x4& viewProjection);
+	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
@@ -156,6 +162,8 @@ private:
 
 	// プレイヤーのテクスチャ
 	std::unique_ptr<Texture2D> tex_;
+
+	std::vector<std::unique_ptr<Model>> models_;
 
 	// 入力状況
 	Input* input_ = nullptr;

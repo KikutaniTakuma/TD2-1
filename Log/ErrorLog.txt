@@ -1,3 +1,5 @@
 2023/10/03 21:44:00 : ShaderManager / Shader Load failed
 2023/10/03 21:57:05 : RootSignature / Unsupported RangeType value 3435973836 (descriptor table slot [1], root parameter [0]).
 
+2023/10/17 14:32:42 : Texture / LoadTexture() : Failed : This file is not exist -> ./Resources/Player/C:\\Users\\mei\\Desktop\\Asesprite\\TD_1_2023.10_バチン\\player_body.png
+2023/10/17 14:34:43 : Model / pipeline is nullptr

@@ -13,6 +13,10 @@ Player::Player() {
 	tex_ = std::make_unique<Texture2D>();
 	tex_->LoadTexture("./Resources/Player/usausa.png");
 
+	models_.push_back(std::make_unique<Model>());
+	models_[static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Player/Player.obj");
+	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
+
 	globalVariables_ = std::make_unique<GlobalVariables>();
 
 	tex_->pos = {};
@@ -393,11 +397,14 @@ void Player::MemoHighest() {
 	}
 }
 
-//void Player::Draw(const Mat4x4& viewProjection) {
-//
-//}
+void Player::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
+	for (const std::unique_ptr<Model>& model : models_) {
+		model->Draw(viewProjection, cameraPos);
+	}
+}
 
 void Player::Draw2D(const Mat4x4& viewProjection) {
 
 	tex_->Draw(viewProjection, Pipeline::Normal, false);
+
 }

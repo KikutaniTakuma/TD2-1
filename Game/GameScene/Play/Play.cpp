@@ -718,6 +718,8 @@ void Play::Update() {
 
 	layer_->Update();
 
+	camera3D_->pos = camera2D_->pos;
+
 	camera2D_->Update();
 	camera3D_->Update();
 }
@@ -750,6 +752,9 @@ void Play::Draw() {
 	}
 
 	player_->Draw2D(camera2D_->GetViewOthographics());
+
+
+	player_->Draw(camera3D_->GetViewProjection(), camera3D_->GetPos());
 }
 
 
