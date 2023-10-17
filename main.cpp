@@ -13,6 +13,8 @@
 #include "Drawers/Model/Model.h"
 #include "Drawers/Particle/Particle.h"
 
+#include "SceneManager/Fade/Fade.h"
+
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ライブラリ初期化
@@ -31,11 +33,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	auto input = Input::GetInstance();
 
-	Particle hoge;
-	hoge.LopadSettingDirectory("smoke");
+	/*Particle hoge;
+	hoge.LopadSettingDirectory("smoke");*/
 
 	Camera camera;
 	camera.pos.z = -3.0f;
+
+	Fade fade;
 
 	/// 
 	/// メインループ
@@ -55,8 +59,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 更新処理
 		/// 
 
-		hoge.Update();
-		hoge.Debug("particle test");
+		/*hoge.Update();
+		hoge.Debug("particle test");*/
+
+		fade.Update();
 
 		///
 		/// 更新処理ここまで
@@ -67,7 +73,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// 
 		camera.Update();
 
-		hoge.Draw(camera.GetViewOthographics());
+		fade.Draw(camera.GetViewOthographics());
+
+		//hoge.Draw(camera.GetViewOthographics());
 
 		///
 		/// 描画処理ここまで
