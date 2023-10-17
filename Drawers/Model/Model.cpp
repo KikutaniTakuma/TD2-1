@@ -129,6 +129,12 @@ Model::Model() :
 	*colorBuf = UintToVector4(color);
 }
 
+Model::Model(const std::string& fileName):
+	Model()
+{
+	this->LoadObj(fileName);
+}
+
 Model::Model(const Model& right) :
 	Model()
 {

@@ -39,6 +39,7 @@ private:
 
 public:
 	Model();
+	Model(const std::string& fileName);
 	Model(const Model& right);
 	Model(Model&& right) noexcept;
 	~Model();
