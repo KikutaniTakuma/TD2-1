@@ -118,12 +118,14 @@ Model::Model() :
 
 	dirLig.shaderRegister = 1;
 	light.ligDirection = { 1.0f,-1.0f,-1.0f };
-	light.ligDirection = dirLig->ligDirection.Normalize();
+	light.ligDirection = light.ligDirection.Normalize();
 	light.ligColor = UintToVector4(0xffffadff).GetVector3();
 
 	light.ptPos = Vector3::zero;
 	light.ptColor = Vector3::zero;
-	light.ptRange = 0.0f;
+	light.ptRange = std::numeric_limits<float>::max();
+
+	*dirLig = light;
 
 	colorBuf.shaderRegister = 2;
 	*colorBuf = UintToVector4(color);
@@ -178,6 +180,8 @@ Model& Model::operator=(const Model& right) {
 		loadObjFlg = true;
 	}
 
+	light = right.light;
+
 	// 定数バッファの値をコピー
 	*wvpData = *right.wvpData;
 	*dirLig = *right.dirLig;
@@ -218,6 +222,8 @@ Model& Model::operator=(Model&& right) noexcept {
 		loadObjFlg = true;
 	}
 
+	light = std::move(right.light);
+
 	// 定数バッファの値をコピー
 	*wvpData = *right.wvpData;
 	*dirLig = *right.dirLig;
@@ -241,6 +247,11 @@ void Model::LoadObj(const std::string& fileName) {
 	}
 }
 
+void Model::ChangeTexture(const std::string& useMtlName, const std::string& texName) {
+	data[useMtlName].tex = TextureManager::GetInstance()->LoadTexture(texName);
+	assert(data[useMtlName].tex->GetFileName() == texName);
+}
+
 void Model::Update() {
 	*dirLig = light;
 }
@@ -257,8 +268,8 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 		*colorBuf = UintToVector4(color);
 
+		light.eyePos = cameraPos;
 		dirLig->eyePos = cameraPos;
-
 
 		auto commandlist = Engine::GetCommandList();
 
