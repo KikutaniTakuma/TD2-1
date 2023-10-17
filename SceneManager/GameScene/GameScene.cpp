@@ -13,12 +13,12 @@ GameScene::GameScene():
 {}
 
 void GameScene::Initialize() {
-	camera_.farClip = 3000.0f;
-
+	camera_.pos.z -= 10.0f;
+	
 	globalVariables_.LoadFile();
 
-	texs_.push_back(Texture2D());
-	texs_.back().scale *= 512.0f;
+	particles.push_back(Particle{});
+	particles.back().LopadSettingDirectory("break");
 }
 
 void GameScene::Finalize() {
@@ -32,6 +32,11 @@ void GameScene::Update() {
 
 	for (auto& tex : texs_) {
 		tex.Update();
+	}
+
+	particles.back().Debug("particle");
+	for (auto& particle : particles) {
+		particle.Update();
 	}
 
 #ifdef _DEBUG
@@ -50,5 +55,9 @@ void GameScene::Draw() {
 
 	for (auto& tex : texs_) {
 		tex.Draw(camera_.GetViewOthographics());
+	}
+
+	for (auto& particle : particles) {
+		particle.Draw(camera_.GetViewOthographics());
 	}
 }

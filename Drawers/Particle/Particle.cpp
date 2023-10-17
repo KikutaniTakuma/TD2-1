@@ -250,6 +250,18 @@ Particle& Particle::operator=(const Particle& right) {
 	isAnimation_ = right.isAnimation_;
 	uvPibotSpd_ = right.uvPibotSpd_;
 
+	emitterPos_ = right.emitterPos_;
+
+	datas = right.datas;
+	dataDirectoryName = right.dataDirectoryName;
+
+	settings = right.settings;
+
+	isLoop_ = right.isLoop_;
+
+	currentSettingIndex = right.currentSettingIndex;
+	currentParticleIndex = right.currentParticleIndex;
+
 	return *this;
 }
 
@@ -273,6 +285,19 @@ Particle& Particle::operator=(Particle&& right) noexcept {
 	aniCount_ = std::move(right.aniCount_);
 	isAnimation_ = std::move(right.isAnimation_);
 	uvPibotSpd_ = std::move(right.uvPibotSpd_);
+
+
+	emitterPos_ = std::move(right.emitterPos_);
+
+	datas = std::move(right.datas);
+	dataDirectoryName = std::move(right.dataDirectoryName);
+
+	settings = std::move(right.settings);
+
+	isLoop_ = std::move(right.isLoop_);
+
+	currentSettingIndex = std::move(right.currentSettingIndex);
+	currentParticleIndex = std::move(right.currentParticleIndex);
 
 	return *this;
 }
@@ -848,7 +873,9 @@ void Particle::Debug(const std::string& guiName) {
 			// directory内のファイルをすべて読み込む
 			for (const auto& entry : dirItr) {
 				if (ImGui::Button(entry.path().string().c_str())) {
-					LopadSettingDirectory(entry.path().string());
+					settings.clear();
+					datas.clear();
+					LopadSettingDirectory(entry.path().stem().string());
 				}
 			}
 		}
@@ -919,22 +946,22 @@ void Particle::Debug(const std::string& guiName) {
 			if (ImGui::TreeNode("Appear")) {
 				auto particleNumFirst = int32_t(settings[i].particleNum.first);
 				auto particleNumSecond = int32_t(settings[i].particleNum.second);
-				ImGui::DragInt("particleNum first", &particleNumFirst, 1.0f, 0);
-				ImGui::DragInt("particleNum second", &particleNumSecond, 1.0f, 0);
+				ImGui::DragInt("particleNum first", &particleNumFirst, 0.1f, 0, int32_t(settings[i].emitter.particleMaxNum));
+				ImGui::DragInt("particleNum second", &particleNumSecond, 0.1f, 0, int32_t(settings[i].emitter.particleMaxNum));
 				settings[i].particleNum.first = uint32_t(particleNumFirst);
 				settings[i].particleNum.second = uint32_t(particleNumSecond);
 
 				auto freqFirst = int32_t(settings[i].freq.first);
 				auto freqSecond = int32_t(settings[i].freq.second);
-				ImGui::DragInt("freq first(milliseconds)", &freqFirst, 1.0f, 0);
-				ImGui::DragInt("freq second(milliseconds)", &freqSecond, 1.0f, 0);
+				ImGui::DragInt("freq first(milliseconds)", &freqFirst, 1.0f, 0, int32_t(settings[i].emitter.validTime.count()));
+				ImGui::DragInt("freq second(milliseconds)", &freqSecond, 1.0f, 0, int32_t(settings[i].emitter.validTime.count()));
 				settings[i].freq.first = uint32_t(freqFirst);
 				settings[i].freq.second = uint32_t(freqSecond);
 
 				auto deathFirst = int32_t(settings[i].death.first);
 				auto deathSecond = int32_t(settings[i].death.second);
-				ImGui::DragInt("death first(milliseconds)", &deathFirst, 10.0f, 0);
-				ImGui::DragInt("death second(milliseconds)", &deathSecond, 10.0f, 0);
+				ImGui::DragInt("death first(milliseconds)", &deathFirst, 10.0f, 0, std::numeric_limits<int32_t>::max());
+				ImGui::DragInt("death second(milliseconds)", &deathSecond, 10.0f, 0, std::numeric_limits<int32_t>::max());
 				settings[i].death.first = uint32_t(deathFirst);
 				settings[i].death.second = uint32_t(deathSecond);
 				ImGui::TreePop();

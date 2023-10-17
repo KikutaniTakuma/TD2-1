@@ -48,8 +48,8 @@ private:
 	};
 
 	enum class EmitterType {
-		Circle,
 		Cube,
+		Circle,
 	};
 
 	struct Emitter {
