@@ -48,6 +48,13 @@ RenderTarget::RenderTarget():
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
+	Engine::GetDevice()->
+		CreateRenderTargetView(
+			resource.Get(),
+			&rtvDesc,
+			RTVHeap->GetCPUDescriptorHandleForHeapStart()
+		);
+
 	srvDesc = {};
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Format = rtvDesc.Format;

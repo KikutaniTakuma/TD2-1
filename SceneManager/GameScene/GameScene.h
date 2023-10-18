@@ -3,6 +3,7 @@
 #include "Drawers/Model/Model.h"
 #include "Drawers/Texture2D/Texture2D.h"
 #include "Drawers/Particle/Particle.h"
+#include "Drawers/PeraRender/PeraRender.h"
 #include "GlobalVariables/GlobalVariables.h"
 
 class GameScene : public BaseScene {

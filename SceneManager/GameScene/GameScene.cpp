@@ -16,13 +16,6 @@ void GameScene::Initialize() {
 	camera_.pos.z -= 10.0f;
 	
 	globalVariables_.LoadFile();
-
-	/*particles.push_back(Particle{});
-	particles.back().LopadSettingDirectory("break");*/
-
-	texs_.push_back(Texture2D{});
-	texs_.back().LoadTexture("./Resources/Watame.png");
-	texs_.back().scale = texs_.back().GetTexSize();
 }
 
 void GameScene::Finalize() {
@@ -38,7 +31,6 @@ void GameScene::Update() {
 		tex.Update();
 	}
 
-	//particles.back().Debug("particle");
 	for (auto& particle : particles) {
 		particle.Update();
 	}

@@ -3,10 +3,14 @@
 
 class RenderTarget {
 public:
-	// ディスクリプタの大きさはデフォルトコンストラクタで4
 	RenderTarget();
 	RenderTarget(uint32_t width, uint32_t height);
 	~RenderTarget();
+
+	RenderTarget(const RenderTarget&) = delete;
+	RenderTarget(RenderTarget&&) = delete;
+	RenderTarget& operator=(const RenderTarget&) = delete;
+	RenderTarget& operator=(RenderTarget&&) = delete;
 
 public:
 	// レンダーターゲットに設定する

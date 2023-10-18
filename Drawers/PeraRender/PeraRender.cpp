@@ -2,7 +2,7 @@
 #include "Engine/Engine.h"
 #include <cassert>
 #include "Utils/ConvertString/ConvertString.h"
-#include "Engine/ShaderManager/ShaderManager.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "externals/imgui/imgui.h"
 
 PeraRender::PeraRender():
@@ -22,7 +22,10 @@ PeraRender::PeraRender(uint32_t width_, uint32_t height_):
 {}
 
 PeraRender::~PeraRender() {
-	peraVertexResource->Release();
+	if (peraVertexResource) {
+		peraVertexResource->Release();
+		peraVertexResource.Reset();
+	}
 }
 
 void PeraRender::Initialize(const std::string& vsFileName, const std::string& psFileName) {
@@ -47,6 +50,9 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 	peraVertexResource->Map(0, nullptr, reinterpret_cast<void**>(&mappedData));
 	std::copy(pv.begin(), pv.end(), mappedData);
 	peraVertexResource->Unmap(0, nullptr);
+
+	static auto srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap->CreatePerarenderView(render);
 }
 
 void PeraRender::CreateShader(const std::string& vsFileName, const std::string& psFileName) {
