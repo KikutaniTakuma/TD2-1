@@ -34,13 +34,6 @@ void GameScene::Update() {
 	for (auto& particle : particles) {
 		particle.Update();
 	}
-
-#ifdef _DEBUG
-	/*if (input_->GetKey()->Pushed(DIK_SPACE)) {
-		models_.back().ChangeTexture("Material", "./Resources/uvChecker.png");
-	}*/
-#endif // _DEBUG
-
 }
 
 void GameScene::Draw() {
