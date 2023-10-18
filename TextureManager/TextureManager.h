@@ -1,6 +1,5 @@
 #pragma once
 #include "Texture/Texture.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
 
 #include <unordered_map>
 #include <string>
@@ -63,7 +62,7 @@ public:
 
 
 private:
-	ShaderResourceHeap srvHeap;
+	class ShaderResourceHeap* srvHeap;
 
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;

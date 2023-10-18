@@ -2,6 +2,7 @@
 #include "Engine/Engine.h"
 #include <algorithm>
 #include "Engine/PipelineManager/PipelineManager.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 
 Shader Line::shader = {};
 
@@ -48,7 +49,9 @@ Line::Line() :
 
 	vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vertexMap));
 
-	heap.CreateConstBufferView(wvpMat);
+	heap = ShaderResourceHeap::GetInstance();
+
+	heap->CreateConstBufferView(wvpMat);
 }
 
 Line::Line(const Line& right):
@@ -87,7 +90,7 @@ void Line::Draw(const Mat4x4& viewProjection, uint32_t color) {
 	*wvpMat = viewProjection;
 
 	pipline->Use();
-	heap.Use();
+	heap->Use(wvpMat.GetDescIndex(), 0);
 	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &vertexView);
 	Engine::GetCommandList()->DrawInstanced(kVertexNum, 1, 0, 0);
 }

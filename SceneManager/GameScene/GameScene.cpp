@@ -17,11 +17,12 @@ void GameScene::Initialize() {
 	
 	globalVariables_.LoadFile();
 
-	particles.push_back(Particle{});
-	particles.back().LopadSettingDirectory("hoge");
+	/*particles.push_back(Particle{});
+	particles.back().LopadSettingDirectory("break");*/
 
-	//models_.push_back(Model{});
-	//models_.back().LoadObj("./Resources/Cube.obj");
+	texs_.push_back(Texture2D{});
+	texs_.back().LoadTexture("./Resources/Watame.png");
+	texs_.back().scale = texs_.back().GetTexSize();
 }
 
 void GameScene::Finalize() {
@@ -37,7 +38,7 @@ void GameScene::Update() {
 		tex.Update();
 	}
 
-	particles.back().Debug("particle");
+	//particles.back().Debug("particle");
 	for (auto& particle : particles) {
 		particle.Update();
 	}

@@ -107,9 +107,19 @@ public:
 		return roootParamater;
 	}
 
-	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle) noexcept {
-		Engine::GetDevice()->CreateConstantBufferView(&cbvDesc, descriptorHandle);
+	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHandleGPU, UINT dsecIndex) noexcept {
+		Engine::GetDevice()->CreateConstantBufferView(&cbvDesc, descHandle);
+		descriptorHandle = descHandleGPU;
+		dsecIndex_ = dsecIndex;
 		isCreateView = true;
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE GetViewHandle() const noexcept {
+		return descriptorHandle;
+	}
+
+	UINT GetDescIndex() const noexcept {
+		return dsecIndex_;
 	}
 
 private:
@@ -121,6 +131,10 @@ private:
 	bool isWright;
 
 	bool isCreateView;
+
+	D3D12_GPU_DESCRIPTOR_HANDLE descriptorHandle;
+
+	UINT dsecIndex_;
 
 	D3D12_ROOT_PARAMETER roootParamater;
 public:

@@ -1,7 +1,7 @@
 #pragma once
 #include "TextureManager/TextureManager.h"
 #include "Engine/PipelineManager/PipelineManager.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include "Engine/StructuredBuffer/StructuredBuffer.h"
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
@@ -292,13 +292,7 @@ public:
 	/// パーティクルの量を返る
 	/// </summary>
 	/// <param name="index">particleのインデックス</param>
-	void Resize(uint32_t index) {
-		wvpMat.Resize(index);
-		srvHeap.CreateStructuredBufferView(wvpMat, 1);
-		colorBuf.Resize(index);
-		srvHeap.CreateStructuredBufferView(colorBuf, 2);
-		wtfs.resize(index);
-	}
+	void Resize(uint32_t index);
 
 public:
 	Vector2 uvPibot;
@@ -317,7 +311,7 @@ private:
 
 	std::vector<WorldTransForm> wtfs;
 
-	ShaderResourceHeap srvHeap;
+	class ShaderResourceHeap* srvHeap;
 
 
 	D3D12_VERTEX_BUFFER_VIEW vertexView;

@@ -165,10 +165,7 @@ void Pipeline::Create(
 		{
 		case Pipeline::Blend::None:
 		default:
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendEnable = true;
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].SrcBlend = D3D12_BLEND_ONE;
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].DestBlend = D3D12_BLEND_ZERO;
-			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD;
+			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendEnable = false;
 			break;
 		case Pipeline::Blend::Normal:
 			graphicsPipelineStateDesc.BlendState.RenderTarget[i].BlendEnable = true;

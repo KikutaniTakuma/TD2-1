@@ -4,6 +4,8 @@
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/FrameInfo/FrameInfo.h"
 #include "Engine/WinApp/WinApp.h"
+#include "Engine/Engine.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include <numeric>
 
 #include "externals/nlohmann/json.hpp"
@@ -58,17 +60,28 @@ void Particle::LoadShader(const std::string& vsFileName, const std::string& psFi
 }
 
 void Particle::CreateGraphicsPipeline() {
-	D3D12_DESCRIPTOR_RANGE range = {};
-	range.NumDescriptors = 3;
-	range.BaseShaderRegister = 0;
-	range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-	range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	std::array<D3D12_DESCRIPTOR_RANGE,1> texRange = {};
+	texRange[0].NumDescriptors = 1;
+	texRange[0].BaseShaderRegister = 0;
+	texRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	texRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 
-	std::array<D3D12_ROOT_PARAMETER, 1> rootPrams={};
+	std::array<D3D12_DESCRIPTOR_RANGE, 1> strucBufRange = {};
+	strucBufRange[0].NumDescriptors = 2;
+	strucBufRange[0].BaseShaderRegister = 1;
+	strucBufRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	strucBufRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+
+	std::array<D3D12_ROOT_PARAMETER, 2> rootPrams={};
 	rootPrams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootPrams[0].DescriptorTable.NumDescriptorRanges = 1;
-	rootPrams[0].DescriptorTable.pDescriptorRanges = &range;
+	rootPrams[0].DescriptorTable.NumDescriptorRanges = UINT(texRange.size());
+	rootPrams[0].DescriptorTable.pDescriptorRanges = texRange.data();
 	rootPrams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	rootPrams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootPrams[1].DescriptorTable.NumDescriptorRanges = UINT(strucBufRange.size());
+	rootPrams[1].DescriptorTable.pDescriptorRanges = strucBufRange.data();
+	rootPrams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
 	PipelineManager::CreateRootSgnature(rootPrams.data(), rootPrams.size(), true);
 	PipelineManager::SetShader(shader);
@@ -105,8 +118,10 @@ Particle::Particle() :
 	isAnimation_(0.0f),
 	settings(),
 	currentSettingIndex(0u),
-	currentParticleIndex(0u)
+	currentParticleIndex(0u),
+	srvHeap(nullptr)
 {
+	srvHeap = ShaderResourceHeap::GetInstance();
 	for (uint32_t i = 0; i < wvpMat.Size(); i++) {
 		wvpMat[i] = MakeMatrixIndentity();
 	}
@@ -151,6 +166,7 @@ Particle::Particle() :
 		}
 		dirCount++;
 	}
+
 }
 
 Particle::Particle(uint32_t indexNum) :
@@ -167,8 +183,10 @@ Particle::Particle(uint32_t indexNum) :
 	isAnimation_(0.0f),
 	settings(),
 	currentSettingIndex(0u),
-	currentParticleIndex(0u)
+	currentParticleIndex(0u),
+	srvHeap(nullptr)
 {
+	srvHeap = ShaderResourceHeap::GetInstance();
 	for (uint32_t i = 0; i < wvpMat.Size();i++) {
 		wvpMat[i] = MakeMatrixIndentity();
 	}
@@ -302,6 +320,14 @@ Particle& Particle::operator=(Particle&& right) noexcept {
 	return *this;
 }
 
+void Particle::Resize(uint32_t index) {
+	wvpMat.Resize(index);
+	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat, wvpMat.GetDescIndex());
+	colorBuf.Resize(index);
+	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf, colorBuf.GetDescIndex());
+	wtfs.resize(index);
+}
+
 Particle::~Particle() {
 	for (auto i = 0llu; i < settings.size(); i++) {
 		const auto groupName = ("setting" + std::to_string(i));
@@ -373,10 +399,9 @@ void Particle::LoadTexture(const std::string& fileName) {
 	if (tex && !isLoad) {
 		isLoad = true;
 	}
-	srvHeap.InitializeReset(3);
-	srvHeap.CreateTxtureView(tex);
-	srvHeap.CreateStructuredBufferView(wvpMat);
-	srvHeap.CreateStructuredBufferView(colorBuf);
+	srvHeap->CreateTxtureView(tex);
+	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
+	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
 }
 
 void Particle::ThreadLoadTexture(const std::string& fileName) {
@@ -426,19 +451,12 @@ void Particle::LopadSettingDirectory(const std::string& directoryName) {
 		}
 		else {
 			tex = TextureManager::GetInstance()->GetWhiteTex();
+			isLoad = true;
+			srvHeap->CreateTxtureView(tex);
+			srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
+			srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
 		}
 		file.close();
-	}
-
-	if (!tex) {
-		tex = TextureManager::GetInstance()->GetWhiteTex();
-	}
-	if (tex) {
-		isLoad = true;
-		srvHeap.InitializeReset(3);
-		srvHeap.CreateTxtureView(tex);
-		srvHeap.CreateStructuredBufferView(wvpMat);
-		srvHeap.CreateStructuredBufferView(colorBuf);
 	}
 }
 
@@ -689,10 +707,9 @@ void Particle::Update() {
 	assert(wtfs.size() == wvpMat.Size());
 
 	if (tex && tex->CanUse() && !isLoad) {
-		srvHeap.InitializeReset(3);
-		srvHeap.CreateTxtureView(tex);
-		srvHeap.CreateStructuredBufferView(wvpMat);
-		srvHeap.CreateStructuredBufferView(colorBuf);
+		srvHeap->CreateTxtureView(tex);
+		srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
+		srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
 		isLoad = true;
 	}
 
@@ -888,7 +905,8 @@ void Particle::Draw(
 			auto commandlist = Engine::GetCommandList();
 			// 各種描画コマンドを積む
 			graphicsPipelineState[blend]->Use();
-			srvHeap.Use();
+			tex->Use(0);
+			srvHeap->Use(wvpMat.GetDescIndex(), 1);
 			commandlist->IASetVertexBuffers(0, 1, &vertexView);
 			commandlist->IASetIndexBuffer(&indexView);
 			commandlist->DrawIndexedInstanced(6, drawCount, 0, 0, 0);

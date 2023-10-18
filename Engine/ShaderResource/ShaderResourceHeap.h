@@ -1,91 +1,85 @@
 #pragma once
+#include <memory>
+#include <vector>
 #include <wrl.h>
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
 #include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/StructuredBuffer/StructuredBuffer.h"
 #include "TextureManager/Texture/Texture.h"
-#include <memory>
-#include <vector>
+#include "Engine/RenderTarget/RenderTarget.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 
 class ShaderResourceHeap {
 private:
-	enum class HeapType {
-		SRV,
-		CBV,
-		UAV
-	};
-
-public:
-	ShaderResourceHeap();
-	ShaderResourceHeap(const ShaderResourceHeap& right);
-	ShaderResourceHeap(ShaderResourceHeap&& right) noexcept;
-	ShaderResourceHeap(uint16_t numDescriptor);
+	ShaderResourceHeap() = delete;
+	ShaderResourceHeap(const ShaderResourceHeap& right) = delete;
+	ShaderResourceHeap(ShaderResourceHeap&& right) noexcept = delete;
+	ShaderResourceHeap(UINT numDescriptor);
 	~ShaderResourceHeap();
-public:
-	ShaderResourceHeap& operator=(const ShaderResourceHeap& right);
-	ShaderResourceHeap& operator=(ShaderResourceHeap&& right) noexcept;
+	ShaderResourceHeap& operator=(const ShaderResourceHeap& right) = delete;
+	ShaderResourceHeap& operator=(ShaderResourceHeap&& right) noexcept = delete;
 
 public:
-	void InitializeReset();
-	void InitializeReset(uint32_t numDescriptor);
+	static void Initialize(UINT numDescriptor);
 
-	void Use();
-	void Use(D3D12_GPU_DESCRIPTOR_HANDLE handle);
+	static void Finalize();
 
-	template<class T>
+	static ShaderResourceHeap* GetInstance();
+
+private:
+	static ShaderResourceHeap* instance;
+
+public:
+	void SetHeap();
+
+	void Use(D3D12_GPU_DESCRIPTOR_HANDLE handle, UINT rootParmIndex);
+	void Use(uint32_t handleIndex, UINT rootParmIndex);
+
+	template<IsNotPtrCB T>
 	uint32_t CreateConstBufferView(ConstBuffer<T>& conBuf) {
 		assert(currentHadleIndex < heapSize);
 		if (currentHadleIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		conBuf.CrerateView(heapHadles[currentHadleIndex].first);
+		conBuf.CrerateView(heapHadles[currentHadleIndex].first, heapHadles[currentHadleIndex].second, currentHadleIndex);
 		currentHadleIndex++;
-
-		heapOrder.push_back(HeapType::CBV);
 
 		return currentHadleIndex - 1u;
 	}
 
-	template<class T>
-	void CreateConstBufferView(ConstBuffer<T>& conBuf, uint32_t heapIndex) {
+	template<IsNotPtrCB T>
+	void CreateConstBufferView(ConstBuffer<T>& conBuf, UINT heapIndex) {
 		assert(heapIndex < heapSize);
 		if (heapIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		conBuf.CrerateView(heapHadles[heapIndex].first);
-
-		heapOrder[heapIndex] = HeapType::CBV;
+		conBuf.CrerateView(heapHadles[heapIndex].first, heapHadles[heapIndex].second, heapIndex);
 	}
 
-	template<class T>
+	template<IsNotPtrSB T>
 	uint32_t CreateStructuredBufferView(StructuredBuffer<T>& strcBuf) {
 		assert(currentHadleIndex < heapSize);
 		if (currentHadleIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		strcBuf.CrerateView(heapHadles[currentHadleIndex].first);
+		strcBuf.CrerateView(heapHadles[currentHadleIndex].first, heapHadles[currentHadleIndex].second, currentHadleIndex);
 		currentHadleIndex++;
-
-		heapOrder.push_back(HeapType::SRV);
 
 		return currentHadleIndex - 1u;
 	}
 
-	template<class T>
-	void CreateStructuredBufferView(StructuredBuffer<T>& strcBuf, uint32_t heapIndex) {
+	template<IsNotPtrSB T>
+	void CreateStructuredBufferView(StructuredBuffer<T>& strcBuf, UINT heapIndex) {
 		assert(heapIndex < heapSize);
 		if (heapIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		strcBuf.CrerateView(heapHadles[heapIndex].first);
-
-		heapOrder[heapIndex] = HeapType::SRV;
+		strcBuf.CrerateView(heapHadles[heapIndex].first, heapHadles[heapIndex].second, heapIndex);
 	}
 
 	inline uint32_t CreateTxtureView(Texture* tex) {
@@ -100,8 +94,6 @@ public:
 		tex->CreateSRVView(heapHadles[currentHadleIndex].first);
 		currentHadleIndex++;
 
-		heapOrder.push_back(HeapType::SRV);
-
 		return currentHadleIndex - 1u;
 	}
 	inline void CreateTxtureView(Texture* tex, uint32_t heapIndex) {
@@ -111,11 +103,19 @@ public:
 			ErrorCheck::GetInstance()->ErrorTextBox("CreatTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 		tex->CreateSRVView(heapHadles[heapIndex].first);
-
-		heapOrder[heapIndex] = HeapType::SRV;
 	}
 
-	D3D12_ROOT_PARAMETER GetParameter();
+	inline uint32_t CreatePerarenderView(RenderTarget& renderTarget) {
+		assert(currentHadleIndex < heapSize);
+		if (currentHadleIndex >= heapSize) {
+			ErrorCheck::GetInstance()->ErrorTextBox("CreatePerarenderView failed\nOver HeapSize", "ShaderResourceHeap");
+		}
+
+		renderTarget.CreateView(heapHadles[currentHadleIndex].first, heapHadles[currentHadleIndex].second);
+		currentHadleIndex++;
+
+		return currentHadleIndex - 1u;
+	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuHeapHandle(uint32_t heapIndex) {
 		return heapHadles[heapIndex].first;
@@ -132,6 +132,11 @@ public:
 		return SRVHeap.Get();
 	}
 
+	inline ID3D12DescriptorHeap* const* GetAddressOf() const {
+		return SRVHeap.GetAddressOf();
+	}
+
+private:
 	void Reset();
 
 private:
@@ -141,7 +146,4 @@ private:
 	UINT currentHadleIndex;
 
 	std::vector<std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>> heapHadles;
-	std::vector<HeapType> heapOrder;
-
-	std::vector<D3D12_DESCRIPTOR_RANGE> descriptorRanges;
 };
