@@ -17,11 +17,11 @@ void GameScene::Initialize() {
 	
 	globalVariables_.LoadFile();
 
-	/*particles.push_back(Particle{});
-	particles.back().LopadSettingDirectory("break");*/
+	particles.push_back(Particle{});
+	particles.back().LopadSettingDirectory("hoge");
 
-	models_.push_back(Model{});
-	models_.back().LoadObj("./Resources/Cube.obj");
+	//models_.push_back(Model{});
+	//models_.back().LoadObj("./Resources/Cube.obj");
 }
 
 void GameScene::Finalize() {
@@ -37,15 +37,15 @@ void GameScene::Update() {
 		tex.Update();
 	}
 
-	//particles.back().Debug("particle");
+	particles.back().Debug("particle");
 	for (auto& particle : particles) {
 		particle.Update();
 	}
 
 #ifdef _DEBUG
-	if (input_->GetKey()->Pushed(DIK_SPACE)) {
+	/*if (input_->GetKey()->Pushed(DIK_SPACE)) {
 		models_.back().ChangeTexture("Material", "./Resources/uvChecker.png");
-	}
+	}*/
 #endif // _DEBUG
 
 }

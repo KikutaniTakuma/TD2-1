@@ -873,28 +873,25 @@ void Particle::Draw(
 		std::copy(pv.begin(), pv.end(), mappedData);
 		vertexResource->Unmap(0, nullptr);
 
-		bool isDraw = false;
+		UINT drawCount = 0;
+		assert(wtfs.size() == wvpMat.Size());
 		for (uint32_t i = 0; i < wvpMat.Size();i++) {
 			if (wtfs[i].isActive) {
-				wvpMat[i] = viewProjection * VertMakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos);
-				colorBuf[i] = UintToVector4(wtfs[i].color);
-				isDraw = true;
-			}
-			else {
-				wvpMat[i] = Mat4x4();
-				colorBuf[i] = UintToVector4(0u);
+				wvpMat[drawCount] = viewProjection * VertMakeMatrixAffin(wtfs[i].scale, wtfs[i].rotate, wtfs[i].pos);
+				colorBuf[drawCount] = UintToVector4(wtfs[i].color);
+				drawCount++;
 			}
 		}
 
 
-		if (isDraw) {
+		if (0 < drawCount) {
 			auto commandlist = Engine::GetCommandList();
 			// 各種描画コマンドを積む
 			graphicsPipelineState[blend]->Use();
 			srvHeap.Use();
 			commandlist->IASetVertexBuffers(0, 1, &vertexView);
 			commandlist->IASetIndexBuffer(&indexView);
-			commandlist->DrawIndexedInstanced(6, wvpMat.Size(), 0, 0, 0);
+			commandlist->DrawIndexedInstanced(6, drawCount, 0, 0, 0);
 		}
 	}
 }
@@ -917,9 +914,22 @@ void Particle::Debug(const std::string& guiName) {
 			// directory内のファイルをすべて読み込む
 			for (const auto& entry : dirItr) {
 				if (ImGui::Button(entry.path().string().c_str())) {
-					settings.clear();
-					datas.clear();
-					LopadSettingDirectory(entry.path().stem().string());
+					int32_t id = MessageBoxA(
+						WinApp::GetInstance()->GetHwnd(),
+						"Are you sure you wanna load this setting?", "Particle",
+						MB_OKCANCEL | MB_ICONINFORMATION
+					);
+
+					if (id == IDOK) {
+						settings.clear();
+						datas.clear();
+						LopadSettingDirectory(entry.path().stem().string());
+						MessageBoxA(
+							WinApp::GetInstance()->GetHwnd(),
+							"Load success", "Particle",
+							MB_OK | MB_ICONINFORMATION
+						);
+					}
 				}
 			}
 		}
@@ -1116,12 +1126,33 @@ void Particle::Debug(const std::string& guiName) {
 			);
 
 			if (id == IDOK) {
-				BackUpSettingFile(groupName);
+				int32_t id2 = MessageBoxA(
+					WinApp::GetInstance()->GetHwnd(),
+					"Really??? delete it???", "Particle",
+					MB_OKCANCEL | MB_ICONINFORMATION
+				);
+				if (id2 == IDOK) {
+					int32_t id3 = MessageBoxA(
+						WinApp::GetInstance()->GetHwnd(),
+						"Really????????????????????????", "Particle",
+						MB_OKCANCEL | MB_ICONINFORMATION
+					);
 
-				settings.erase(settings.begin() + i);
-				datas.erase(groupName);
-				ImGui::EndMenu();
-				break;
+					if (id3 == IDOK) {
+						BackUpSettingFile(groupName);
+
+						settings.erase(settings.begin() + i);
+						datas.erase(groupName);
+						ImGui::EndMenu();
+
+						MessageBoxA(
+							WinApp::GetInstance()->GetHwnd(),
+							"delete success", "Particle",
+							MB_OK | MB_ICONINFORMATION
+						);
+						break;
+					}
+				}
 			}
 		}
 
