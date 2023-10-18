@@ -10,8 +10,7 @@ Play::Play() {
 	ShockWave::GlobalVariablesLoad();
 	Layer::GlobalVariablesLoad();
 
-	camera2D_ = std::make_unique<Camera>(Camera::Type::Othographic);
-	camera3D_ = std::make_unique<Camera>(Camera::Type::Projecction);
+	camera2D_ = std::make_unique<Camera>();
 
 	player_ = std::make_unique<Player>();
 	player_->SetPlayScene(this);

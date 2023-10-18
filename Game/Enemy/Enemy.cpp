@@ -1,8 +1,9 @@
 #include "Enemy.h"
 
 #include "Engine/FrameInfo/FrameInfo.h"
-
+#include "Utils/Camera/Camera.h"
 #include "Game/Layer/Layer.h"
+#include <numbers>
 
 std::unique_ptr<GlobalVariables> Enemy::globalVariables_ = std::make_unique<GlobalVariables>();
 
@@ -14,6 +15,22 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, float scale) {
 
 	tex_ = std::make_unique<Texture2D>();
 	tex_->LoadTexture("./Resources/Enemy/usabom.png");
+
+	for (int i = 0; i < static_cast<int>(Parts::kEnd); i++) {
+		models_.push_back(std::make_unique<Model>());
+	}
+	models_[static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Enemy/enemy.obj");
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
+	models_[static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->LoadObj("./Resources/Enemy/enemy_doukasen.obj");
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->light.ligColor = { 1.0f,1.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->light.ptRange = 10000.0f;
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate.y = std::numbers::pi_v<float>;
+
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->parent = models_[static_cast<uint16_t>(Parts::kMain)].get();
 	
 	if (type == static_cast<int>(Type::kFly)) {
 		type_ = Type::kFly;
@@ -103,7 +120,7 @@ void Enemy::SetParametar(int type, const Vector3& pos, const float& y) {
 //
 //}
 
-void Enemy::Update(Layer* layer, const float& y) {
+void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 
 	ApplyGlobalVariable();
 
@@ -155,6 +172,19 @@ void Enemy::Update(Layer* layer, const float& y) {
 		break;
 	}
 
+	float ratio = static_cast<float>(Engine::GetInstance()->clientHeight) /
+		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
+
+	float indication = 90.0f;
+
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.x = tex_->pos.x / ratio + camera->pos.x - camera->pos.x / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.y = tex_->pos.y / ratio + camera->pos.y - camera->pos.y / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.x = tex_->scale.x / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.y = tex_->scale.y / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->Update();
 	tex_->Update();
 }
 
@@ -237,9 +267,11 @@ void Enemy::DeathUpdate() {
 	statusRequest_ = Status::kGeneration;
 }
 
-//void Enemy::Draw(const Mat4x4& viewProjection) {
-//
-//}
+void Enemy::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
+	for (const std::unique_ptr<Model>& model : models_) {
+		model->Draw(viewProjection, cameraPos);
+	}
+}
 
 void Enemy::Draw2D(const Mat4x4& viewProjection) {
 

@@ -1,8 +1,10 @@
 #include "Player.h"
 
 #include "Engine/FrameInfo/FrameInfo.h"
-#include "Game/GameScene/Play/Play.h"
 #include "Game/ShockWave/ShockWave.h"
+#include "SceneManager/GameScene/GameScene.h"
+#include "Utils/Camera/Camera.h"
+#include <numbers>
 
 #include "externals/imgui/imgui.h"
 
@@ -15,7 +17,10 @@ Player::Player() {
 
 	models_.push_back(std::make_unique<Model>());
 	models_[static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Player/Player.obj");
-	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
+	models_[static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
 
 	globalVariables_ = std::make_unique<GlobalVariables>();
 
@@ -92,7 +97,7 @@ void Player::Initialize() {
 	isSteped_ = false;
 }
 
-void Player::Update(const float& y) {
+void Player::Update(const float& y, const Camera* camera) {
 
 #ifdef _DEBUG
 	ImGui::Begin("PlayerFlag");
@@ -152,6 +157,18 @@ void Player::Update(const float& y) {
 		break;
 	}
 
+	float ratio = static_cast<float>(Engine::GetInstance()->clientHeight) /
+		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
+
+	float indication = 90.0f;
+
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.x = tex_->pos.x / ratio + camera->pos.x - camera->pos.x / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.y = tex_->pos.y / ratio + camera->pos.y- camera->pos.y / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.x = tex_->scale.x / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.y = tex_->scale.y / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
 	tex_->Update();
 }
 

@@ -7,7 +7,9 @@
 
 #include "GlobalVariables/GlobalVariables.h"
 
-class Play;
+class GameScene;
+
+class Camera;
 
 class Player
 {
@@ -25,6 +27,7 @@ public:
 	// モデルのパーツ
 	enum class Parts {
 		kMain, // 一番の親。本体 
+		kEnd, // 末尾
 	};
 
 	Player();
@@ -38,7 +41,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(const float& y);
+	void Update(const float& y, const Camera* camera);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
@@ -88,7 +91,7 @@ public:
 	/// プレイシーンのポインタのsetter
 	/// </summary>
 	/// <param name="play">プレイシーンのポインタ</param>
-	void SetPlayScene(Play* play) { play_ = play; }
+	void SetGameScene(GameScene* play) { play_ = play; }
 
 	void CollisionScaffolding(const Texture2D* tex);
 
@@ -158,7 +161,7 @@ private:
 	
 private:
 
-	Play* play_ = nullptr;
+	GameScene* play_ = nullptr;
 
 	// プレイヤーのテクスチャ
 	std::unique_ptr<Texture2D> tex_;

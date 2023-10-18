@@ -2,10 +2,13 @@
 
 #include "Utils/Math/Mat4x4.h"
 #include "Drawers/Texture2D/Texture2D.h"
+#include "Drawers/Model/Model.h"
 
 #include "GlobalVariables/GlobalVariables.h"
 
 class Layer;
+
+class Camera;
 
 class Enemy
 {
@@ -18,6 +21,13 @@ public:
 		kFalling, // 落ちている
 		kFaint, // 気絶
 		kDeath, // 死亡
+	};
+
+	// モデルのパーツ
+	enum class Parts {
+		kMain, // 一番の親。本体 
+		kDoukasen, // 導火線
+		kEnd, // 末尾
 	};
 
 	enum class Type {
@@ -47,13 +57,13 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(Layer* layer, const float& y);
+	void Update(Layer* layer, const float& y, const Camera* camera);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
-	void Draw(const Mat4x4& viewProjection);
+	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
@@ -173,6 +183,8 @@ private:
 
 	// Enemyのテクスチャ
 	std::unique_ptr<Texture2D> tex_;
+
+	std::vector<std::unique_ptr<Model>> models_;
 
 	// 初期座標の保存用。倒した敵を生成するのに使うイメージ。
 	Vector3 firstPos_;

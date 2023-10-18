@@ -1,14 +1,24 @@
-Use Adapter:NVIDIA GeForce RTX 4070 Ti
+Use Adapter:NVIDIA GeForce RTX 3060 Laptop GPU
 FeatureLevel:12.2
 Complete create D3D12Device!!!
 Begin CompilerShader, path:./Resources/Shaders/Texture2DShader/Texture2D.VS.hlsl, profile:vs_6_0
 Compile Succeeded, path:./Resources/Shaders/Texture2DShader/Texture2D.VS.hlsl, profile:vs_6_0
 Begin CompilerShader, path:./Resources/Shaders/Texture2DShader/Texture2DNone.PS.hlsl, profile:ps_6_0
 Compile Succeeded, path:./Resources/Shaders/Texture2DShader/Texture2DNone.PS.hlsl, profile:ps_6_0
+Begin CompilerShader, path:./Resources/Shaders/ModelShader/Model.VS.hlsl, profile:vs_6_0
+Compile Succeeded, path:./Resources/Shaders/ModelShader/Model.VS.hlsl, profile:vs_6_0
+Begin CompilerShader, path:./Resources/Shaders/ModelShader/Model.PS.hlsl, profile:ps_6_0
+Compile Succeeded, path:./Resources/Shaders/ModelShader/Model.PS.hlsl, profile:ps_6_0
+Begin CompilerShader, path:./Resources/Shaders/ModelShader/ModelNone.GS.hlsl, profile:gs_6_0
+Compile Succeeded, path:./Resources/Shaders/ModelShader/ModelNone.GS.hlsl, profile:gs_6_0
+Begin CompilerShader, path:./Resources/Shaders/LineShader/Line.VS.hlsl, profile:vs_6_0
+Compile Succeeded, path:./Resources/Shaders/LineShader/Line.VS.hlsl, profile:vs_6_0
+Begin CompilerShader, path:./Resources/Shaders/LineShader/Line.PS.hlsl, profile:ps_6_0
+Compile Succeeded, path:./Resources/Shaders/LineShader/Line.PS.hlsl, profile:ps_6_0
 Begin CompilerShader, path:./Resources/Shaders/ParticleShader/Particle.VS.hlsl, profile:vs_6_0
 Compile Succeeded, path:./Resources/Shaders/ParticleShader/Particle.VS.hlsl, profile:vs_6_0
 Begin CompilerShader, path:./Resources/Shaders/ParticleShader/Particle.PS.hlsl, profile:ps_6_0
 Compile Succeeded, path:./Resources/Shaders/ParticleShader/Particle.PS.hlsl, profile:ps_6_0
-Average Fps : 0.00
-Max Fps : 165.00
-Min Fps : 165.00
+Average Fps : 51.48
+Max Fps : 60.00
+Min Fps : 36.01

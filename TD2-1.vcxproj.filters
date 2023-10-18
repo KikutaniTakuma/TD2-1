@@ -152,20 +152,11 @@
     <ClCompile Include="SceneManager\ResultScene\ResultScene.cpp">
       <Filter>SceneManager\ResultScene</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameScene\GameScene.cpp">
-      <Filter>GameScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\GameScene\Play\Play.cpp">
-      <Filter>GameScene\Play</Filter>
-    </ClCompile>
     <ClCompile Include="Game\GameScene\Result\Result.cpp">
       <Filter>GameScene\Result</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameScene\Title\Title.cpp">
       <Filter>GameScene\Title</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\Player\Player.cpp">
-      <Filter>Player</Filter>
     </ClCompile>
     <ClCompile Include="Game\Enemy\Enemy.cpp">
       <Filter>Enemy</Filter>
@@ -184,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="Game\Background\Background.cpp">
       <Filter>Background</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Player\Player.cpp">
+      <Filter>Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -518,12 +512,6 @@
     </ClInclude>
     <ClInclude Include="SceneManager\ResultScene\ResultScene.h">
       <Filter>SceneManager\ResultScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\GameScene\GameScene.h">
-      <Filter>GameScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\GameScene\Play\Play.h">
-      <Filter>GameScene\Play</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameScene\Result\Result.h">
       <Filter>GameScene\Result</Filter>
