@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <list>
+#include <queue>
 #include <wrl.h>
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
@@ -36,6 +38,12 @@ public:
 	void Use(D3D12_GPU_DESCRIPTOR_HANDLE handle, UINT rootParmIndex);
 	void Use(uint32_t handleIndex, UINT rootParmIndex);
 
+	/// <summary>
+	/// CBVを作成
+	/// </summary>
+	/// <typeparam name="T">ポインタ型に制限</typeparam>
+	/// <param name="conBuf">ConstBuffer</param>
+	/// <returns>作成した場所のハンドル</returns>
 	template<IsNotPtrCB T>
 	uint32_t CreateConstBufferView(ConstBuffer<T>& conBuf) {
 		assert(currentHadleIndex < heapSize);
@@ -43,12 +51,18 @@ public:
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		conBuf.CrerateView(heapHadles[currentHadleIndex].first, heapHadles[currentHadleIndex].second, currentHadleIndex);
+		conBuf.CrerateView(heapHandles[currentHadleIndex].first, heapHandles[currentHadleIndex].second, currentHadleIndex);
 		currentHadleIndex++;
 
 		return currentHadleIndex - 1u;
 	}
 
+	/// <summary>
+	/// CBVを作成
+	/// </summary>
+	/// <typeparam name="T">ポインタ型に制限</typeparam>
+	/// <param name="conBuf">ConstBuffer</param>
+	/// <param name="heapIndex">作成する場所のハンドル</param>
 	template<IsNotPtrCB T>
 	void CreateConstBufferView(ConstBuffer<T>& conBuf, UINT heapIndex) {
 		assert(heapIndex < heapSize);
@@ -56,9 +70,15 @@ public:
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		conBuf.CrerateView(heapHadles[heapIndex].first, heapHadles[heapIndex].second, heapIndex);
+		conBuf.CrerateView(heapHandles[heapIndex].first, heapHandles[heapIndex].second, heapIndex);
 	}
 
+	/// <summary>
+	/// SRVを作成
+	/// </summary>
+	/// <typeparam name="T">ポインタ型に制限</typeparam>
+	/// <param name="strcBuf">StructuredBuffer</param>
+	/// <returns>作成した場所のハンドル</returns>
 	template<IsNotPtrSB T>
 	uint32_t CreateStructuredBufferView(StructuredBuffer<T>& strcBuf) {
 		assert(currentHadleIndex < heapSize);
@@ -66,12 +86,18 @@ public:
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		strcBuf.CrerateView(heapHadles[currentHadleIndex].first, heapHadles[currentHadleIndex].second, currentHadleIndex);
+		strcBuf.CrerateView(heapHandles[currentHadleIndex].first, heapHandles[currentHadleIndex].second, currentHadleIndex);
 		currentHadleIndex++;
 
 		return currentHadleIndex - 1u;
 	}
 
+	/// <summary>
+	/// SRVを作成
+	/// </summary>
+	/// <typeparam name="T">ポインタ型に制限</typeparam>
+	/// <param name="strcBuf">StructuredBuffe</param>
+	/// <param name="heapIndex">作成する場所のハンドル</param>
 	template<IsNotPtrSB T>
 	void CreateStructuredBufferView(StructuredBuffer<T>& strcBuf, UINT heapIndex) {
 		assert(heapIndex < heapSize);
@@ -79,49 +105,35 @@ public:
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		strcBuf.CrerateView(heapHadles[heapIndex].first, heapHadles[heapIndex].second, heapIndex);
+		strcBuf.CrerateView(heapHandles[heapIndex].first, heapHandles[heapIndex].second, heapIndex);
 	}
 
-	inline uint32_t CreateTxtureView(Texture* tex) {
-		assert(tex != nullptr);
-		if (tex == nullptr || !*tex) {
-			return currentHadleIndex;
-		}
-		assert(currentHadleIndex < heapSize);
-		if (currentHadleIndex >= heapSize) {
-			ErrorCheck::GetInstance()->ErrorTextBox("CreateTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
-		}
-		tex->CreateSRVView(heapHadles[currentHadleIndex].first);
-		currentHadleIndex++;
+	/// <summary>
+	/// テクスチャのビューを作成
+	/// </summary>
+	/// <param name="tex">Texture</param>
+	/// <returns>作成した場所のハンドル</returns>
+	uint32_t CreateTxtureView(Texture* tex);
 
-		return currentHadleIndex - 1u;
-	}
-	inline void CreateTxtureView(Texture* tex, uint32_t heapIndex) {
-		assert(tex != nullptr);
-		assert(heapIndex < heapSize);
-		if (currentHadleIndex >= heapSize) {
-			ErrorCheck::GetInstance()->ErrorTextBox("CreatTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
-		}
-		tex->CreateSRVView(heapHadles[heapIndex].first);
-	}
+	/// <summary>
+	/// テクスチャのビューを作成
+	/// </summary>
+	/// <param name="tex">Texture</param>
+	/// <param name="heapIndex">作成する場所のハンドル</param>
+	void CreateTxtureView(Texture* tex, uint32_t heapIndex);
 
-	inline uint32_t CreatePerarenderView(RenderTarget& renderTarget) {
-		assert(currentHadleIndex < heapSize);
-		if (currentHadleIndex >= heapSize) {
-			ErrorCheck::GetInstance()->ErrorTextBox("CreatePerarenderView failed\nOver HeapSize", "ShaderResourceHeap");
-		}
-
-		renderTarget.CreateView(heapHadles[currentHadleIndex].first, heapHadles[currentHadleIndex].second);
-		currentHadleIndex++;
-
-		return currentHadleIndex - 1u;
-	}
+	/// <summary>
+	/// ペラポリ用のビュー作成
+	/// </summary>
+	/// <param name="renderTarget">RenderTarget</param>
+	/// <returns>作成した場所のハンドル</returns>
+	uint32_t CreatePerarenderView(RenderTarget& renderTarget);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuHeapHandle(uint32_t heapIndex) {
-		return heapHadles[heapIndex].first;
+		return heapHandles[heapIndex].first;
 	}
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHeapHandle(uint32_t heapIndex) {
-		return heapHadles[heapIndex].second;
+		return heapHandles[heapIndex].second;
 	}
 	
 	inline UINT GetSize() const {
@@ -136,6 +148,8 @@ public:
 		return SRVHeap.GetAddressOf();
 	}
 
+	//void SetReleasedIndexPos(UINT nextCreateViewNum);
+
 private:
 	void Reset();
 
@@ -144,6 +158,10 @@ private:
 
 	UINT heapSize;
 	UINT currentHadleIndex;
+	/*std::queue<UINT> releaseHadleIndex;
+	
+	std::vector<bool> isUse;
+	std::list<int32_t> releaseView;*/
 
-	std::vector<std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>> heapHadles;
+	std::vector<std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>> heapHandles;
 };
