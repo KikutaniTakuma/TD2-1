@@ -27,6 +27,11 @@ void Star::Start() {
 	isStart_ = true;
 }
 
+void Star::NormalStart() {
+	isEnd_ = true;
+	scaleEase_.Start(true, 0.2f, Easeing::InExpo);
+}
+
 void Star::Debug([[maybe_unused]]const std::string& guiName) {
 #ifdef _DEBUG
 	ImGui::Begin(guiName.c_str());
@@ -55,18 +60,10 @@ void Star::Update() {
 			rotateEase_.Start(false, rotateEaseTime_, Easeing::InOutCirc);
 			ease_.Start(false, scaleEaseTime_, Easeing::OutBack);
 		}
+		// 通常の演出
 		else {
 			ease_.Start(false, specialScaleEaseTime_, Easeing::OutElastic);
 		}
-	}
-
-	// 3.スターの演出終了
-	if (ease_.ActiveExit()) {
-		isStart_ = false;
-		tex_.rotate = rotate_;
-		isEnd_ = true;
-
-		scaleEase_.Start(true, 0.2f, Easeing::InExpo);
 	}
 
 	// 2.スターの演出実行時
@@ -78,6 +75,13 @@ void Star::Update() {
 		}
 		tex_.scale = ease_.Get(scaleDuration_.first, scaleDuration_.second);
 	}
+
+	// 3.スターの演出終了
+	if (ease_.ActiveExit()) {
+		isStart_ = false;
+		tex_.rotate = rotate_;
+	}
+
 
 	// 4.スター演出が終わった
 	if (isEnd_) {

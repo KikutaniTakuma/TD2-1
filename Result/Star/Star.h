@@ -23,9 +23,14 @@ public:
 	void Start();
 
 	/// <summary>
+	/// 通常時の演出スタート
+	/// </summary>
+	void NormalStart();
+
+	/// <summary>
 	/// デバッグ(調整関数)
 	/// </summary>
-	/// <param name="guiName"></param>
+	/// <param name="guiName">デバッグ時の名前</param>
 	void Debug(const std::string& guiName);
 
 	/// <summary>
