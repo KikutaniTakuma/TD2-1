@@ -16,7 +16,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	}
 	// シーンマネージャー初期化
 	auto* const sceneManager = SceneManager::GetInstace();
-	sceneManager->Initialize(new ResultScene{});
+	auto result = new ResultScene{};
+	result->SetClearTime(std::chrono::milliseconds(64000));
+	sceneManager->Initialize(result);
 
 	// メインループ
 	sceneManager->Game();

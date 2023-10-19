@@ -61,9 +61,7 @@ public:
 /// セッター
 /// </summary>
 public:
-	void SetClearTime(std::chrono::milliseconds clearTime) {
-		clearTime_ = clearTime;
-	}
+	void SetClearTime(std::chrono::milliseconds clearTime);
 
 
 
@@ -85,22 +83,46 @@ private:
 	std::vector<Texture2D> texs_;
 	std::vector<Particle> particles_;
 	GlobalVariables globalVariables_;
-	std::chrono::milliseconds clearTime_;
 
 	///
 	/// ここに必要なメンバ変数を追加
 	/// 
 	
+	// 星
 	std::array<Star,3> stars_;
 
-	Texture2D speechBubble_;
+	// 背景の型
+	std::array<Star,3> starsGray_;
 
-	std::array<Texture2D, 3> backGround_;
-	PeraRender backGroundBlur_;
+	// グレースケール化
+	PeraRender grayPera_;
 
+	// 星のアニメーション間隔
 	std::chrono::milliseconds starEffectDuration_;
 	std::chrono::steady_clock::time_point startTime_;
 	size_t currentStar_;
+
+	// 吹き出し
+	Texture2D speechBubble_;
+
+	// 背景
+	std::array<Texture2D, 3> backGround_;
+	// 背景に軽く縦平均化ブラー
+	PeraRender backGroundBlur_;
+
+	// クリア時間
+	std::chrono::milliseconds clearTime_;
+
+	std::array<std::chrono::milliseconds, 3> clearTimeBasis_;
+
+	int32_t score_;
+
+	// アップデートが始まる時間
+	std::chrono::milliseconds updateStartTime_;
+	bool isUpdate_;
+
+	// プレイヤーのモデル
+	Model player_;
 
 	///
 	/// =============================================

@@ -48,11 +48,17 @@ public:
 		return isEnd_;
 	}
 
+	const UtilsLib::Flg& GetStartFlg() const {
+		return isStart_;
+	}
+
+	void SetDefaultScale(float magnification);
+
 public:
 	// ポジション
 	Vector3 pos_;
 	// スケール
-	Vector3 scale_;
+	Vector2 scale_;
 	// 回転
 	Vector3 rotate_;
 

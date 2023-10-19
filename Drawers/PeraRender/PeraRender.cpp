@@ -63,10 +63,6 @@ void PeraRender::CreateShader(const std::string& vsFileName, const std::string& 
 }
 
 void PeraRender::CreateGraphicsPipeline() {
-	// RootSignatureの生成
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;
 	descriptorRange[0].NumDescriptors = 1;

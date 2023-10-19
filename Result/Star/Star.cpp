@@ -12,8 +12,10 @@ Star::Star() :
 	rotateEaseTime_{1.0f},
 	specialScaleEaseTime_{ 1.0f }
 {
+	scale_ = Vector2::zero;
+		
 	scaleDuration_.first = Vector2::zero;
-	scaleDuration_.second = Vector2{ 200.0f, 200.0f } * 0.8f;
+	scaleDuration_.second = Vector2{ 200.0f, 200.0f } *0.8f;
 
 	scaleNormalDuration_.first = scaleDuration_.second;
 	scaleNormalDuration_.second = scaleDuration_.second * 1.1f;
@@ -29,6 +31,12 @@ void Star::Start() {
 
 void Star::NormalStart() {
 	scaleEase_.Start(true, 0.2f, Easeing::InExpo);
+}
+
+void Star::SetDefaultScale(float magnification) {
+	scale_ = scaleDuration_.second;
+	scale_*= magnification;
+	tex_.scale = scale_;
 }
 
 void Star::Debug([[maybe_unused]]const std::string& guiName) {
@@ -54,6 +62,8 @@ void Star::Debug([[maybe_unused]]const std::string& guiName) {
 }
 
 void Star::Update() {
+	isEnd_.Update();
+
 	// 1.スターの演出開始
 	if (isStart_.OnEnter()) {
 		// 星3つの演出
@@ -74,7 +84,7 @@ void Star::Update() {
 			// 回転
 			tex_.rotate = rotate_ + rotateEase_.Get(rotateDuration_.first, rotateDuration_.second);
 		}
-		tex_.scale = ease_.Get(scaleDuration_.first, scaleDuration_.second);
+		scale_ = ease_.Get(scaleDuration_.first, scaleDuration_.second);
 	}
 
 	// 3.スターの演出終了
@@ -86,11 +96,12 @@ void Star::Update() {
 
 
 	// 4.スター演出が終わった
-	if (!isStart_) {
+	if (!isStart_ && isEnd_) {
 		// 大きさ
-		tex_.scale = scaleEase_.Get(scaleNormalDuration_.first, scaleNormalDuration_.second);
+		scale_ = scaleEase_.Get(scaleNormalDuration_.first, scaleNormalDuration_.second);
 	}
 
+	tex_.scale = scale_;
 	tex_.pos = pos_;
 	
 	// 板ポリアップデート
@@ -103,7 +114,6 @@ void Star::Update() {
 
 	//各フラグアップデート
 	isStart_.Update();
-	isEnd_.Update();
 	isSpecial_.Update();
 }
 
