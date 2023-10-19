@@ -125,7 +125,7 @@ namespace UtilsLib {
 	}
 
 
-	std::vector<std::filesystem::path> GetFilePahtFormDir(
+	std::vector<std::filesystem::path> GetFilePathFormDir(
 		const std::filesystem::path& directoryName,
 		const std::filesystem::path& extension
 	) {
@@ -139,7 +139,7 @@ namespace UtilsLib {
 			if (!path.has_extension()) {
 				std::vector<std::filesystem::path> files;
 				// その中にあるファイルをすべて探索(再帰的に探す)
-				files = GetFilePahtFormDir(path, extension);
+				files = GetFilePathFormDir(path, extension);
 
 				// コンテナに追加
 				for (auto& i : files) {

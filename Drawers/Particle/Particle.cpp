@@ -1244,7 +1244,7 @@ void Particle::Debug(const std::string& guiName) {
 		}
 	}
 
-	auto fileNames = UtilsLib::GetFilePahtFormDir("./Resources", ".png");
+	auto fileNames = UtilsLib::GetFilePathFormDir("./Resources", ".png");
 
 	if (isLoad) {
 		if (ImGui::TreeNode("png files Load")) {

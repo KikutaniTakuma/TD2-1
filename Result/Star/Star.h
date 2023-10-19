@@ -44,6 +44,10 @@ public:
 	/// <param name="viewProjection">カメラ行列</param>
 	void Draw(const Mat4x4& viewProjection);
 
+	const UtilsLib::Flg& GetEndFlg() const {
+		return isEnd_;
+	}
+
 public:
 	// ポジション
 	Vector3 pos_;

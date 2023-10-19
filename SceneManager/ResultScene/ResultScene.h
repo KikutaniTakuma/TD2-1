@@ -5,6 +5,7 @@
 #include "Drawers/Particle/Particle.h"
 #include "GlobalVariables/GlobalVariables.h"
 #include "Result/Star/Star.h"
+#include "Drawers/PeraRender/PeraRender.h"
 
 class ResultScene : public BaseScene {
 /// <summary>
@@ -90,9 +91,16 @@ private:
 	/// ここに必要なメンバ変数を追加
 	/// 
 	
-	Star hoge;
+	std::array<Star,3> stars_;
 
+	Texture2D speechBubble_;
 
+	std::array<Texture2D, 3> backGround_;
+	PeraRender backGroundBlur_;
+
+	std::chrono::milliseconds starEffectDuration_;
+	std::chrono::steady_clock::time_point startTime_;
+	size_t currentStar_;
 
 	///
 	/// =============================================

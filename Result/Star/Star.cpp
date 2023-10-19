@@ -8,17 +8,17 @@ Star::Star() :
 	rotateEase_{},
 	isStart_{false},
 	isEnd_{false},
-	scaleEaseTime_{1.2f},
-	rotateEaseTime_{0.8f},
+	scaleEaseTime_{1.4f},
+	rotateEaseTime_{1.0f},
 	specialScaleEaseTime_{ 1.0f }
 {
 	scaleDuration_.first = Vector2::zero;
-	scaleDuration_.second = { 200.0f, 200.0f };
+	scaleDuration_.second = Vector2{ 200.0f, 200.0f } * 0.8f;
 
 	scaleNormalDuration_.first = scaleDuration_.second;
 	scaleNormalDuration_.second = scaleDuration_.second * 1.1f;
 
-	rotateDuration_.second.z = -6.28f;
+	rotateDuration_.first.z = -6.28f;
 
 	tex_.LoadTexture("./Resources/Result/Star.png");
 }
@@ -28,7 +28,6 @@ void Star::Start() {
 }
 
 void Star::NormalStart() {
-	isEnd_ = true;
 	scaleEase_.Start(true, 0.2f, Easeing::InExpo);
 }
 
@@ -44,6 +43,8 @@ void Star::Debug([[maybe_unused]]const std::string& guiName) {
 	ImGui::DragFloat3("rotate normal star second", &rotateDuration_.second.x, 0.01f);
 
 	ImGui::Checkbox("is special", isSpecial_.Data());
+
+	ImGui::DragFloat2("pos", &pos_.x);
 
 	if (ImGui::Button("start")) {
 		this->Start();
@@ -80,16 +81,17 @@ void Star::Update() {
 	if (ease_.ActiveExit()) {
 		isStart_ = false;
 		tex_.rotate = rotate_;
+		isEnd_ = true;
 	}
 
 
 	// 4.スター演出が終わった
-	if (isEnd_) {
+	if (!isStart_) {
 		// 大きさ
 		tex_.scale = scaleEase_.Get(scaleNormalDuration_.first, scaleNormalDuration_.second);
 	}
 
-
+	tex_.pos = pos_;
 	
 	// 板ポリアップデート
 	tex_.Update();
