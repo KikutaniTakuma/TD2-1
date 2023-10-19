@@ -50,6 +50,10 @@ public:
 
 	void Draw2DNear(const Mat4x4& viewProjection);
 
+	void TimerStart();
+
+	void TimerStop();
+
 public:
 
 	/// <summary>
@@ -83,6 +87,10 @@ public:
 	/// ダメージの加算
 	/// </summary>
 	void AddDamage(int damage) { damage_ += damage; }
+
+	inline const std::chrono::milliseconds& GetPlayTime() const {
+		return gamePlayTime_;
+	}
 
 private:
 
@@ -142,4 +150,6 @@ private:
 
 	UtilsLib::Flg isClear_;
 
+	std::chrono::milliseconds gamePlayTime_;
+	std::chrono::steady_clock::time_point playStartTime_;
 };

@@ -167,10 +167,15 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 
 	gauge_->Initialize(hitPoints_[nowLayer_], kMaxHitPoints_[nowLayer_]);
 
+	TimerStart();
+
+	gamePlayTime_ = std::chrono::milliseconds(0);
 }
 
 void Layer::Update(const Camera* camera) {
 	isClear_.Update();
+
+	[[maybe_unused]]auto nowTime = std::chrono::steady_clock::now();
 
 	ApplyGlobalVariable();
 
@@ -182,8 +187,15 @@ void Layer::Update(const Camera* camera) {
 		hitPoints_[nowLayer_] = 0;
 
 		if (nowLayer_ == kMaxLayerNum_ - 1) {
+
 			// クリア処理
 			isClear_ = true;
+
+			// クリアした時間を計算して代入
+			if (isClear_.OnEnter()) {
+				TimerStop();
+			}
+
 			// 今は仮で層のリセット
 			Reset();
 
@@ -236,4 +248,13 @@ void Layer::Draw2DNear(const Mat4x4& viewProjection) {
 			tex_[i]->Draw(viewProjection, Pipeline::Normal, false);
 		}
 	}
+}
+
+void Layer::TimerStart() {
+	playStartTime_ = std::chrono::steady_clock::now();
+}
+
+void Layer::TimerStop() {
+	auto nowTime = std::chrono::steady_clock::now();
+	gamePlayTime_ += std::chrono::duration_cast<decltype(gamePlayTime_)>(nowTime - playStartTime_);
 }
