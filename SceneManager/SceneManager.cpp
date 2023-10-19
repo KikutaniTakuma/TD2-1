@@ -3,6 +3,17 @@
 
 bool BaseScene::isPad_ = false;
 
+BaseScene::BaseScene(BaseScene::ID sceneID):
+	sceneManager_(nullptr),
+	meshManager_(nullptr),
+	audioManager_(nullptr),
+	textureManager_(nullptr),
+	frameInfo_(nullptr),
+	input_(nullptr),
+	sceneID_(sceneID),
+	camera_()
+{}
+
 void BaseScene::SceneInitialize(SceneManager* sceneManager) {
 	sceneManager_ = sceneManager;
 

@@ -13,7 +13,15 @@
 
 class BaseScene {
 public:
-	BaseScene() = default;
+	enum class ID {
+		Game,
+		Result,
+		Title,
+		StageSelect,
+	};
+
+public:
+	BaseScene(BaseScene::ID sceneID);
 	BaseScene(const BaseScene&) = delete;
 	BaseScene(BaseScene&&) = delete;
 	virtual ~BaseScene() = default;
@@ -30,6 +38,10 @@ public:
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
 
+	inline BaseScene::ID GetID() const {
+		return sceneID_;
+	}
+
 protected:
 	class SceneManager* sceneManager_;
 
@@ -44,6 +56,8 @@ protected:
 	Input* input_;
 
 	static bool isPad_;
+
+	BaseScene::ID sceneID_;
 
 protected:
 	Camera camera_;

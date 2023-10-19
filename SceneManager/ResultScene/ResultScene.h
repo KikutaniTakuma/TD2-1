@@ -7,7 +7,7 @@
 
 class ResultScene : public BaseScene {
 public:
-	ResultScene() = default;
+	ResultScene();
 	ResultScene(const ResultScene&) = delete;
 	ResultScene(ResultScene&&) = delete;
 	~ResultScene() = default;
@@ -27,7 +27,7 @@ public:
 private:
 	std::vector<Model> models_;
 	std::vector<Texture2D> texs_;
-	std::vector<Particle> particles;
+	std::vector<Particle> particles_;
 	GlobalVariables globalVariables_;
 
 	///

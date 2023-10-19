@@ -6,7 +6,9 @@
 #include "externals/imgui/imgui.h"
 #include "SceneManager/ResultScene/ResultScene.h"
 
-GameScene::GameScene() {
+GameScene::GameScene() :
+	BaseScene(BaseScene::ID::Game)
+{
 
 	/*models_(),
 	texs_(),

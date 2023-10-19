@@ -1,5 +1,15 @@
 #include "ResultScene.h"
 
+ResultScene::ResultScene():
+	BaseScene(BaseScene::ID::Result),
+	models_(),
+	texs_(),
+	particles_(),
+	globalVariables_()
+{
+
+}
+
 void ResultScene::Initialize() {
 	camera_.farClip = 3000.0f;
 
