@@ -20,7 +20,7 @@ Star::Star() :
 
 	rotateDuration_.second.z = -6.28f;
 
-	tex_.LoadTexture("./Resources/Star.png");
+	tex_.LoadTexture("./Resources/Result/Star.png");
 }
 
 void Star::Start() {
