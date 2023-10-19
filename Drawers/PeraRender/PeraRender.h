@@ -4,8 +4,8 @@
 
 #include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/RenderTarget/RenderTarget.h"
-#include "Engine/PipelineManager/PipelineManager.h"
 #include "Engine/ShaderManager/ShaderManager.h"
+#include "Engine/PipelineManager/PipelineManager.h"
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Vector2.h"
@@ -27,7 +27,10 @@ public:
 	PeraRender(uint32_t width_, uint32_t height_);
 	~PeraRender();
 
-	PeraRender& operator=(const PeraRender&) = default;
+	PeraRender(const PeraRender&) = delete;
+	PeraRender(PeraRender&&) = delete;
+	PeraRender& operator=(const PeraRender&) = delete;
+	PeraRender& operator=(PeraRender&&) = delete;
 
 public:
 	void Initialize(const std::string& vsFileName, const std::string& psFileName);
@@ -49,5 +52,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> peraVertexResource = nullptr;
 	Shader shader;
 
-	std::array<Pipeline*, 3> piplines;
+	std::array<class Pipeline*, 3> piplines;
 };

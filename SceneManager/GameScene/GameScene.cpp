@@ -616,20 +616,20 @@ void GameScene::Collision() {
 
 		const Texture2D* enemyTex = enemy->GetTex();
 
-		// エネミーが通常時の時、プレイヤーが通常時ヒップドロップ時の時のみ
+		// �G�l�~�[���ʏ펞�̎��A�v���C���[���ʏ펞�q�b�v�h���b�v���̎��̂�
 		if (enemy->GetStatus() == Enemy::Status::kNormal &&
 			(player_->GetStatus() == Player::Status::kNormal || player_->GetStatus() == Player::Status::kHipDrop)) {
 
 			if (playerTex->Collision(*enemyTex)) {
 
-				// 雑だけど速度が0以下でプレイヤーが踏んでる判定にしている
+				// �G�����Ǒ��x��0�ȉ��Ńv���C���[������ł锻��ɂ��Ă���
 				if (playerVelocity.y < 0.0f) {
-					// 敵を踏んだ時
+					// �G�𓥂񂾎�
 					enemy->StatusRequest(Enemy::Status::kFalling);
 					player_->EnemyStep(true);
 				}
 				else {
-					// 敵に踏まれた時
+					// �G�ɓ��܂ꂽ��
 					player_->EnemyStep(false);
 				}
 			}

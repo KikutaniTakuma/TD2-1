@@ -15,35 +15,13 @@ void PipelineManager::Finalize() {
 }
 
 void PipelineManager::CreateRootSgnature(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootParamaterSize_, bool isTexture_) {
-	if (instance->rootSignatures.empty()) {
-		auto rootSignature = std::make_unique<RootSignature>();
+	auto rootSignature = std::make_unique<RootSignature>();
 
-		rootSignature->Create(rootParamater_, rootParamaterSize_, isTexture_);
+	rootSignature->Create(rootParamater_, rootParamaterSize_, isTexture_);
 
-		instance->rootSignature = rootSignature.get();
+	instance->rootSignature = rootSignature.get();
 
-		instance->rootSignatures.push_back(std::move(rootSignature));
-	}
-	else {
-		auto IsSame = [&rootParamater_,&rootParamaterSize_, &isTexture_](const std::unique_ptr<RootSignature>& rootSignature_) {
-			return rootSignature_->IsSame(rootParamater_, rootParamaterSize_, isTexture_);
-		};
-
-		auto rootSignatureItr = std::find_if(instance->rootSignatures.begin(), instance->rootSignatures.end(), IsSame);
-
-		if (rootSignatureItr == instance->rootSignatures.end()) {
-			auto rootSignature = std::make_unique<RootSignature>();
-
-			rootSignature->Create(rootParamater_, rootParamaterSize_, isTexture_);
-
-			instance->rootSignature = rootSignature.get();
-
-			instance->rootSignatures.push_back(std::move(rootSignature));
-		}
-		else {
-			instance->rootSignature = rootSignatureItr->get();
-		}
-	}
+	instance->rootSignatures.push_back(std::move(rootSignature));
 }
 void PipelineManager::SetRootSgnature(RootSignature* rootSignature) {
 	instance->rootSignature = rootSignature;
@@ -75,76 +53,28 @@ void PipelineManager::IsDepth(bool isDepth_) {
 }
 
 Pipeline* PipelineManager::Create() {
-	if (instance->pipelines.empty()) {
-		auto pipeline = std::make_unique<Pipeline>();
-		pipeline->SetShader(instance->shader);
-		for (auto& i : instance->vertexInputStates) {
-			pipeline->SetVertexInput(std::get<std::string>(i), std::get<uint32_t>(i), std::get<DXGI_FORMAT>(i));
-		}
-		pipeline->Create(
-			*instance->rootSignature,
-			instance->blend,
-			instance->cullMode,
-			instance->solidState,
-			instance->topologyType,
-			instance->numRenderTarget,
-			instance->isDepth
-		);
-
-		if (!pipeline->graphicsPipelineState) {
-			return nullptr;
-		}
-
-		instance->pipelines.push_back(std::move(pipeline));
-
-		return instance->pipelines.rbegin()->get();
+	auto pipeline = std::make_unique<Pipeline>();
+	pipeline->SetShader(instance->shader);
+	for (auto& i : instance->vertexInputStates) {
+		pipeline->SetVertexInput(std::get<std::string>(i), std::get<uint32_t>(i), std::get<DXGI_FORMAT>(i));
 	}
-	else {
-		auto IsSmae = [](const std::unique_ptr<Pipeline>& pipeline) {
-			bool issame = pipeline->IsSame(
-				instance->shader,
-				instance->blend,
-				instance->cullMode,
-				instance->solidState,
-				instance->topologyType,
-				instance->numRenderTarget,
-				instance->rootSignature->Get(),
-				instance->isDepth
-			);
+	pipeline->Create(
+		*instance->rootSignature,
+		instance->blend,
+		instance->cullMode,
+		instance->solidState,
+		instance->topologyType,
+		instance->numRenderTarget,
+		instance->isDepth
+	);
 
-			return issame;
-		};
-
-		auto pipelineItr = std::find_if(instance->pipelines.begin(), instance->pipelines.end(),IsSmae);
-
-		if (pipelineItr == instance->pipelines.end()) {
-			auto pipeline = std::make_unique<Pipeline>();
-			pipeline->SetShader(instance->shader);
-			for (auto& i : instance->vertexInputStates) {
-				pipeline->SetVertexInput(std::get<0>(i), std::get<1>(i), std::get<2>(i));
-			}
-			pipeline->Create(
-				*instance->rootSignature,
-				instance->blend,
-				instance->cullMode,
-				instance->solidState,
-				instance->topologyType,
-				instance->numRenderTarget,
-				instance->isDepth
-			);
-
-			if (!pipeline->graphicsPipelineState) {
-				return nullptr;
-			}
-
-			instance->pipelines.push_back(std::move(pipeline));
-
-			return instance->pipelines.rbegin()->get();
-		}
-		else {
-			return pipelineItr->get();
-		}
+	if (!pipeline->graphicsPipelineState) {
+		return nullptr;
 	}
+
+	instance->pipelines.push_back(std::move(pipeline));
+
+	return instance->pipelines.back().get();
 }
 
 void PipelineManager::StateReset() {

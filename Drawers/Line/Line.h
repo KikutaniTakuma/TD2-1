@@ -3,7 +3,6 @@
 #include "Utils/Math/Mat4x4.h"
 #include "Utils/Math/Vector4.h"
 #include "Engine/ConstBuffer/ConstBuffer.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "Engine/ShaderManager/ShaderManager.h"
 class Pipeline;
 
@@ -47,7 +46,7 @@ private:
 	// 頂点バッファマップ
 	VertexData* vertexMap;
 
-	ShaderResourceHeap heap;
+	class ShaderResourceHeap* heap;
 
 	ConstBuffer<Mat4x4> wvpMat;
 };

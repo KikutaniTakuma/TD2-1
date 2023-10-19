@@ -88,6 +88,8 @@ public:
 	void SetParent(Model* parent_) {
 		parent = parent_;
 	}
+	
+	void ChangeTexture(const std::string& useMtlName, const std::string& texName);
 
 public:
 	Vector3 pos;

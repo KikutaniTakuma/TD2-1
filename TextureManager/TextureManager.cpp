@@ -2,6 +2,7 @@
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/Engine.h"
 #include <cassert>
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 
 TextureManager* TextureManager::instance = nullptr;
 
@@ -29,7 +30,7 @@ TextureManager::TextureManager() :
 	fence(),
 	fenceVal(0),
 	fenceEvent(nullptr),
-	srvHeap(2048)
+	srvHeap(nullptr)
 {
 	// コマンドキューを作成
 	commandQueue = nullptr;
@@ -77,6 +78,8 @@ TextureManager::TextureManager() :
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateEvent() Failed", "TextureManager");
 		return;
 	}
+
+	srvHeap = ShaderResourceHeap::GetInstance();
 }
 
 TextureManager::~TextureManager() {
@@ -128,7 +131,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 			return nullptr;
 		}
 
-		tex->heapPos = srvHeap.CreateTxtureView(tex.get());
+		tex->heapPos = srvHeap->CreateTxtureView(tex.get());
 		
 		textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -175,7 +178,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 				return nullptr;
 			}
 
-			tex->heapPos = srvHeap.CreateTxtureView(tex.get());
+			tex->heapPos = srvHeap->CreateTxtureView(tex.get());
 
 			textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -194,7 +197,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 			return nullptr;
 		}
 
-		tex->heapPos = srvHeap.CreateTxtureView(tex.get());
+		tex->heapPos = srvHeap->CreateTxtureView(tex.get());
 
 		textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -209,7 +212,7 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 				return nullptr;
 			}
 
-			tex->heapPos = srvHeap.CreateTxtureView(tex.get());
+			tex->heapPos = srvHeap->CreateTxtureView(tex.get());
 
 			textures.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -298,9 +301,6 @@ void TextureManager::ResetCommandList() {
 
 void TextureManager::Use(int32_t texIndex, UINT rootParam) {
 	auto* const mainComlist = Engine::GetCommandList();
-	ID3D12DescriptorHeap* ppHeaps[] = { srvHeap.Get() };
-	mainComlist->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
 	mainComlist->SetGraphicsRootDescriptorTable(
-		rootParam, srvHeap.GetSrvGpuHeapHandle(texIndex));
+		rootParam, srvHeap->GetSrvGpuHeapHandle(texIndex));
 }
