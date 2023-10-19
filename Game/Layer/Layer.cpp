@@ -170,6 +170,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 }
 
 void Layer::Update(const Camera* camera) {
+	isClear_.Update();
 
 	ApplyGlobalVariable();
 
@@ -182,7 +183,7 @@ void Layer::Update(const Camera* camera) {
 
 		if (nowLayer_ == kMaxLayerNum_ - 1) {
 			// クリア処理
-
+			isClear_ = true;
 			// 今は仮で層のリセット
 			Reset();
 

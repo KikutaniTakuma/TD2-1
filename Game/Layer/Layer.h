@@ -7,6 +7,8 @@
 #include "Game/Gauge/Gauge.h"
 #include "Drawers/Model/Model.h"
 
+#include "Utils/UtilsLib/UtilsLib.h"
+
 class Camera;
 
 class Layer
@@ -75,7 +77,7 @@ public:
 
 	const bool GetChangeLayerFlag() { return isChangeLayer_; }
 
-	const bool GetClearFlag() { return isClear_; }
+	const UtilsLib::Flg GetClearFlag() { return isClear_; }
 
 	/// <summary>
 	/// ダメージの加算
@@ -138,6 +140,6 @@ private:
 
 	bool isChangeLayer_;
 
-	bool isClear_;
+	UtilsLib::Flg isClear_;
 
 };
