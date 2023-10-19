@@ -3,6 +3,7 @@
 
 #include "SceneManager/SceneManager.h"
 #include "SceneManager/GameScene/GameScene.h"
+#include "SceneManager/ResultScene/ResultScene.h"
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ライブラリ初期化
@@ -15,7 +16,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	}
 	// シーンマネージャー初期化
 	auto* const sceneManager = SceneManager::GetInstace();
-	sceneManager->Initialize(new GameScene{});
+	sceneManager->Initialize(new ResultScene{});
 
 	// メインループ
 	sceneManager->Game();

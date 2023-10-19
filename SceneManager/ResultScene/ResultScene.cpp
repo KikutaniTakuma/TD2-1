@@ -5,7 +5,9 @@ ResultScene::ResultScene():
 	models_(),
 	texs_(),
 	particles_(),
-	globalVariables_()
+	globalVariables_(),
+	clearTime_(),
+	hoge()
 {
 
 }
@@ -14,10 +16,6 @@ void ResultScene::Initialize() {
 	camera_.farClip = 3000.0f;
 
 	globalVariables_.LoadFile();
-
-	texs_.push_back(Texture2D());
-	texs_.back().LoadTexture("./Resources/Watame.png");
-	texs_.back().scale = texs_.back().GetTexSize();
 }
 
 void ResultScene::Finalize() {
@@ -32,6 +30,8 @@ void ResultScene::Update() {
 	for (auto& tex : texs_) {
 		tex.Update();
 	}
+
+	hoge.Update();
 }
 
 void ResultScene::Draw() {
@@ -44,4 +44,6 @@ void ResultScene::Draw() {
 	for (auto& tex : texs_) {
 		tex.Draw(camera_.GetViewOthographics());
 	}
+
+	hoge.Draw(camera_.GetViewOthographics());
 }

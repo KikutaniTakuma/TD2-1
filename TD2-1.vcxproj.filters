@@ -179,6 +179,9 @@
     <ClCompile Include="Game\Player\Player.cpp">
       <Filter>Player</Filter>
     </ClCompile>
+    <ClCompile Include="Result\Star\Star.cpp">
+      <Filter>Result\Star</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -351,6 +354,12 @@
     </Filter>
     <Filter Include="Background">
       <UniqueIdentifier>{1543e0fc-cea3-46d5-b886-35a93e0945b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Result">
+      <UniqueIdentifier>{a05f4951-3685-453d-88f7-8968d46ebe4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Result\Star">
+      <UniqueIdentifier>{0763eb47-a13a-4fa0-a2fd-6ff026fce9c3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -539,6 +548,9 @@
     </ClInclude>
     <ClInclude Include="Game\Background\Background.h">
       <Filter>Background</Filter>
+    </ClInclude>
+    <ClInclude Include="Result\Star\Star.h">
+      <Filter>Result\Star</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
