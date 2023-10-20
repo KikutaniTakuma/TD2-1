@@ -11,6 +11,8 @@ Gauge::Gauge() {
 		textures_[i]->LoadTexture("./Resources/white2x2.png");
 	}
 
+	textures_[static_cast<int>(TextureNames::kMostBack)]->LoadTexture("./Resources/Gauge/gage_flame.png");
+
 	textures_[static_cast<int>(TextureNames::kMostBack)]->color = 0x111111FF;
 	textures_[static_cast<int>(TextureNames::kGaugeBack)]->color = 0x444444FF;
 	textures_[static_cast<int>(TextureNames::kGaugeMain)]->color = 0x33FF99FF;

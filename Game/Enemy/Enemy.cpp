@@ -2,14 +2,21 @@
 
 #include "Engine/FrameInfo/FrameInfo.h"
 #include "Utils/Camera/Camera.h"
+#include "Game/Player/Player.h"
 #include "Game/Layer/Layer.h"
 #include <numbers>
+#include <cmath>
+#include <algorithm>
 
 std::unique_ptr<GlobalVariables> Enemy::globalVariables_ = std::make_unique<GlobalVariables>();
 
 float Enemy::kFallingSpeed_ = -9.8f;
 
 const std::string Enemy::groupName_ = "StaticEnemy";
+
+float Enemy::kReboundCoefficient_ = 0.9f;
+
+float Enemy::kLayerReboundCoefficient_ = 0.3f;
 
 Enemy::Enemy(int type, const Vector3& pos, const float& layerY, float scale) {
 
@@ -67,7 +74,8 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, float scale) {
 		velocity_ = {};
 
 		tex_->pos = pos;
-		tex_->rotate.z = 3.14f;
+		tex_->rotate.z = std::numbers::pi_v<float>;
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
 
 		break;
 	case Enemy::Type::kEnd:
@@ -111,6 +119,102 @@ void Enemy::SetParametar(int type, const Vector3& pos, const float& y) {
 		type_ = Type::kFly;
 		firstPos_ = pos;
 		
+	}
+}
+
+void Enemy::CollisionEnemy(Enemy* enemy)
+{
+
+	if (tex_->Collision(*enemy->GetTex())) {
+		if (status_ == Status::kFalling) {
+			isCollisionEnemy_ = true;
+			if (isCollisionEnemy_.OnEnter()) {
+
+				Vector3 vector = tex_->pos - enemy->GetTex()->pos;
+
+				float speed = velocity_.Length() * kReboundCoefficient_;
+
+				if (vector.y <= 0 && velocity_.y <= 0) {
+					velocity_.x = vector.Normalize().x * speed;
+					velocity_.y = -vector.Normalize().y * speed;
+				}
+				else {
+					velocity_ = vector.Normalize() * speed;
+				}
+				velocity_.z = 0;
+
+				fallingSpeed_ = kFallingSpeed_;
+
+				if (velocity_.x == 0) {
+
+					velocity_.x = std::sinf(rotateAddAngle_) * UtilsLib::Random(2, 6);
+
+					/*if (std::fabsf(rotateAddAngle_) <= 0.5f) {
+						rotateAddAngle_ = rotateAddAngle_ * UtilsLib::Random(3, 6);
+					}
+					velocity_.x = -std::sinf(rotateAddAngle_) * velocity_.y;
+					velocity_.y = std::cosf(rotateAddAngle_) * velocity_.y;*/
+				}
+				else {
+
+					float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
+
+					if (angle >= std::numbers::pi_v<float> / 2) {
+						angle -= std::numbers::pi_v<float> / 2;
+					}
+					else if (angle <= -std::numbers::pi_v<float> / 2) {
+						angle += std::numbers::pi_v<float> / 2;
+					}
+					rotateAddAngle_ = angle * 6;
+				}
+			}
+		}
+		else if (type_ == Type::kWalk && status_ == Status::kNormal && enemy->GetType() == Type::kWalk && enemy->GetStatus() == Status::kNormal) {
+
+		}
+	}
+	else {
+		isCollisionEnemy_ = false;
+	}
+}
+
+void Enemy::CollisionPlayer(Player* player) {
+
+
+	if (tex_->Collision(*player->GetTex())) {
+
+		if (player->GetVelocity().y < 0.0f) {
+			StatusRequest(Enemy::Status::kFalling);
+			fallingSpeed_ = kFallingSpeed_ + player->GetVelocity().y;
+			
+			Vector3 vector = player->GetTex()->pos - tex_->pos;
+
+			if (vector.x == 0) {
+
+				if (UtilsLib::Random(0, 1) == 0) {
+					rotateAddAngle_ = 6.0f;
+				}
+				else {
+					rotateAddAngle_ = -6.0f;
+				}
+			}
+			else {
+				float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
+
+				if (angle >= std::numbers::pi_v<float> / 2) {
+					angle -= std::numbers::pi_v<float> / 2;
+				}
+				else if (angle <= -std::numbers::pi_v<float> / 2) {
+					angle += std::numbers::pi_v<float> / 2;
+				}
+				rotateAddAngle_ = angle * 6;
+			}
+
+			player->EnemyStep(true);
+		}
+		else {
+			player->EnemyStep(false);
+		}
 	}
 }
 
@@ -172,10 +276,30 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 		break;
 	}
 
+	ModelUpdate(camera);
+	tex_->Update();
+
+	isCollisionEnemy_.Update();
+	isCollisionLayer_.Update();
+}
+
+void Enemy::Collision(const float& y) {
+	float posY = tex_->pos.y - tex_->scale.y / 2.0f;
+
+	if (y > posY) {
+		tex_->pos.y += y - posY;
+	}
+}
+
+void Enemy::ModelUpdate(const Camera* camera)
+{
+
 	float ratio = static_cast<float>(Engine::GetInstance()->clientHeight) /
 		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
 
 	float indication = 90.0f;
+
+	//models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = tex_->rotate.z;
 
 	models_[static_cast<uint16_t>(Parts::kMain)]->pos.x = tex_->pos.x / ratio + camera->pos.x - camera->pos.x / ratio;
 	models_[static_cast<uint16_t>(Parts::kMain)]->pos.y = tex_->pos.y / ratio + camera->pos.y - camera->pos.y / ratio;
@@ -186,15 +310,7 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 	models_[static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[static_cast<uint16_t>(Parts::kMain)]->scale.y;
 	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
 	models_[static_cast<uint16_t>(Parts::kDoukasen)]->Update();
-	tex_->Update();
-}
 
-void Enemy::Collision(const float& y) {
-	float posY = tex_->pos.y - tex_->scale.y / 2.0f;
-
-	if (y > posY) {
-		tex_->pos.y += y - posY;
-	}
 }
 
 void Enemy::GenerationInitialize() {
@@ -226,16 +342,59 @@ void Enemy::FallingInitialize() {
 }
 
 void Enemy::FallingUpdate(const float& y) {
+	
+	velocity_.y += fallingSpeed_;
 
-	velocity_.y += kFallingSpeed_ * FrameInfo::GetInstance()->GetDelta();
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 
-	tex_->pos += velocity_;
+	if (isCollisionLayer_.OnStay()) {
+
+		rotateTimeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+		float t = std::clamp<float>(rotateTimeCount_, 0.0f, rotateTime_) / rotateTime_;
+
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::lerp(startRotate_, endRotate_, t);
+	}
+	else {
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z += rotateAddAngle_ * FrameInfo::GetInstance()->GetDelta();
+	}
+
 
 	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
 
 		Collision(y);
-		velocity_.y = 0.0f;
-		statusRequest_ = Status::kFaint;
+
+		if (isCollisionLayer_.OnStay()) {
+			velocity_.y = 0.0f;
+			velocity_.x = 0.0f;
+			statusRequest_ = Status::kFaint;
+			isCollisionLayer_ = false;
+			models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
+		}
+		else {
+			
+			isCollisionLayer_ = true;
+
+			fallingSpeed_ = kFallingSpeed_;
+			velocity_.y = std::fabsf(velocity_.y) * kLayerReboundCoefficient_;
+
+			rotateTime_ = 2.0f * velocity_.y / (-fallingSpeed_) * FrameInfo::GetInstance()->GetDelta();
+			startRotate_ = models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z;
+
+			float pi = std::numbers::pi_v<float>;
+			float memo = startRotate_ / 2.0f / pi;
+			if (startRotate_ >= 0) {
+				endRotate_ = pi + 2.0f * pi * (static_cast<int>(memo));
+			}
+			else {
+				endRotate_ = -pi + 2.0f * pi * (static_cast<int>(memo));
+			}
+
+			rotateTimeCount_ = 0.0f;
+
+			velocity_.x = 0.0f;
+
+		}
 	}
 	
 }
@@ -246,9 +405,9 @@ void Enemy::FaintInitialize() {
 
 void Enemy::FaintUpdate(const float& y) {
 
-	velocity_.y += kFallingSpeed_ * FrameInfo::GetInstance()->GetDelta();
+	velocity_.y += kFallingSpeed_;
 
-	tex_->pos += velocity_;
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 
 	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
 

@@ -5,10 +5,13 @@
 #include "Drawers/Model/Model.h"
 
 #include "GlobalVariables/GlobalVariables.h"
+#include "Utils/UtilsLib/UtilsLib.h"
 
 class Layer;
 
 class Camera;
+
+class Player;
 
 class Enemy
 {
@@ -84,6 +87,8 @@ public:
 	/// <returns>状態</returns>
 	Status GetStatus() { return status_; }
 
+	Type GetType() { return type_; }
+
 	/// <summary>
 	/// テクスチャの参照。あたり判定用。
 	/// </summary>
@@ -104,6 +109,10 @@ public:
 	/// 初期座標などのパラメーターをいれる
 	/// </summary>
 	void SetParametar(int type, const Vector3& pos, const float& y = 0);
+
+	void CollisionEnemy(Enemy* enemy);
+
+	void CollisionPlayer(Player* player);
 
 private:
 
@@ -168,7 +177,10 @@ private:
 	/// </summary>
 	void Collision(const float& y);
 
+	void ModelUpdate(const Camera* camera);
+
 private:
+	
 
 	// 落下スピード
 	static float kFallingSpeed_;
@@ -179,12 +191,19 @@ private:
 	// 静的メンバ定数のグローバル変数のグループネーム
 	static const std::string groupName_;
 
+	// 反発係数
+	static float kReboundCoefficient_;
+	
+	static float kLayerReboundCoefficient_;
+
 private:
 
 	// Enemyのテクスチャ
 	std::unique_ptr<Texture2D> tex_;
 
 	std::vector<std::unique_ptr<Model>> models_;
+
+	float rotateAcceleration_;
 
 	// 初期座標の保存用。倒した敵を生成するのに使うイメージ。
 	Vector3 firstPos_;
@@ -200,5 +219,19 @@ private:
 	// 速度
 	Vector3 velocity_;
 
+	float rotateAddAngle_;
 
+	float fallingSpeed_;
+
+	float startRotate_;
+
+	float endRotate_;
+
+	float rotateTimeCount_;
+
+	float rotateTime_;
+
+	UtilsLib::Flg isCollisionEnemy_;
+
+	UtilsLib::Flg isCollisionLayer_;
 };

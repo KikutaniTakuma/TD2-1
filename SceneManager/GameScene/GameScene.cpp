@@ -602,9 +602,6 @@ void GameScene::DeleteShockWave() {
 
 void GameScene::Collision() {
 
-	const Texture2D* playerTex = player_->GetTex();
-	const Vector3& playerVelocity = player_->GetVelocity();
-
 	int i = 0;
 
 	for (std::unique_ptr<Enemy>& enemy : enemies_) {
@@ -620,19 +617,8 @@ void GameScene::Collision() {
 		if (enemy->GetStatus() == Enemy::Status::kNormal &&
 			(player_->GetStatus() == Player::Status::kNormal || player_->GetStatus() == Player::Status::kHipDrop)) {
 
-			if (playerTex->Collision(*enemyTex)) {
-
-				// �G�����Ǒ��x��0�ȉ��Ńv���C���[������ł锻��ɂ��Ă���
-				if (playerVelocity.y < 0.0f) {
-					// �G�𓥂񂾎�
-					enemy->StatusRequest(Enemy::Status::kFalling);
-					player_->EnemyStep(true);
-				}
-				else {
-					// �G�ɓ��܂ꂽ��
-					player_->EnemyStep(false);
-				}
-			}
+			enemy->CollisionPlayer(player_.get());
+			
 		}
 		else if (enemy->GetStatus() == Enemy::Status::kFaint && shockWaves_.size() != 0) {
 			for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
@@ -644,6 +630,19 @@ void GameScene::Collision() {
 						enemy->StatusRequest(Enemy::Status::kDeath);
 					}
 				}
+			}
+		}
+
+		int j = 0;
+
+		for (std::unique_ptr<Enemy>& enemy2 : enemies_) {
+			if (enemyNums_[stage_][layer_->GetNowLayer()] == j) {
+				break;
+			}
+			j++;
+
+			if (i != j) {
+				enemy->CollisionEnemy(enemy2.get());
 			}
 		}
 	}
