@@ -221,3 +221,25 @@ uint32_t Vector4ToUint(const Vector4& color) {
 
 	return result;
 }
+
+Vector4 ColorLerp(const Vector4& start, const Vector4& end, float t) {
+	Vector4 result;
+
+	for (auto i = 0llu; i < result.m.size();i++) {
+		result[i] = std::lerp(start[i], end[i], t);
+	}
+
+	return result;
+}
+
+uint32_t ColorLerp(uint32_t start, uint32_t end, float t) {
+	Vector4 result;
+	Vector4&& startTmp = UintToVector4(start);
+	Vector4&& endTmp = UintToVector4(end);
+
+	for (auto i = 0llu; i < result.m.size(); i++) {
+		result[i] = std::lerp(startTmp[i], endTmp[i], t);
+	}
+
+	return Vector4ToUint(result);
+}

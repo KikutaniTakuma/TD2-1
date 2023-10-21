@@ -232,5 +232,7 @@ void Texture::ReleaseIntermediateResource() {
 }
 
 void Texture::Use(UINT rootParamator) {
-	TextureManager::GetInstance()->Use(heapPos, rootParamator);
+	static TextureManager* textureManager = TextureManager::GetInstance();
+	assert(textureManager);
+	textureManager->Use(heapPos, rootParamator);
 }

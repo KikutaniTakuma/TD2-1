@@ -61,8 +61,9 @@ public:
 	/// <summary>
 	/// 衝撃波の作成
 	/// </summary>
-	/// <param name="highest">プレイヤーの座標</param>
+	/// <param name="pos">プレイヤーの座標</param>
 	/// <param name="highest">プレイヤーの最大の高さ</param>
+	/// <param name="y">層の高さ</param>
 	void CreatShockWave(const Vector3& pos, float highest, float y);
 
 private:

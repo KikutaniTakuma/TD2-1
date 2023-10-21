@@ -2,12 +2,15 @@
 #include "TextureManager/TextureManager.h"
 #include "Engine/Engine.h"
 #include "Engine/ConstBuffer/ConstBuffer.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "Engine/PipelineManager/PipelineManager.h"
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
 #include "Utils/Math/Vector2.h"
 #include "Utils/Math/Vector4.h"
+
+#include "Utils/UtilsLib/UtilsLib.h"
 
 #include <array>
 
@@ -23,7 +26,11 @@ public:
 	};
 
 public:
+	/// <summary>
+	/// デフォルトのコンストラクタではwhite2x2.pngを読み込む
+	/// </summary>
 	Texture2D();
+	Texture2D(const std::string& fileName);
 	Texture2D(const Texture2D&);
 	Texture2D(Texture2D&&) noexcept;
 	~Texture2D();
@@ -51,7 +58,7 @@ private:
 /// 静的メンバ変数
 /// </summary>
 private:
-	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum)*2> graphicsPipelineState;
+	static std::array<Pipeline*, size_t(Pipeline::Blend::BlendTypeNum) * 2> graphicsPipelineState;
 	static Shader shader;
 
 	static D3D12_INDEX_BUFFER_VIEW indexView;
@@ -65,15 +72,9 @@ public:
 public:
 	void Update();
 
-	/// <summary>
-	/// Draw関数を実装
-	/// </summary>
-	/// <param name="viewProjection">カメラのマトリックス</param>
-	/// <param name="blend">ブレンドモード</param>
-	/// <param name="isDepth">深度バッファの有効か否か(trueなら有効)</param>
 	void Draw(
 		const Mat4x4& viewProjection,
-		Pipeline::Blend blend = Pipeline::Normal,
+		Pipeline::Blend blend = Pipeline::Blend::Normal,
 		bool isDepth = true
 	);
 
@@ -135,6 +136,8 @@ public:
 	std::array<Vector3, 4> worldPos;
 
 	uint32_t color;
+
+	UtilsLib::Flg isSameTexSize;
 
 private:
 	D3D12_VERTEX_BUFFER_VIEW vertexView;

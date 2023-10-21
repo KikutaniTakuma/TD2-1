@@ -121,3 +121,7 @@ Vector4 UintToVector4(uint32_t color);
 /// Vector4からuint32_tへの変換
 /// </summary>
 uint32_t Vector4ToUint(const Vector4& color);
+
+Vector4 ColorLerp(const Vector4& start, const Vector4& end, float t);
+
+uint32_t ColorLerp(uint32_t start, uint32_t end, float t);

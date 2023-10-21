@@ -112,30 +112,50 @@ void Gamepad::Vibration(float leftVibIntensity, float rightVibIntensity) {
 }
 
 void Gamepad::Debug() {
-	ImGui::SetNextWindowSizeConstraints({190.0f, 400.0f}, { 190.0f, 400.0f });
+	ImGui::SetNextWindowSizeConstraints({}, { 210.0f, 400.0f });
 	ImGui::Begin("Gamepad Debug");
-    ImGui::Text("LeftX          = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_X)) * 100.0f);
-	ImGui::Text("LeftY          = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_Y)) * 100.0f);
-	ImGui::Text("RightX         = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_X)) * 100.0f);
-	ImGui::Text("RightY         = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_Y)) * 100.0f);
-	ImGui::Text("LEFT_TRIGER    = %.2f%%\n", GetTriger(Triger::LEFT) * 100.0f);
-	ImGui::Text("RIGHT_TRIGER   = %.2f%%\n", GetTriger(Triger::RIGHT) * 100.0f);
-	ImGui::Text("UP             = %d\n", GetButton(Button::UP));
-	ImGui::Text("DOWN           = %d\n", GetButton(Button::DOWN));
-	ImGui::Text("LEFT           = %d\n", GetButton(Button::LEFT));
-	ImGui::Text("RIGHT          = %d\n", GetButton(Button::RIGHT));
-	ImGui::Text("START          = %d\n", GetButton(Button::START));
-	ImGui::Text("BACK           = %d\n", GetButton(Button::BACK));
-	ImGui::Text("LEFT_THUMB     = %d\n", GetButton(Button::LEFT_THUMB));
-	ImGui::Text("RIGHT_THUMB    = %d\n", GetButton(Button::RIGHT_THUMB));
-	ImGui::Text("LEFT_SHOULDER  = %d\n", GetButton(Button::LEFT_SHOULDER));
-	ImGui::Text("RIGHT_SHOULDER = %d\n", GetButton(Button::RIGHT_SHOULDER));
-	ImGui::Text("A              = %d\n", GetButton(Button::A));
-	ImGui::Text("B              = %d\n", GetButton(Button::B));
-	ImGui::Text("X              = %d\n", GetButton(Button::X));
-	ImGui::Text("Y              = %d\n", GetButton(Button::Y));
-	static Vector2 vibration;
-	ImGui::DragFloat2("Vib", &vibration.x, 0.01f, 0.0f, 1.0f);
-	Gamepad::Vibration(vibration.x, vibration.y);
+	if (ImGui::TreeNode("stick")) {
+		ImGui::Text("LeftX          = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_X)) * 100.0f);
+		ImGui::Text("LeftY          = %.2f%%\n", static_cast<float>(GetStick(Stick::LEFT_Y)) * 100.0f);
+		ImGui::Text("RightX         = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_X)) * 100.0f);
+		ImGui::Text("RightY         = %.2f%%\n", static_cast<float>(GetStick(Stick::RIGHT_Y)) * 100.0f);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("triger")) {
+		ImGui::Text("LEFT_TRIGER    = %.2f%%\n", GetTriger(Triger::LEFT) * 100.0f);
+		ImGui::Text("RIGHT_TRIGER   = %.2f%%\n", GetTriger(Triger::RIGHT) * 100.0f);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("ABXY")) {
+		ImGui::Text("A              = %d\n", GetButton(Button::A));
+		ImGui::Text("B              = %d\n", GetButton(Button::B));
+		ImGui::Text("X              = %d\n", GetButton(Button::X));
+		ImGui::Text("Y              = %d\n", GetButton(Button::Y));
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("cross button")) {
+		ImGui::Text("UP             = %d\n", GetButton(Button::UP));
+		ImGui::Text("DOWN           = %d\n", GetButton(Button::DOWN));
+		ImGui::Text("LEFT           = %d\n", GetButton(Button::LEFT));
+		ImGui::Text("RIGHT          = %d\n", GetButton(Button::RIGHT));
+		ImGui::TreePop();
+	}	
+	if (ImGui::TreeNode("other")) {
+		ImGui::Text("START          = %d\n", GetButton(Button::START));
+		ImGui::Text("BACK           = %d\n", GetButton(Button::BACK));
+		ImGui::Text("LEFT_THUMB     = %d\n", GetButton(Button::LEFT_THUMB));
+		ImGui::Text("RIGHT_THUMB    = %d\n", GetButton(Button::RIGHT_THUMB));
+		ImGui::Text("LEFT_SHOULDER  = %d\n", GetButton(Button::LEFT_SHOULDER));
+		ImGui::Text("RIGHT_SHOULDER = %d\n", GetButton(Button::RIGHT_SHOULDER));
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("vibration")) {
+		static Vector2 vibration;
+		ImGui::DragFloat2("Vib", &vibration.x, 0.01f, 0.0f, 1.0f);
+		Gamepad::Vibration(vibration.x, vibration.y);
+		ImGui::TreePop();
+	}
+
 	ImGui::End();
 }

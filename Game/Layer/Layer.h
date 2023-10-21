@@ -5,10 +5,21 @@
 
 #include "GlobalVariables/GlobalVariables.h"
 #include "Game/Gauge/Gauge.h"
+#include "Drawers/Model/Model.h"
+
+#include "Utils/UtilsLib/UtilsLib.h"
+
+class Camera;
 
 class Layer
 {
 public:
+
+	// モデルのパーツ
+	enum class Parts {
+		kMain, // 一番の親。本体 
+		kEnd, // 末尾
+	};
 
 	Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints);
 	~Layer() = default;
@@ -23,19 +34,25 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(const Camera* camera);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
-	void Draw(const Mat4x4& viewProjection);
+	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
-	void Draw2D(const Mat4x4& viewProjection);
+	void Draw2DFar(const Mat4x4& viewProjection);
+
+	void Draw2DNear(const Mat4x4& viewProjection);
+
+	void TimerStart();
+
+	void TimerStop();
 
 public:
 
@@ -64,12 +81,16 @@ public:
 
 	const bool GetChangeLayerFlag() { return isChangeLayer_; }
 
-	const bool GetClearFlag() { return isClear_; }
+	const UtilsLib::Flg GetClearFlag() { return isClear_; }
 
 	/// <summary>
 	/// ダメージの加算
 	/// </summary>
 	void AddDamage(int damage) { damage_ += damage; }
+
+	inline const std::chrono::milliseconds& GetPlayTime() const {
+		return gamePlayTime_;
+	}
 
 private:
 
@@ -107,6 +128,8 @@ private:
 	// テクスチャ
 	std::vector<std::unique_ptr<Texture2D>> tex_;
 
+	std::vector<std::vector<std::unique_ptr<Model>>> models_;
+
 	std::unique_ptr<Gauge> gauge_;
 
 	// HP
@@ -125,6 +148,8 @@ private:
 
 	bool isChangeLayer_;
 
-	bool isClear_;
+	UtilsLib::Flg isClear_;
 
+	std::chrono::milliseconds gamePlayTime_;
+	std::chrono::steady_clock::time_point playStartTime_;
 };

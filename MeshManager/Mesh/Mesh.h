@@ -4,6 +4,7 @@
 #include <wrl.h>
 #include <string>
 #include <unordered_map>
+#include <initializer_list>
 
 #include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
@@ -16,6 +17,13 @@
 /// 基本的にポインタ型で使う
 /// </summary>
 class Mesh {
+public:
+	struct CopyData {
+		std::pair<ID3D12Resource*, D3D12_VERTEX_BUFFER_VIEW> resource;
+		uint32_t vertNum;
+		Texture* tex;
+	};
+
 private:
 	struct VertData {
 		Vector4 position;
@@ -37,18 +45,19 @@ private:
 		}
 	};
 
-	struct MeshData{
+	struct VertResourece {
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer = nullptr;
 		// 頂点バッファビュー
 		D3D12_VERTEX_BUFFER_VIEW vertexView{};
 		// 頂点バッファマップ
 		VertData* vertexMap = nullptr;
+	};
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> indexBuffer = nullptr;
-		// インデックスバッファビュー
-		D3D12_INDEX_BUFFER_VIEW indexView{};
-		// インデックスバッファマップ
-		uint32_t* indexMap = nullptr;
+	struct MeshData{
+		std::unordered_map<size_t, VertData> vertices;
+
+		UINT sizeInBytes;
+		UINT strideInBytes;
 
 		// 頂点数
 		uint32_t vertNum = 0;
@@ -67,14 +76,14 @@ public:
 public:
 	void LoadObj(const std::string& objfileName);
 
+	std::unordered_map<std::string, CopyData> CreateResource();
+private:
 	void LoadMtl(const std::string& fileName);
 
-	void Use();
-
 private:
-	std::unordered_map<std::string, MeshData> meshs_;
+	
 
-	std::unordered_map<std::string, ShaderResourceHeap> SRVHeap_;
+	std::unordered_map<std::string, MeshData> meshs_;
 
 	std::unordered_map<std::string, Texture*> texs_;
 

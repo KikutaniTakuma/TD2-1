@@ -8,11 +8,11 @@
 RenderTarget::RenderTarget():
 	resource(),
 	RTVHeap(),
-	SRVHeap(),
 	srvHeapHandle(),
 	isResourceStateChange(false),
 	width(Engine::GetInstance()->clientWidth),
-	height(Engine::GetInstance()->clientHeight)
+	height(Engine::GetInstance()->clientHeight),
+	srvDesc{}
 {
 	auto resDesc = Engine::GetSwapchainBufferDesc();
 
@@ -50,39 +50,26 @@ RenderTarget::RenderTarget():
 
 	Engine::GetDevice()->
 		CreateRenderTargetView(
-			resource.Get(), 
-			&rtvDesc, 
+			resource.Get(),
+			&rtvDesc,
 			RTVHeap->GetCPUDescriptorHandleForHeapStart()
 		);
 
-	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
-
-	srvHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc = {};
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Format = rtvDesc.Format;
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-	Engine::GetDevice()->
-		CreateShaderResourceView(
-			resource.Get(), 
-			&srvDesc, 
-			srvHeapHandle
-		);
-
-	srvHeapHandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 	resource(),
 	RTVHeap(),
-	SRVHeap(),
 	srvHeapHandle(),
 	isResourceStateChange(false),
 	width(width_),
-	height(height_)
+	height(height_),
+	srvDesc{}
 {
 	auto resDesc = Engine::GetSwapchainBufferDesc();
 	resDesc.Width = width;
@@ -128,173 +115,14 @@ RenderTarget::RenderTarget(uint32_t width_, uint32_t height_) :
 			RTVHeap->GetCPUDescriptorHandleForHeapStart()
 		);
 
-	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 4, true);
-
-	srvHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc = {};
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Format = rtvDesc.Format;
 	srvDesc.Texture2D.MipLevels = 1;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-	Engine::GetDevice()->
-		CreateShaderResourceView(
-			resource.Get(),
-			&srvDesc,
-			srvHeapHandle
-		);
-
-	srvHeapHandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-}
-
-RenderTarget::RenderTarget(uint16_t numDescriptor) :
-	resource(),
-	RTVHeap(),
-	SRVHeap(),
-	srvHeapHandle(),
-	isResourceStateChange(false),
-	width(Engine::GetInstance()->clientWidth),
-	height(Engine::GetInstance()->clientHeight)
-{
-	auto resDesc = Engine::GetSwapchainBufferDesc();
-
-	// Resourceを生成する
-	// リソース用のヒープの設定
-	D3D12_HEAP_PROPERTIES heapPropaerties{};
-	heapPropaerties.Type = D3D12_HEAP_TYPE_DEFAULT;
-	float clsValue[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	D3D12_CLEAR_VALUE clearValue{};
-	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	for (int32_t i = 0; i < _countof(clearValue.Color); i++) {
-		clearValue.Color[i] = clsValue[i];
-	}
-
-	// 実際にリソースを作る
-	HRESULT hr = Engine::GetDevice()->
-		CreateCommittedResource(
-			&heapPropaerties,
-			D3D12_HEAP_FLAG_NONE,
-			&resDesc,
-			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-			&clearValue,
-			IID_PPV_ARGS(resource.GetAddressOf())
-		);
-	if (!SUCCEEDED(hr)) {
-		ErrorCheck::GetInstance()->ErrorTextBox("CreateCommittedResource Function Failed", "RenderTarget");
-		return;
-	}
-
-	RTVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
-
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-	Engine::GetDevice()->
-		CreateRenderTargetView(
-			resource.Get(),
-			&rtvDesc,
-			RTVHeap->GetCPUDescriptorHandleForHeapStart()
-		);
-
-	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
-
-	srvHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Format = rtvDesc.Format;
-	srvDesc.Texture2D.MipLevels = 1;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-	Engine::GetDevice()->
-		CreateShaderResourceView(
-			resource.Get(),
-			&srvDesc,
-			srvHeapHandle
-		);
-
-	srvHeapHandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-}
-
-RenderTarget::RenderTarget(uint16_t numDescriptor, uint32_t width_, uint32_t height_) :
-	resource(),
-	RTVHeap(),
-	SRVHeap(),
-	srvHeapHandle(),
-	isResourceStateChange(false),
-	width(width_),
-	height(height_)
-{
-	auto resDesc = Engine::GetSwapchainBufferDesc();
-	resDesc.Width = width;
-	resDesc.Height = height;
-
-	// Resourceを生成する
-	// リソース用のヒープの設定
-	D3D12_HEAP_PROPERTIES heapPropaerties{};
-	heapPropaerties.Type = D3D12_HEAP_TYPE_DEFAULT;
-	float clsValue[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	D3D12_CLEAR_VALUE clearValue{};
-	clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	for (int32_t i = 0; i < _countof(clearValue.Color); i++) {
-		clearValue.Color[i] = clsValue[i];
-	}
-
-	// 実際にリソースを作る
-	HRESULT hr = Engine::GetDevice()->
-		CreateCommittedResource(
-			&heapPropaerties,
-			D3D12_HEAP_FLAG_NONE,
-			&resDesc,
-			D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-			&clearValue,
-			IID_PPV_ARGS(resource.GetAddressOf())
-		);
-	if (!SUCCEEDED(hr)) {
-		ErrorCheck::GetInstance()->ErrorTextBox("CreateCommittedResource Function Failed", "RenderTarget");
-		return;
-	}
-
-	RTVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
-
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-	Engine::GetDevice()->
-		CreateRenderTargetView(
-			resource.Get(),
-			&rtvDesc,
-			RTVHeap->GetCPUDescriptorHandleForHeapStart()
-		);
-
-	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
-
-	srvHeapHandle = SRVHeap->GetCPUDescriptorHandleForHeapStart();
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Format = rtvDesc.Format;
-	srvDesc.Texture2D.MipLevels = 1;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-	Engine::GetDevice()->
-		CreateShaderResourceView(
-			resource.Get(),
-			&srvDesc,
-			srvHeapHandle
-		);
-
-	srvHeapHandle.ptr += Engine::GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 RenderTarget::~RenderTarget() {
-	if(SRVHeap){
-		SRVHeap->Release();
-	}
-
 	if (RTVHeap) {
 		RTVHeap->Release();
 	}
@@ -334,11 +162,22 @@ void RenderTarget::SetMainRenderTarget() {
 	// 描画先をメインレンダーターゲットに変更
 	auto rtvHeapHandle = Engine::GetMainRendertTargetHandle();
 	auto dsvH = Engine::GetDsvHandle();
-	Engine::GetCommandList()->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
+
+	static auto mainComList = Engine::GetCommandList();
+	mainComList->OMSetRenderTargets(1, &rtvHeapHandle, false, &dsvH);
 }
 
 void RenderTarget::UseThisRenderTargetShaderResource() {
-	Engine::GetCommandList()->SetDescriptorHeaps(1, SRVHeap.GetAddressOf());
-	auto SRVHandle = SRVHeap->GetGPUDescriptorHandleForHeapStart();
-	Engine::GetCommandList()->SetGraphicsRootDescriptorTable(0,SRVHandle);
+	static auto mainComList = Engine::GetCommandList();
+	mainComList->SetGraphicsRootDescriptorTable(0, srvHeapHandle);
+}
+
+void RenderTarget::CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU) {
+	Engine::GetDevice()->CreateShaderResourceView(
+		resource.Get(),
+		&srvDesc,
+		descHeapHandle
+	);
+
+	srvHeapHandle = descHeapHandleGPU;
 }

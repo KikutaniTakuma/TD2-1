@@ -130,27 +130,16 @@ void Mesh::LoadObj(const std::string& objFileName) {
 		objFile.close();
 
 		for (auto i : indexDatas) {
-			meshs_[i.first].vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertData) * indexDatas[i.first].size());
-			assert(meshData[i.first].vertexBuffer);
-
-
-			// リソースの先頭のアドレスから使う
-			meshs_[i.first].vertexView.BufferLocation = meshs_[i.first].vertexBuffer->GetGPUVirtualAddress();
-			// 使用するリソースのサイズは頂点3つ分のサイズ
-			meshs_[i.first].vertexView.SizeInBytes = static_cast<UINT>(sizeof(VertData) * indexDatas[i.first].size());
+			// 使用するリソースのサイズは頂点数分のサイズ
+			meshs_[i.first].sizeInBytes = static_cast<UINT>(sizeof(VertData) * indexDatas[i.first].size());
 			// 1頂点当たりのサイズ
-			meshs_[i.first].vertexView.StrideInBytes = sizeof(VertData);
-
-			// 頂点リソースにデータを書き込む
-			meshs_[i.first].vertexMap = nullptr;
-			// 書き込むためのアドレスを取得
-			meshs_[i.first].vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&meshs_[i.first].vertexMap));
+			meshs_[i.first].strideInBytes = sizeof(VertData);
 
 			for (int32_t j = 0; j < indexDatas[i.first].size(); j++) {
-				meshs_[i.first].vertexMap[j].position = posDatas[indexDatas[i.first][j].vertNum];
-				meshs_[i.first].vertexMap[j].normal = normalDatas[indexDatas[i.first][j].normalNum];
+				meshs_[i.first].vertices[j].position = posDatas[indexDatas[i.first][j].vertNum];
+				meshs_[i.first].vertices[j].normal = normalDatas[indexDatas[i.first][j].normalNum];
 				if (!uvDatas.empty()) {
-					meshs_[i.first].vertexMap[j].uv = uvDatas[indexDatas[i.first][j].uvNum];
+					meshs_[i.first].vertices[j].uv = uvDatas[indexDatas[i.first][j].uvNum];
 				}
 			}
 
@@ -168,7 +157,6 @@ void Mesh::LoadMtl(const std::string& fileName) {
 
 	std::string lineBuf;
 	std::unordered_map<std::string, Texture*>::iterator texItr;
-	std::unordered_map<std::string, ShaderResourceHeap>::iterator hepaItr;
 
 	std::string useMtlName;
 	while (std::getline(file, lineBuf)) {
@@ -183,26 +171,51 @@ void Mesh::LoadMtl(const std::string& fileName) {
 			line >> texName;
 
 			texItr->second = TextureManager::GetInstance()->LoadTexture(path.parent_path().string() + "/" + texName);
-			hepaItr->second.CreateTxtureView(texItr->second);
 		}
 		else if (identifier == "newmtl") {
 			line >> useMtlName;
-			texs_.insert({ useMtlName, nullptr });
+			texs_[useMtlName];
 			texItr = texs_.find(useMtlName);
-			SRVHeap_.insert({ useMtlName , ShaderResourceHeap() });
-			hepaItr = SRVHeap_.find(useMtlName);
-			hepaItr->second.InitializeReset(16);
 		}
 	}
 
 	for (auto& i : texs_) {
 		if (i.second == nullptr || !(*i.second)) {
 			i.second = TextureManager::GetInstance()->GetWhiteTex();
-			SRVHeap_[i.first].CreateTxtureView(i.second);
 		}
 	}
 }
 
-void Mesh::Use() {
+std::unordered_map<std::string, Mesh::CopyData> Mesh::CreateResource() {
+	std::unordered_map<std::string, Mesh::CopyData> resource;
 
+	for (auto& mesh : meshs_) {
+		// コンテナに追加
+		resource[mesh.first];
+		// resource生成
+		resource[mesh.first].resource.first = Engine::CreateBufferResuorce(mesh.second.sizeInBytes);
+		// view情報追加
+		resource[mesh.first].resource.second.BufferLocation = resource[mesh.first].resource.first->GetGPUVirtualAddress();
+		resource[mesh.first].resource.second.SizeInBytes = mesh.second.sizeInBytes;
+		resource[mesh.first].resource.second.StrideInBytes = mesh.second.strideInBytes;
+		
+		// 頂点情報コピー
+		VertData* vertMap = nullptr;
+		resource[mesh.first].resource.first->Map(0, nullptr, reinterpret_cast<void**>(&vertMap));
+
+		for (auto& vert : mesh.second.vertices) {
+			assert(vertMap);
+			vertMap[vert.first] = vert.second;
+		}
+
+		resource[mesh.first].resource.first->Unmap(0, nullptr);
+
+		// 頂点数追加
+		resource[mesh.first].vertNum = mesh.second.vertNum;
+
+		// テクスチャ追加
+		resource[mesh.first].tex = texs_[mesh.first];
+	}
+
+	return resource;
 }

@@ -1,0 +1,25 @@
+{
+    "Stage7": {
+        "Enemy0IsHealer": 0,
+        "Enemy0MoveVector": 0,
+        "Enemy0Pos": [
+            -200.0,
+            300.0,
+            0.0
+        ],
+        "Enemy0Type": 0,
+        "Layer0EnemyNum": 1,
+        "Layer0HP": 1,
+        "Layer0ScaffoldingNum": 1,
+        "LayerNum": 1,
+        "Scaffolding0Pos": [
+            -200.0,
+            100.0,
+            0.0
+        ],
+        "Scaffolding0Scale": [
+            100.0,
+            10.0
+        ]
+    }
+}

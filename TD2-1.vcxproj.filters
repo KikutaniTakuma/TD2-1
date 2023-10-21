@@ -140,20 +140,23 @@
     <ClCompile Include="Utils\Easeing\Easeing.cpp">
       <Filter>Utils\Easeing</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameScene\GameScene.cpp">
-      <Filter>GameScene</Filter>
+    <ClCompile Include="SceneManager\SceneManager.cpp">
+      <Filter>SceneManager</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameScene\Play\Play.cpp">
-      <Filter>GameScene\Play</Filter>
+    <ClCompile Include="SceneManager\GameScene\GameScene.cpp">
+      <Filter>SceneManager\GameScene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager\Fade\Fade.cpp">
+      <Filter>SceneManager\Fade</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager\ResultScene\ResultScene.cpp">
+      <Filter>SceneManager\ResultScene</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameScene\Result\Result.cpp">
       <Filter>GameScene\Result</Filter>
     </ClCompile>
     <ClCompile Include="Game\GameScene\Title\Title.cpp">
       <Filter>GameScene\Title</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\Player\Player.cpp">
-      <Filter>Player</Filter>
     </ClCompile>
     <ClCompile Include="Game\Enemy\Enemy.cpp">
       <Filter>Enemy</Filter>
@@ -172,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="Game\Background\Background.cpp">
       <Filter>Background</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Player\Player.cpp">
+      <Filter>Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -300,6 +306,18 @@
     </Filter>
     <Filter Include="Utils\Easeing">
       <UniqueIdentifier>{f16e45ab-4143-42ad-8fd5-3f82c6326404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager">
+      <UniqueIdentifier>{6521f805-11ba-4c5b-8653-802d7d8002ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\GameScene">
+      <UniqueIdentifier>{daf1fd15-6380-419e-b6dc-ddc0b96c053d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\Fade">
+      <UniqueIdentifier>{0275d580-d178-41c8-9359-014a9ab4a8ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\ResultScene">
+      <UniqueIdentifier>{3025218e-6088-4e77-a14e-ba3f9c984402}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameScene">
       <UniqueIdentifier>{464a587f-01eb-4ac8-ac12-3035923ae6b3}</UniqueIdentifier>
@@ -483,11 +501,17 @@
     <ClInclude Include="Utils\Easeing\Easeing.h">
       <Filter>Utils\Easeing</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GameScene\GameScene.h">
-      <Filter>GameScene</Filter>
+    <ClInclude Include="SceneManager\SceneManager.h">
+      <Filter>SceneManager</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GameScene\Play\Play.h">
-      <Filter>GameScene\Play</Filter>
+    <ClInclude Include="SceneManager\GameScene\GameScene.h">
+      <Filter>SceneManager\GameScene</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\Fade\Fade.h">
+      <Filter>SceneManager\Fade</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\ResultScene\ResultScene.h">
+      <Filter>SceneManager\ResultScene</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameScene\Result\Result.h">
       <Filter>GameScene\Result</Filter>

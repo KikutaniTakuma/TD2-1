@@ -3,13 +3,14 @@
 #include <cassert>
 #include <wrl.h>
 #include "Engine/ErrorCheck/ErrorCheck.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
+#include <type_traits>
+
+template<class T>
+concept IsNotPtrSB = !std::is_pointer_v<T>;
 
 // ポインタをテンプレートパラメータに設定してはいけない
-template<class T>
+template<IsNotPtrSB T>
 class StructuredBuffer {
-	static_assert(!std::is_pointer<T>::value, "Do not use pointer types");
-
 public:
 	StructuredBuffer() = delete;
 
@@ -115,6 +116,8 @@ public:
 		srvDesc.Buffer.NumElements = UINT(instanceNum);
 		srvDesc.Buffer.StructureByteStride = sizeof(T);
 
+		isCreateView = false;
+
 		OnWright();
 	}
 
@@ -130,9 +133,19 @@ public:
 		return roootParamater;
 	}
 
-	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle) noexcept {
-		Engine::GetDevice()->CreateShaderResourceView(bufferResource.Get(), &srvDesc, descriptorHandle);
+	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHandleGPU, UINT dsecIndex) noexcept {
+		Engine::GetDevice()->CreateShaderResourceView(bufferResource.Get(), &srvDesc, descHandle);
 		isCreateView = true;
+		descriptorHandle_ = descHandleGPU;
+		dsecIndex_ = dsecIndex;
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE GetViewHandle() const noexcept {
+		return descriptorHandle_;
+	}
+
+	UINT GetDescIndex() const noexcept {
+		return dsecIndex_;
 	}
 
 private:
@@ -150,4 +163,8 @@ private:
 
 
 	uint32_t instanceNum;
+
+	D3D12_GPU_DESCRIPTOR_HANDLE descriptorHandle_;
+
+	UINT dsecIndex_;
 };

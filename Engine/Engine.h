@@ -22,7 +22,6 @@
 
 #include <string>
 #include <vector>
-#include <chrono>
 #include <memory>
 #include <unordered_map>
 
@@ -218,8 +217,6 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
-
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence;
 	uint64_t fenceVal = 0;

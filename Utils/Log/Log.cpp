@@ -2,14 +2,17 @@
 #include <fstream>
 #include <filesystem>
 #include <cassert>
+#include <Windows.h>
+#undef max
+#undef min
 
 namespace Log {
 	bool AddLog(const std::string& text) {
-		static const std::string fileName = "./Log/Log.txt";
+		static const std::filesystem::path fileName = "./ExecutionLog/Log.txt";
 		static bool isOpned = false;
 
-		if (!std::filesystem::exists("./Log/")) {
-			std::filesystem::create_directories("./Log/");
+		if (!std::filesystem::exists(fileName.parent_path())) {
+			std::filesystem::create_directories(fileName.parent_path());
 		}
 
 		std::ofstream file;
@@ -28,5 +31,9 @@ namespace Log {
 		isOpned = true;
 
 		return true;
+	}
+
+	void DebugLog(const std::string& text) {
+		OutputDebugStringA(text.c_str());
 	}
 }

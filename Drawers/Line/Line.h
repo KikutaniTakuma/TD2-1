@@ -3,7 +3,6 @@
 #include "Utils/Math/Mat4x4.h"
 #include "Utils/Math/Vector4.h"
 #include "Engine/ConstBuffer/ConstBuffer.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "Engine/ShaderManager/ShaderManager.h"
 class Pipeline;
 
@@ -17,8 +16,21 @@ private:
 	static constexpr uint16_t kVertexNum = 2u;
 
 public:
+	static void Initialize();
+
+private:
+	static Shader shader;
+
+	static Pipeline* pipline;
+
+public:
 	Line();
+	Line(const Line& right);
+	Line(Line&& right) noexcept;
 	~Line();
+
+	Line& operator=(const Line& right);
+	Line& operator=(Line&& right)noexcept;
 
 public:
 	void Draw(const Mat4x4& viewProjection, uint32_t color);
@@ -34,11 +46,7 @@ private:
 	// 頂点バッファマップ
 	VertexData* vertexMap;
 
-	ShaderResourceHeap heap;
-	
-	Shader shader;
-
-	Pipeline* pipline;
+	class ShaderResourceHeap* heap;
 
 	ConstBuffer<Mat4x4> wvpMat;
 };

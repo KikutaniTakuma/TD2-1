@@ -10,8 +10,7 @@ Play::Play() {
 	ShockWave::GlobalVariablesLoad();
 	Layer::GlobalVariablesLoad();
 
-	camera2D_ = std::make_unique<Camera>(Camera::Type::Othographic);
-	camera3D_ = std::make_unique<Camera>(Camera::Type::Projecction);
+	camera2D_ = std::make_unique<Camera>();
 
 	player_ = std::make_unique<Player>();
 	player_->SetPlayScene(this);
@@ -718,6 +717,8 @@ void Play::Update() {
 
 	layer_->Update();
 
+	camera3D_->pos = camera2D_->pos;
+
 	camera2D_->Update();
 	camera3D_->Update();
 }
@@ -750,6 +751,9 @@ void Play::Draw() {
 	}
 
 	player_->Draw2D(camera2D_->GetViewOthographics());
+
+
+	player_->Draw(camera3D_->GetViewProjection(), camera3D_->GetPos());
 }
 
 

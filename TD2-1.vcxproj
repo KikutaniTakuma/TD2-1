@@ -178,8 +178,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Game\Background\Background.cpp" />
     <ClCompile Include="Game\Enemy\Enemy.cpp" />
-    <ClCompile Include="Game\GameScene\GameScene.cpp" />
-    <ClCompile Include="Game\GameScene\Play\Play.cpp" />
     <ClCompile Include="Game\GameScene\Result\Result.cpp" />
     <ClCompile Include="Game\GameScene\Title\Title.cpp" />
     <ClCompile Include="Game\Gauge\Gauge.cpp" />
@@ -194,13 +192,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Input\Mouse\Mouse.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshManager\MeshManager.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="MeshManager\Mesh\Mesh.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="SceneManager\Fade\Fade.cpp" />
+    <ClCompile Include="SceneManager\GameScene\GameScene.cpp" />
+    <ClCompile Include="SceneManager\ResultScene\ResultScene.cpp" />
+    <ClCompile Include="SceneManager\SceneManager.cpp" />
     <ClCompile Include="TextureManager\TextureManager.cpp" />
     <ClCompile Include="TextureManager\Texture\Texture.cpp" />
     <ClCompile Include="Utils\Action\Frame\Frame.cpp" />
@@ -247,8 +249,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Game\Background\Background.h" />
     <ClInclude Include="Game\Enemy\Enemy.h" />
-    <ClInclude Include="Game\GameScene\GameScene.h" />
-    <ClInclude Include="Game\GameScene\Play\Play.h" />
     <ClInclude Include="Game\GameScene\Result\Result.h" />
     <ClInclude Include="Game\GameScene\Title\Title.h" />
     <ClInclude Include="Game\Gauge\Gauge.h" />
@@ -262,13 +262,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Input\KeyInput\KeyInput.h" />
     <ClInclude Include="Input\Mouse\Mouse.h" />
     <ClInclude Include="MeshManager\MeshManager.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="MeshManager\Mesh\Mesh.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="SceneManager\Fade\Fade.h" />
+    <ClInclude Include="SceneManager\GameScene\GameScene.h" />
+    <ClInclude Include="SceneManager\ResultScene\ResultScene.h" />
+    <ClInclude Include="SceneManager\SceneManager.h" />
     <ClInclude Include="TextureManager\TextureManager.h" />
     <ClInclude Include="TextureManager\Texture\Texture.h" />
     <ClInclude Include="Utils\Action\Frame\Frame.h" />

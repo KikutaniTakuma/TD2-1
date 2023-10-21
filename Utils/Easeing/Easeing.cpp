@@ -7,12 +7,25 @@
 #include <cmath>
 #include <numbers>
 
+Easeing::Easeing():
+#ifdef _DEBUG
+	easeType_(0),easeTime_(0.0f),
+#endif // _DEBUG
+	ease_([](float num) {return num; }),
+	isActive_(false),
+	isLoop_(false),
+	t_(0.0f),
+	spdT_(1.0f)
+{}
+
 void Easeing::Update() {
+	isActive_.Update();
+	isLoop_.Update();
 	if (isActive_) {
 		t_ += spdT_ * FrameInfo::GetInstance()->GetDelta();
 		t_ = std::clamp(t_, 0.0f, 1.0f);
 
-		if (0.0f <= t_ || 1.0f <= t_) {
+		if (t_ <= 0.0f || 1.0f <= t_) {
 			if (isLoop_) {
 				spdT_ *= -1.0f;
 			}
@@ -47,12 +60,7 @@ void Easeing::Stop() {
 	isLoop_ = false;
 
 	t_ = 0.0f;
-	spdT_ = 0.0f;
-}
-
-template<>
-Vector3 Easeing::Get(const Vector3& start, const Vector3& end) {
-	return Vector3::Lerp(start, end, ease_(t_));
+	spdT_ = 1.0f;
 }
 
 template<>
@@ -62,136 +70,23 @@ Vector2 Easeing::Get(const Vector2& start, const Vector2& end) {
 
 void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 #ifdef _DEBUG
-	easeTime_ = 1.0f / spdT_;
+	if (spdT_) {
+		easeTime_ = 1.0f / spdT_;
+	}
+	else {
+		easeTime_ = 1.0f;
+	}
 	ImGui::Begin(debugName.c_str());
 	ImGui::SliderInt("easeType", &easeType_, 0, 30);
 	ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, 0.0f);
-	ImGui::Checkbox("isLoop", &isLoop_);
+	ImGui::Checkbox("isLoop", isLoop_.Data());
 	if (ImGui::Button("Start")) {
 		isActive_ = true;
 		t_ = 0.0f;
 
 	    spdT_ = 1.0f / easeTime_;
 
-		switch (easeType_)
-		{
-		default:
-		case 0:
-			ease_ = [](float t) {
-				return t;
-				};
-			break;
-
-
-		case 1:
-			ease_ = InSine;
-			break;
-		case 2:
-			ease_ = OutSine;
-			break;
-		case 3:
-			ease_ = InOutSine;
-			break;
-
-
-		case 4:
-			ease_ = InQuad;
-			break;
-		case 5:
-			ease_ = OutQuad;
-			break;
-		case 6:
-			ease_ = InOutQuad;
-			break;
-
-
-		case 7:
-			ease_ = InCubic;
-			break;
-		case 8:
-			ease_ = OutCubic;
-			break;
-		case 9:
-			ease_ = InOutCubic;
-			break;
-
-
-		case 10:
-			ease_ = InQuart;
-			break;
-		case 11:
-			ease_ = OutQuart;
-			break;
-		case 12:
-			ease_ = InOutQuart;
-			break;
-
-
-		case 13:
-			ease_ = InQuint;
-			break;
-		case 14:
-			ease_ = OutQuint;
-			break;
-		case 15:
-			ease_ = InOutQuint;
-			break;
-
-
-		case 16:
-			ease_ = InExpo;
-			break;
-		case 17:
-			ease_ = OutExpo;
-			break;
-		case 18:
-			ease_ = InOutExpo;
-			break;
-
-
-		case 19:
-			ease_ = InCirc;
-			break;
-		case 20:
-			ease_ = OutCirc;
-			break;
-		case 21:
-			ease_ = InOutCirc;
-			break;
-
-
-		case 22:
-			ease_ = InBack;
-			break;
-		case 23:
-			ease_ = OutBack;
-			break;
-		case 24:
-			ease_ = InOutBack;
-			break;
-
-
-		case 25:
-			ease_ = InElastic;
-			break;
-		case 26:
-			ease_ = OutElastic;
-			break;
-		case 27:
-			ease_ = InOutElastic;
-			break;
-
-
-		case 28:
-			ease_ = InBounce;
-			break;
-		case 29:
-			ease_ = OutBounce;
-			break;
-		case 30:
-			ease_ = InOutBounce;
-			break;
-		}
+		ease_ = GetFunction(easeType_);
 	}
 	else if (ImGui::Button("Stop")) {
 		isActive_ = false;
@@ -202,6 +97,26 @@ void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 #endif // _DEBUG
 }
 
+void Easeing::DebugTreeNode([[maybe_unused]] const std::string& debugName) {
+#ifdef _DEBUG
+	if (spdT_) {
+		easeTime_ = 1.0f / spdT_;
+	}
+	else {
+		easeTime_ = 1.0f;
+	}
+	if (ImGui::TreeNode(debugName.c_str())) {
+		ImGui::SliderInt("easeType", &easeType_, 0, 30);
+		ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, 0.0f);
+		ImGui::Checkbox("isLoop", isLoop_.Data());
+
+		ease_ = GetFunction(easeType_);
+
+		ImGui::TreePop();
+	}
+
+#endif // _DEBUG
+}
 
 
 float Easeing::InSine(float t) {

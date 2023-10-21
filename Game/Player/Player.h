@@ -2,11 +2,14 @@
 
 #include "Utils/Math/Mat4x4.h"
 #include "Drawers/Texture2D/Texture2D.h"
+#include "Drawers/Model/Model.h"
 #include "Input/Input.h"
 
 #include "GlobalVariables/GlobalVariables.h"
 
-class Play;
+class GameScene;
+
+class Camera;
 
 class Player
 {
@@ -21,6 +24,12 @@ public:
 		kFalling, // 落ちている
 	};
 
+	// モデルのパーツ
+	enum class Parts {
+		kMain, // 一番の親。本体 
+		kEnd, // 末尾
+	};
+
 	Player();
 	~Player() = default;
 
@@ -32,13 +41,13 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(const float& y);
+	void Update(const float& y, const Camera* camera);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
-	void Draw(const Mat4x4& viewProjection);
+	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
@@ -82,7 +91,7 @@ public:
 	/// プレイシーンのポインタのsetter
 	/// </summary>
 	/// <param name="play">プレイシーンのポインタ</param>
-	void SetPlayScene(Play* play) { play_ = play; }
+	void SetGameScene(GameScene* play) { play_ = play; }
 
 	void CollisionScaffolding(const Texture2D* tex);
 
@@ -152,10 +161,12 @@ private:
 	
 private:
 
-	Play* play_ = nullptr;
+	GameScene* play_ = nullptr;
 
 	// プレイヤーのテクスチャ
 	std::unique_ptr<Texture2D> tex_;
+
+	std::vector<std::unique_ptr<Model>> models_;
 
 	// 入力状況
 	Input* input_ = nullptr;

@@ -2,10 +2,16 @@
 
 #include "Utils/Math/Mat4x4.h"
 #include "Drawers/Texture2D/Texture2D.h"
+#include "Drawers/Model/Model.h"
 
 #include "GlobalVariables/GlobalVariables.h"
+#include "Utils/UtilsLib/UtilsLib.h"
 
 class Layer;
+
+class Camera;
+
+class Player;
 
 class Enemy
 {
@@ -18,6 +24,13 @@ public:
 		kFalling, // 落ちている
 		kFaint, // 気絶
 		kDeath, // 死亡
+	};
+
+	// モデルのパーツ
+	enum class Parts {
+		kMain, // 一番の親。本体 
+		kDoukasen, // 導火線
+		kEnd, // 末尾
 	};
 
 	enum class Type {
@@ -35,7 +48,7 @@ public:
 	/// <param name="pos">初期座標</param>
 	/// <param name="layerY">層の上のY座標</param>
 	/// <param name="scale">スケール</param>
-	Enemy(int type, const Vector3& pos, const float& layerY, float scale = 40.0f);
+	Enemy(int type, const Vector3& pos, const float& layerY,int firstMoveVector = 0, int isHealer = 0, float moveRadius = 0.0f, float scale = 40.0f);
 	~Enemy() = default;
 	
 
@@ -47,13 +60,13 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(Layer* layer, const float& y);
+	void Update(Layer* layer, const float& y, const Camera* camera);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
-	void Draw(const Mat4x4& viewProjection);
+	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
@@ -74,6 +87,8 @@ public:
 	/// <returns>状態</returns>
 	Status GetStatus() { return status_; }
 
+	Type GetType() { return type_; }
+
 	/// <summary>
 	/// テクスチャの参照。あたり判定用。
 	/// </summary>
@@ -93,7 +108,11 @@ public:
 	/// <summary>
 	/// 初期座標などのパラメーターをいれる
 	/// </summary>
-	void SetParametar(int type, const Vector3& pos, const float& y = 0);
+	void SetParametar(int type, const Vector3& pos, const float& y = 0, int firstMoveVector = 0, int isHealer = 0, float moveRadius = 0.0f);
+
+	void CollisionEnemy(Enemy* enemy);
+
+	void CollisionPlayer(Player* player);
 
 private:
 
@@ -158,7 +177,16 @@ private:
 	/// </summary>
 	void Collision(const float& y);
 
+	void ModelUpdate(const Camera* camera);
+
+	void InitializeFirstMove(int move);
+
+	void InitializeIsHealer(int isHealer);
+
+	void InitializeMoveRadius(float radius);
+
 private:
+	
 
 	// 落下スピード
 	static float kFallingSpeed_;
@@ -169,15 +197,34 @@ private:
 	// 静的メンバ定数のグローバル変数のグループネーム
 	static const std::string groupName_;
 
+	// 反発係数
+	static float kReboundCoefficient_;
+	
+	static float kLayerReboundCoefficient_;
+
+	static float enemyScale_;
+
 private:
 
 	// Enemyのテクスチャ
 	std::unique_ptr<Texture2D> tex_;
 
+	std::vector<std::unique_ptr<Model>> models_;
+
+	float rotateAcceleration_;
+
 	// 初期座標の保存用。倒した敵を生成するのに使うイメージ。
 	Vector3 firstPos_;
 
 	Type type_;
+
+	int firstMoveVector_;
+
+	Vector3 moveVector_;
+
+	float moveRadius_;
+
+	bool isHealer_;
 
 	// 今のエネミーの状態
 	Status status_ = Status::kGeneration;
@@ -188,5 +235,19 @@ private:
 	// 速度
 	Vector3 velocity_;
 
+	float rotateAddAngle_;
 
+	float fallingSpeed_;
+
+	float startRotate_;
+
+	float endRotate_;
+
+	float rotateTimeCount_;
+
+	float rotateTime_;
+
+	UtilsLib::Flg isCollisionEnemy_;
+
+	UtilsLib::Flg isCollisionLayer_;
 };
