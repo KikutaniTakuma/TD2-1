@@ -117,6 +117,8 @@ void Enemy::SetGlobalVariable() {
 
 	globalVariables_->AddItem(groupName_, "kLeaveTime", kLeaveTime_);
 
+	globalVariables_->AddItem(groupName_, "kFaintTime", kFaintTime_);
+
 	globalVariables_->AddItem(groupName_, "kDeathTime", kDeathTime_);
 
 	globalVariables_->LoadFile(groupName_);
@@ -134,6 +136,8 @@ void Enemy::ApplyGlobalVariable() {
 	kGenerationTime_ = globalVariables_->GetFloatValue(groupName_, "kGenerationTime");
 
 	kLeaveTime_ = globalVariables_->GetFloatValue(groupName_, "kLeaveTime");
+
+	kFaintTime_ = globalVariables_->GetFloatValue(groupName_, "kFaintTime");
 
 	kDeathTime_ = globalVariables_->GetFloatValue(groupName_, "kDeathTime");
 }
@@ -239,13 +243,12 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 
 void Enemy::CollisionPlayer(Player* player) {
 
-
 	if (tex_->Collision(*player->GetTex())) {
 
 		if (player->GetVelocity().y < 0.0f) {
 			StatusRequest(Enemy::Status::kFalling);
 			fallingSpeed_ = kFallingSpeed_ + player->GetVelocity().y;
-			
+
 			Vector3 vector = player->GetTex()->pos - tex_->pos;
 
 			if (vector.x == 0) {
@@ -272,7 +275,14 @@ void Enemy::CollisionPlayer(Player* player) {
 			player->EnemyStep(true);
 		}
 		else {
-			player->EnemyStep(false);
+
+			if (type_ == Type::kWalk) {
+				moveVector_ *= -1;
+				player->KnockBack(tex_->pos);
+			}
+			else if (type_ == Type::kFly) {
+				player->EnemyStep(false);
+			}
 		}
 	}
 }

@@ -397,6 +397,13 @@ void Player::CollisionScaffolding(const Texture2D* tex)
 	}
 }
 
+void Player::KnockBack(const Vector3& pos)
+{
+	Vector3 s = pos;
+	s = pos;
+
+}
+
 void Player::Collision(const float& y) {
 
 	float posY = tex_->pos.y - tex_->scale.y / 2.0f;
