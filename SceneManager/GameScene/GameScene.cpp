@@ -41,7 +41,7 @@ GameScene::GameScene() {
 
 	globalVariables_ = std::make_unique<GlobalVariables>();
 
-	//InitializeGlobalVariable();
+	InitializeGlobalVariable();
 
 	SetGlobalVariable();
 
