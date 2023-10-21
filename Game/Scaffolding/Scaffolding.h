@@ -2,6 +2,9 @@
 
 #include "Utils/Math/Mat4x4.h"
 #include "Drawers/Texture2D/Texture2D.h"
+#include "Drawers/Model/Model.h"
+
+class Camera;
 
 class Scaffolding {
 public:
@@ -23,7 +26,7 @@ public:
 	/// 3DモデルのDraw仮
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
-	//void Draw(const Mat4x4& viewProjection);
+	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
@@ -42,12 +45,14 @@ public:
 	/// <summary>
 	/// 初期座標などのパラメーターをいれる
 	/// </summary>
-	void SetParametar(const Vector3& pos, const Vector2& scale);
+	void SetParametar(const Vector3& pos, const Vector2& scale, const Camera* camera);
 
 private:
 
 	// テクスチャ
 	std::unique_ptr<Texture2D> tex_;
+
+	std::unique_ptr<Model> model_;
 
 	Vector3 velocity;
 	

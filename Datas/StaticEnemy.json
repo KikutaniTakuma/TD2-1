@@ -1,5 +1,7 @@
 {
     "StaticEnemy": {
-        "kFallingSpeed": -9.800000190734863
+        "kEnemyScale": 40.0,
+        "kFallingSpeed": -9.800000190734863,
+        "kMoveSpeed": 50.0
     }
 }

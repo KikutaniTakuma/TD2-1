@@ -48,7 +48,7 @@ public:
 	/// <param name="pos">初期座標</param>
 	/// <param name="layerY">層の上のY座標</param>
 	/// <param name="scale">スケール</param>
-	Enemy(int type, const Vector3& pos, const float& layerY,int firstMoveVector = 0, int isHealer = 0, float moveRadius = 0.0f, float scale = 40.0f);
+	Enemy(int type, const Vector3& pos, const float& layerY,int firstMoveVector = 0, int isHealer = 0, float moveRadius = 0.0f);
 	~Enemy() = default;
 	
 
@@ -181,6 +181,8 @@ private:
 
 	void InitializeFirstMove(int move);
 
+	void InitializeFirstMove();
+
 	void InitializeIsHealer(int isHealer);
 
 	void InitializeMoveRadius(float radius);
@@ -204,6 +206,8 @@ private:
 
 	static float enemyScale_;
 
+	static float kMoveSpeed_;
+
 private:
 
 	// Enemyのテクスチャ
@@ -219,6 +223,8 @@ private:
 	Type type_;
 
 	int firstMoveVector_;
+
+	bool isChange_;
 
 	Vector3 moveVector_;
 
