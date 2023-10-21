@@ -95,6 +95,8 @@ public:
 
 	void CollisionScaffolding(const Texture2D* tex);
 
+	void KnockBack(const Vector3& pos);
+
 private:
 
 	/// <summary>

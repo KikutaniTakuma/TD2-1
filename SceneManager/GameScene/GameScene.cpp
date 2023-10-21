@@ -699,14 +699,9 @@ void GameScene::Collision() {
 
 		const Texture2D* enemyTex = enemy->GetTex();
 
-		// �G�l�~�[���ʏ펞�̎��A�v���C���[���ʏ펞�q�b�v�h���b�v���̎��̂�
-		if (enemy->GetStatus() == Enemy::Status::kNormal &&
-			(player_->GetStatus() == Player::Status::kNormal || player_->GetStatus() == Player::Status::kHipDrop)) {
+		enemy->CollisionPlayer(player_.get());
 
-			enemy->CollisionPlayer(player_.get());
-			
-		}
-		else if (enemy->GetStatus() == Enemy::Status::kFaint && shockWaves_.size() != 0) {
+		if (shockWaves_.size() != 0) {
 			for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
 				const std::list<std::unique_ptr<Texture2D>>& shockWaveTextures = shockWave->GetTextures();
 
