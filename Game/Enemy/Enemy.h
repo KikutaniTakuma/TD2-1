@@ -23,6 +23,7 @@ public:
 		kNormal, // 通常時
 		kFalling, // 落ちている
 		kFaint, // 気絶
+		kLeave, // 離脱
 		kDeath, // 死亡
 	};
 
@@ -129,7 +130,7 @@ private:
 	/// <summary>
 	/// 生成の初期化。登場時のパーティクルとか
 	/// </summary>
-	void GenerationInitialize();
+	void GenerationInitialize(const float y);
 
 	/// <summary>
 	/// 生成の更新
@@ -143,7 +144,7 @@ private:
 	/// <summary>
 	/// 通常のアップデート
 	/// </summary>
-	void NormalUpdate();
+	void NormalUpdate(const float y);
 
 	/// <summary>
 	/// 落ちる時の初期化
@@ -153,6 +154,10 @@ private:
 	/// 落ちる時のアップデート
 	/// </summary>
 	void FallingUpdate(const float& y);
+
+	void LeaveInitialize();
+
+	void LeaveUpdate(const float& y);
 
 	/// <summary>
 	/// 落ち切った時の初期化
@@ -208,6 +213,14 @@ private:
 
 	static float kMoveSpeed_;
 
+	static float kGenerationTime_;
+
+	static float kLeaveTime_;
+
+	static float kFaintTime_;
+
+	static float kDeathTime_;
+
 private:
 
 	// Enemyのテクスチャ
@@ -216,6 +229,8 @@ private:
 	std::vector<std::unique_ptr<Model>> models_;
 
 	float rotateAcceleration_;
+
+	float timeCount_;
 
 	// 初期座標の保存用。倒した敵を生成するのに使うイメージ。
 	Vector3 firstPos_;
@@ -229,6 +244,8 @@ private:
 	Vector3 moveVector_;
 
 	float moveRadius_;
+
+	float normalFallingSpeed_;
 
 	bool isHealer_;
 

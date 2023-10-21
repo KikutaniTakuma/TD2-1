@@ -22,6 +22,14 @@ float Enemy::kMoveSpeed_ = 5.0f;
 
 float Enemy::enemyScale_ = 40.0f;
 
+float Enemy::kGenerationTime_ = 2.0f;
+
+float Enemy::kLeaveTime_ = 2.0f;
+
+float Enemy::kFaintTime_ = 7.0f;
+
+float Enemy::kDeathTime_ = 5.0f;
+
 Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVector, int isHealer, float moveRadius) {
 
 	tex_ = std::make_unique<Texture2D>();
@@ -105,6 +113,12 @@ void Enemy::SetGlobalVariable() {
 
 	globalVariables_->AddItem(groupName_, "kEnemyScale", enemyScale_);
 
+	globalVariables_->AddItem(groupName_, "kGenerationTime", kGenerationTime_);
+
+	globalVariables_->AddItem(groupName_, "kLeaveTime", kLeaveTime_);
+
+	globalVariables_->AddItem(groupName_, "kDeathTime", kDeathTime_);
+
 	globalVariables_->LoadFile(groupName_);
 	ApplyGlobalVariable();
 }
@@ -117,6 +131,11 @@ void Enemy::ApplyGlobalVariable() {
 
 	enemyScale_ = globalVariables_->GetFloatValue(groupName_, "kEnemyScale");
 
+	kGenerationTime_ = globalVariables_->GetFloatValue(groupName_, "kGenerationTime");
+
+	kLeaveTime_ = globalVariables_->GetFloatValue(groupName_, "kLeaveTime");
+
+	kDeathTime_ = globalVariables_->GetFloatValue(groupName_, "kDeathTime");
 }
 
 void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int firstMoveVector, int isHealer, float moveRadius) {
@@ -138,7 +157,7 @@ void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int first
 		}
 		type_ = Type::kWalk;
 		firstPos_ = pos;
-		firstPos_.y = y + tex_->scale.y / 2.0f;
+		firstPos_.y = y + enemyScale_ / 2.0f;
 		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
 		if (isChange_) {
 			tex_->pos = firstPos_;
@@ -272,7 +291,7 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 		switch (status_)
 		{
 		case Enemy::Status::kGeneration:
-			GenerationInitialize();
+			GenerationInitialize(y);
 			break;
 		case Enemy::Status::kNormal:
 			NormalInitialize();
@@ -282,6 +301,9 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 			break;
 		case Enemy::Status::kFaint:
 			FaintInitialize();
+			break;
+		case Enemy::Status::kLeave:
+			LeaveInitialize();
 			break;
 		case Enemy::Status::kDeath:
 			DeathInitialize(layer);
@@ -299,13 +321,16 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 		GenerationUpdate();
 		break;
 	case Enemy::Status::kNormal:
-		NormalUpdate();
+		NormalUpdate(y);
 		break;
 	case Enemy::Status::kFalling:
 		FallingUpdate(y);
 		break;
 	case Enemy::Status::kFaint:
 		FaintUpdate(y);
+		break;
+	case Enemy::Status::kLeave:
+		LeaveUpdate(y);
 		break;
 	case Enemy::Status::kDeath:
 		DeathUpdate();
@@ -326,6 +351,9 @@ void Enemy::Collision(const float& y) {
 
 	if (y > posY) {
 		tex_->pos.y += y - posY;
+		if (type_ == Type::kWalk && status_ == Status::kNormal) {
+			normalFallingSpeed_ = 0.0f;
+		}
 	}
 }
 
@@ -429,8 +457,10 @@ void Enemy::InitializeMoveRadius(float radius)
 	}
 }
 
-void Enemy::GenerationInitialize() {
+void Enemy::GenerationInitialize(const float y) {
+
 	tex_->pos = firstPos_;
+	Collision(y);
 
 	switch (type_)
 	{
@@ -446,28 +476,46 @@ void Enemy::GenerationInitialize() {
 		break;
 	}
 
+	timeCount_ = 0;
+
 	InitializeFirstMove();
 	
 }
 
 void Enemy::GenerationUpdate() {
 
+	timeCount_ += FrameInfo::GetInstance()->GetDelta();
 
-	statusRequest_ = Status::kNormal;
+	float t = timeCount_ / kGenerationTime_;
+
+	tex_->scale = Vector2(enemyScale_, enemyScale_) * t + Vector2(0.0f, 0.0f) * (1.0f - t);
+
+	if (timeCount_ >= kGenerationTime_) {
+		statusRequest_ = Status::kNormal;
+		timeCount_ = 0;
+		tex_->scale = { enemyScale_, enemyScale_ };
+	}
 }
 
 void Enemy::NormalInitialize() {
 
-	
+	normalFallingSpeed_ = 0.0f;
 }
 
-void Enemy::NormalUpdate() {
+void Enemy::NormalUpdate(const float y) {
 
 
 
 	velocity_ = moveVector_ * kMoveSpeed_;
 
+	if (type_ == Type::kWalk) {
+		normalFallingSpeed_ += kFallingSpeed_;
+		velocity_.y = normalFallingSpeed_;
+	}
+
 	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
+
+	Collision(y);
 
 	if (firstMoveVector_ == 1 || firstMoveVector_ == 2) {
 		if (tex_->pos.x <= firstPos_.x - moveRadius_ || tex_->pos.x >= firstPos_.x + moveRadius_) {
@@ -566,6 +614,7 @@ void Enemy::FallingUpdate(const float& y) {
 
 void Enemy::FaintInitialize() {
 
+	timeCount_ = 0.0f;
 }
 
 void Enemy::FaintUpdate(const float& y) {
@@ -575,12 +624,43 @@ void Enemy::FaintUpdate(const float& y) {
 	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 
 	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
-
 		Collision(y);
 		velocity_.y = 0.0f;
-		
 	}
 
+	timeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+	if (timeCount_ >= kFaintTime_) {
+		if (type_ == Type::kFly) {
+			statusRequest_ = Status::kLeave;
+		}
+		else if (type_ == Type::kWalk) {
+			statusRequest_ = Status::kNormal;
+		}
+	}
+
+}
+
+void Enemy::LeaveInitialize() {
+	timeCount_ = 0;
+}
+
+void Enemy::LeaveUpdate(const float& y) {
+	velocity_.y += kFallingSpeed_;
+
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
+
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
+		Collision(y);
+		velocity_.y = 0.0f;
+	}
+
+	timeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+	if (timeCount_ >= kLeaveTime_) {
+		statusRequest_ = Status::kGeneration;
+		timeCount_ = 0.0f;
+	}
 }
 
 void Enemy::DeathInitialize(Layer* layer) {
@@ -589,7 +669,17 @@ void Enemy::DeathInitialize(Layer* layer) {
 
 void Enemy::DeathUpdate() {
 
-	statusRequest_ = Status::kGeneration;
+	timeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+	float t = timeCount_ / kDeathTime_;
+
+	tex_->scale = Vector2(enemyScale_, enemyScale_) * (1.0f - t) + Vector2(0.0f, 0.0f) * t;
+
+	if (timeCount_ >= kDeathTime_) {
+		statusRequest_ = Status::kGeneration;
+		tex_->scale = {};
+
+	}
 }
 
 void Enemy::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
