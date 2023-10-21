@@ -18,7 +18,11 @@ float Enemy::kReboundCoefficient_ = 0.9f;
 
 float Enemy::kLayerReboundCoefficient_ = 0.3f;
 
-Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVector, int isHealer, float moveRadius, float scale) {
+float Enemy::kMoveSpeed_ = 5.0f;
+
+float Enemy::enemyScale_ = 40.0f;
+
+Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVector, int isHealer, float moveRadius) {
 
 	tex_ = std::make_unique<Texture2D>();
 	tex_->LoadTexture("./Resources/Enemy/usabom.png");
@@ -68,11 +72,11 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 		velocity_ = {};
 
 		tex_->pos = pos;
-		tex_->scale *= scale;
+		tex_->scale *= enemyScale_;
 		break;
 	case Enemy::Type::kWalk:
 
-		tex_->scale *= scale;
+		tex_->scale *= enemyScale_;
 		firstPos_ = pos;
 		firstPos_.y = layerY + tex_->scale.y / 2.0f;
 		velocity_ = {};
@@ -97,6 +101,10 @@ void Enemy::SetGlobalVariable() {
 
 	globalVariables_->AddItem(groupName_, "kFallingSpeed", kFallingSpeed_);
 
+	globalVariables_->AddItem(groupName_, "kMoveSpeed", kMoveSpeed_);
+
+	globalVariables_->AddItem(groupName_, "kEnemyScale", enemyScale_);
+
 	globalVariables_->LoadFile(groupName_);
 	ApplyGlobalVariable();
 }
@@ -105,22 +113,44 @@ void Enemy::ApplyGlobalVariable() {
 
 	kFallingSpeed_ = globalVariables_->GetFloatValue(groupName_, "kFallingSpeed");
 
+	kMoveSpeed_ = globalVariables_->GetFloatValue(groupName_, "kMoveSpeed");
+
+	enemyScale_ = globalVariables_->GetFloatValue(groupName_, "kEnemyScale");
+
 }
 
 void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int firstMoveVector, int isHealer, float moveRadius) {
 
+
 	if (type == static_cast<int>(Type::kFly)) {
 		type_ = Type::kFly;
+
+		if (firstPos_ != pos) {
+			tex_->pos = pos;
+			models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
+		}
 		firstPos_ = pos;
 		
 	}
 	else if (type == static_cast<int>(Type::kWalk)) {
+		if (firstPos_.x != pos.x || type != static_cast<int>(type_)) {
+			isChange_ = true;
+		}
 		type_ = Type::kWalk;
 		firstPos_ = pos;
 		firstPos_.y = y + tex_->scale.y / 2.0f;
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
+		if (isChange_) {
+			tex_->pos = firstPos_;
+			isChange_ = false;
+		}
 	}
 	else {
 		type_ = Type::kFly;
+		if (firstPos_ != pos) {
+			tex_->pos = pos;
+			models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
+		}
 		firstPos_ = pos;
 		
 	}
@@ -228,8 +258,6 @@ void Enemy::CollisionPlayer(Player* player) {
 	}
 }
 
-
-
 //void Enemy::Initialize() {
 //
 //}
@@ -325,8 +353,36 @@ void Enemy::ModelUpdate(const Camera* camera)
 
 void Enemy::InitializeFirstMove(int move)
 {
-	firstMoveVector_ = move;
-	switch (move)
+	if (firstMoveVector_ != move) {
+		firstMoveVector_ = move;
+		switch (firstMoveVector_)
+		{
+		case 0:
+			moveVector_ = { 0.0f,0.0f,0.0f };
+			break;
+		case 1:
+			moveVector_ = { -1.0f,0.0f,0.0f };
+			break;
+		case 2:
+			moveVector_ = { 1.0f,0.0f,0.0f };
+			break;
+		case 3:
+			moveVector_ = { 0.0f,1.0f,0.0f };
+			break;
+		case 4:
+			moveVector_ = { 0.0f,-1.0f,0.0f };
+			break;
+		default:
+			firstMoveVector_ = 0;
+			moveVector_ = { 0.0f,0.0f,0.0f };
+			break;
+		}
+		tex_->pos = firstPos_;
+	}
+}
+
+void Enemy::InitializeFirstMove() {
+	switch (firstMoveVector_)
 	{
 	case 0:
 		moveVector_ = { 0.0f,0.0f,0.0f };
@@ -366,12 +422,32 @@ void Enemy::InitializeMoveRadius(float radius)
 		moveRadius_ = 1280.0f;
 	}
 	else {
-		moveRadius_ = radius;
+		if (moveRadius_ != radius) {
+			moveRadius_ = radius;
+			tex_->pos = firstPos_;
+		}
 	}
 }
 
 void Enemy::GenerationInitialize() {
 	tex_->pos = firstPos_;
+
+	switch (type_)
+	{
+	case Enemy::Type::kFly:
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
+		break;
+	case Enemy::Type::kWalk:
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
+		break;
+	case Enemy::Type::kEnd:
+		break;
+	default:
+		break;
+	}
+
+	InitializeFirstMove();
+	
 }
 
 void Enemy::GenerationUpdate() {
@@ -382,15 +458,30 @@ void Enemy::GenerationUpdate() {
 
 void Enemy::NormalInitialize() {
 
-	//tex_->pos = firstPos_;
-
+	
 }
 
 void Enemy::NormalUpdate() {
 
-#ifdef _DEBUG
-	tex_->pos = firstPos_;
-#endif // _DEBUG
+
+
+	velocity_ = moveVector_ * kMoveSpeed_;
+
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
+
+	if (firstMoveVector_ == 1 || firstMoveVector_ == 2) {
+		if (tex_->pos.x <= firstPos_.x - moveRadius_ || tex_->pos.x >= firstPos_.x + moveRadius_) {
+			moveVector_ *= -1;
+		}
+		else if (tex_->pos.x - tex_->scale.x <= -640 || tex_->pos.x + tex_->scale.x >= 640) {
+			moveVector_ *= -1;
+		}
+	}
+	else if (firstMoveVector_ == 3 || firstMoveVector_ == 4) {
+		if (tex_->pos.y <= firstPos_.y - moveRadius_ || tex_->pos.y >= firstPos_.y + moveRadius_) {
+			moveVector_ *= -1;
+		}
+	}
 
 }
 

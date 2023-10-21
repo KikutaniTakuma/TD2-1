@@ -660,7 +660,7 @@ void GameScene::SetScaffoldingParametar() {
 		if (scaffoldingNums_[stage_][layer_->GetNowLayer()] == i) {
 			break;
 		}
-		scaffolding->SetParametar(scaffoldingPoses_[stage_][i], scaffoldingScales_[stage_][i]);
+		scaffolding->SetParametar(scaffoldingPoses_[stage_][i], scaffoldingScales_[stage_][i], camera2D_.get());
 		i++;
 	}
 }
@@ -850,7 +850,8 @@ void GameScene::Draw() {
 		if (scaffoldingNums_[stage_][layer_->GetNowLayer()] == i) {
 			break;
 		}
-		scaffolding->Draw2D(camera2D_->GetViewOthographics());
+		scaffolding->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
+		//scaffolding->Draw2D(camera2D_->GetViewOthographics());
 		i++;
 	}
 	for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {

@@ -1,6 +1,7 @@
 #include "ShockWave.h"
 
 #include "Engine/FrameInfo/FrameInfo.h"
+#include <numbers>
 
 std::unique_ptr<GlobalVariables> ShockWave::globalVariables_ = std::make_unique<GlobalVariables>();
 
@@ -51,11 +52,17 @@ ShockWave::ShockWave(const Vector3& pos, float highest, float layerY) {
 		type_ = Size::kSmall;
 	}*/
 
+	int i = 0;
+
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
-		tex->LoadTexture("./Resources/uvChecker.png");
+		tex->LoadTexture("./Resources/ShockWave/player_syogekiha.png");
 		tex->scale = kSize_[static_cast<uint16_t>(type_)];
 		tex->pos = pos;
+		if (i % 2 == 1) {
+			tex->rotate.z = std::numbers::pi_v<float>;
+		}
 		tex->Update();
+		i++;
 	}
 
 	Collision(layerY);

@@ -8,7 +8,7 @@ Gauge::Gauge() {
 
 	for (int i = 0; i < static_cast<int>(TextureNames::kEnd); i++) {
 		textures_.push_back(std::make_unique<Texture2D>());
-		textures_[i]->LoadTexture("./Resources/white2x2.png");
+		textures_[i]->LoadTexture("./Resources/Gauge/gage_nakami.png");
 	}
 
 	textures_[static_cast<int>(TextureNames::kMostBack)]->LoadTexture("./Resources/Gauge/gage_flame.png");

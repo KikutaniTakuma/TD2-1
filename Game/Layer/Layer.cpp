@@ -241,13 +241,13 @@ void Layer::Update(const Camera* camera) {
 		float ratio = static_cast<float>(Engine::GetInstance()->clientHeight) /
 			(std::tanf(camera->fov / 2) * (models_[i][static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
 
-		float indication = 200.0f;
+		float indication = 185.0f;
 
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->pos.x = tex_[i]->pos.x / ratio + camera->pos.x - camera->pos.x / ratio;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->pos.y = tex_[i]->pos.y / ratio + camera->pos.y - camera->pos.y / ratio;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.y = tex_[i]->scale.y / (indication * std::tanf(camera->fov / 2) * 2) *
 			(models_[i][static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
-		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.y;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.y * 10;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->Update();
 
 		tex_[i]->Update();
