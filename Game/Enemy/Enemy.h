@@ -48,7 +48,7 @@ public:
 	/// <param name="pos">初期座標</param>
 	/// <param name="layerY">層の上のY座標</param>
 	/// <param name="scale">スケール</param>
-	Enemy(int type, const Vector3& pos, const float& layerY, float scale = 40.0f);
+	Enemy(int type, const Vector3& pos, const float& layerY,int firstMoveVector = 0, int isHealer = 0, float scale = 40.0f);
 	~Enemy() = default;
 	
 
@@ -108,7 +108,7 @@ public:
 	/// <summary>
 	/// 初期座標などのパラメーターをいれる
 	/// </summary>
-	void SetParametar(int type, const Vector3& pos, const float& y = 0);
+	void SetParametar(int type, const Vector3& pos, const float& y = 0, int firstMoveVector = 0, int isHealer = 0);
 
 	void CollisionEnemy(Enemy* enemy);
 
@@ -179,6 +179,10 @@ private:
 
 	void ModelUpdate(const Camera* camera);
 
+	void InitializeFirstMove(int move);
+
+	void InitializeIsHealer(int isHealer);
+
 private:
 	
 
@@ -196,6 +200,8 @@ private:
 	
 	static float kLayerReboundCoefficient_;
 
+	static float enemyScale_;
+
 private:
 
 	// Enemyのテクスチャ
@@ -209,6 +215,12 @@ private:
 	Vector3 firstPos_;
 
 	Type type_;
+
+	int firstMoveVector_;
+
+	Vector3 moveVector_;
+
+	bool isHealer_;
 
 	// 今のエネミーの状態
 	Status status_ = Status::kGeneration;

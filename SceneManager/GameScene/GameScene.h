@@ -48,6 +48,8 @@ public:
 	enum class EnemyParameter {
 		kType, // タイプ
 		kPos, // ポジション
+		kMoveVector, // 移動方向
+		kIsHealer, // ヒーラーかどうか
 		kEnd, // 末尾。要素数を取り出すよう。
 	};
 
@@ -147,6 +149,8 @@ private:
 	const std::string enemyParameter[static_cast<uint16_t>(EnemyParameter::kEnd)] = {
 		"Type", // タイプ
 		"Pos", // 座標
+		"MoveVector", // 移動方向
+		"IsHealer", // ヒーラーかどうか
 	};
 
 	const std::string scaffoldingGruoopName_ = "Scaffolding";
@@ -212,6 +216,10 @@ private:
 
 	// ステージ毎の、それぞれのエネミーのタイプ
 	std::vector<std::vector<int>> enemyType_;
+
+	std::vector<std::vector<int>> enemyIsHealer_;
+
+	std::vector<std::vector<int>> enemyMoveVector_;
 
 	// ステージ毎の、それぞれの足場のポジション
 	std::vector<std::vector<Vector3>> scaffoldingPoses_;

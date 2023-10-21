@@ -1,5 +1,7 @@
 {
     "Stage3": {
+        "Enemy0IsHealer": 0,
+        "Enemy0MoveVector": 0,
         "Enemy0Pos": [
             -200.0,
             300.0,

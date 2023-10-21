@@ -80,6 +80,7 @@ void Layer::ApplyGlobalVariable() {
 
 	if (static_cast<int>(tex_.size()) != kMaxLayerNum_) {
 		tex_.clear();
+		models_.clear();
 		for (int i = 0; i < kMaxLayerNum_; i++) {
 			tex_.push_back(std::make_unique<Texture2D>());
 			tex_[i]->scale = kLayer2DScale_;
@@ -94,6 +95,18 @@ void Layer::ApplyGlobalVariable() {
 			else {
 				tex_[i]->color = 0xFFFF00FF;
 			}
+
+			models_.push_back(std::vector<std::unique_ptr<Model>>());
+
+			for (int j = 0; j < static_cast<int>(Parts::kEnd); j++) {
+				models_[i].push_back(std::make_unique<Model>());
+			}
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
+
 			tex_[i]->Update();
 		}
 	}
@@ -111,6 +124,8 @@ void Layer::ApplyGlobalVariable() {
 			else {
 				tex_[i]->color = 0xFFFF00FF;
 			}
+
+
 			tex_[i]->Update();
 		}
 	}
@@ -147,6 +162,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 	nowLayer_ = 0;
 
 	tex_.clear();
+	models_.clear();
 
 	for (int i = 0; i < kMaxLayerNum_; i++) {
 		tex_.push_back(std::make_unique<Texture2D>());
@@ -162,6 +178,18 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 			tex_[i]->color = 0xFFFF00FF;
 		}
 		tex_[i]->LoadTexture("./Resources/white2x2.png");
+
+		models_.push_back(std::vector<std::unique_ptr<Model>>());
+
+		for (int j = 0; j < static_cast<int>(Parts::kEnd); j++) {
+			models_[i].push_back(std::make_unique<Model>());
+		}
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
+
 		tex_[i]->Update();
 	}
 

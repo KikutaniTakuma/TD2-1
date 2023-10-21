@@ -18,7 +18,7 @@ float Enemy::kReboundCoefficient_ = 0.9f;
 
 float Enemy::kLayerReboundCoefficient_ = 0.3f;
 
-Enemy::Enemy(int type, const Vector3& pos, const float& layerY, float scale) {
+Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVector, int isHealer, float scale) {
 
 	tex_ = std::make_unique<Texture2D>();
 	tex_->LoadTexture("./Resources/Enemy/usabom.png");
@@ -38,6 +38,9 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, float scale) {
 	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate.y = std::numbers::pi_v<float>;
 
 	models_[static_cast<uint16_t>(Parts::kDoukasen)]->parent = models_[static_cast<uint16_t>(Parts::kMain)].get();
+
+	InitializeFirstMove(firstMoveVector);
+	InitializeIsHealer(isHealer);
 	
 	if (type == static_cast<int>(Type::kFly)) {
 		type_ = Type::kFly;
@@ -103,7 +106,7 @@ void Enemy::ApplyGlobalVariable() {
 
 }
 
-void Enemy::SetParametar(int type, const Vector3& pos, const float& y) {
+void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int firstMoveVector, int isHealer) {
 
 	if (type == static_cast<int>(Type::kFly)) {
 		type_ = Type::kFly;
@@ -120,6 +123,10 @@ void Enemy::SetParametar(int type, const Vector3& pos, const float& y) {
 		firstPos_ = pos;
 		
 	}
+
+	InitializeFirstMove(firstMoveVector);
+
+	InitializeIsHealer(isHealer);
 }
 
 void Enemy::CollisionEnemy(Enemy* enemy)
@@ -313,6 +320,43 @@ void Enemy::ModelUpdate(const Camera* camera)
 
 }
 
+void Enemy::InitializeFirstMove(int move)
+{
+	firstMoveVector_ = move;
+	switch (move)
+	{
+	case 0:
+		moveVector_ = { 0.0f,0.0f,0.0f };
+		break;
+	case 1:
+		moveVector_ = { -1.0f,0.0f,0.0f };
+		break;
+	case 2:
+		moveVector_ = { 1.0f,0.0f,0.0f };
+		break;
+	case 3:
+		moveVector_ = { 0.0f,1.0f,0.0f };
+		break;
+	case 4:
+		moveVector_ = { 0.0f,-1.0f,0.0f };
+		break;
+	default:
+		firstMoveVector_ = 0;
+		moveVector_ = { 0.0f,0.0f,0.0f };
+		break;
+	}
+}
+
+void Enemy::InitializeIsHealer(int isHealer)
+{
+	if (isHealer == 0) {
+		isHealer_ = false;
+	}
+	else {
+		isHealer_ = true;
+	}
+}
+
 void Enemy::GenerationInitialize() {
 	tex_->pos = firstPos_;
 }
@@ -383,16 +427,33 @@ void Enemy::FallingUpdate(const float& y) {
 
 			float pi = std::numbers::pi_v<float>;
 			float memo = startRotate_ / 2.0f / pi;
+			float moveSpeed = 100.0f;
 			if (startRotate_ >= 0) {
 				endRotate_ = pi + 2.0f * pi * (static_cast<int>(memo));
+				float theta = endRotate_ - memo;
+
+				if (std::sinf(theta) <= 0) {
+					velocity_.x = std::fabsf(std::cosf(theta)) * moveSpeed;
+				}
+				else {
+					velocity_.x = -std::fabsf(std::cosf(theta)) * moveSpeed;
+				}
+				velocity_.x = std::sinf(theta) * moveSpeed;
 			}
 			else {
 				endRotate_ = -pi + 2.0f * pi * (static_cast<int>(memo));
+				float theta = endRotate_ - memo;
+
+				if (-std::sinf(theta) <= 0) {
+					velocity_.x = std::fabsf(std::cosf(theta)) * moveSpeed;
+				}
+				else {
+					velocity_.x = -std::fabsf(std::cosf(theta)) * moveSpeed;
+				}
+				velocity_.x = -std::sinf(theta) * moveSpeed;
 			}
 
 			rotateTimeCount_ = 0.0f;
-
-			velocity_.x = 0.0f;
 
 		}
 	}

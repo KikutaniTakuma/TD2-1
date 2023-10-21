@@ -1,44 +1,43 @@
 {
     "Stage0": {
+        "Enemy0IsHealer": 0,
+        "Enemy0MoveVector": 0,
         "Enemy0Pos": [
             -200.0,
-            100.0,
+            300.0,
             0.0
         ],
         "Enemy0Type": 0,
+        "Enemy1IsHealer": 0,
+        "Enemy1MoveVector": 0,
         "Enemy1Pos": [
             -100.0,
-            200.0,
+            300.0,
             0.0
         ],
         "Enemy1Type": 0,
+        "Enemy2IsHealer": 0,
+        "Enemy2MoveVector": 0,
         "Enemy2Pos": [
             0.0,
             300.0,
             0.0
         ],
         "Enemy2Type": 0,
+        "Enemy3IsHealer": 0,
+        "Enemy3MoveVector": 0,
         "Enemy3Pos": [
             100.0,
             300.0,
             0.0
         ],
-        "Enemy3Type": 1,
+        "Enemy3Type": 0,
         "Layer0EnemyNum": 3,
         "Layer0HP": 1,
-        "Layer0ScaffoldingNum": 1,
+        "Layer0ScaffoldingNum": 0,
         "Layer1EnemyNum": 4,
         "Layer1HP": 1,
-        "Layer1ScaffoldingNum": 1,
-        "LayerNum": 2,
-        "Scaffolding0Pos": [
-            -300.0,
-            100.0,
-            0.0
-        ],
-        "Scaffolding0Scale": [
-            100.0,
-            10.0
-        ]
+        "Layer1ScaffoldingNum": 0,
+        "LayerNum": 2
     }
 }

@@ -143,6 +143,8 @@ void GameScene::InitializeGlobalVariable() {
 			if (enemyPoses_.size() <= stageNum) {
 				enemyPoses_.push_back(std::vector<Vector3>());
 				enemyType_.push_back(std::vector<int>());
+				enemyIsHealer_.push_back(std::vector<int>());
+				enemyMoveVector_.push_back(std::vector<int>());
 			}
 
 			if (scaffoldingPoses_.size() <= stageNum) {
@@ -156,6 +158,8 @@ void GameScene::InitializeGlobalVariable() {
 				if (enemyPoses_[stageNum].size() <= enemyNum) {
 					enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
 					enemyType_[stageNum].push_back(0);
+					enemyIsHealer_[stageNum].push_back(0);
+					enemyMoveVector_[stageNum].push_back(0);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -168,6 +172,16 @@ void GameScene::InitializeGlobalVariable() {
 				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kType)];
 
 				enemyType_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveVector)];
+
+				enemyMoveVector_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kIsHealer)];
+
+				enemyIsHealer_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -271,6 +285,8 @@ void GameScene::SetGlobalVariable() {
 			if (enemyPoses_.size() <= stageNum) {
 				enemyPoses_.push_back(std::vector<Vector3>());
 				enemyType_.push_back(std::vector<int>());
+				enemyIsHealer_.push_back(std::vector<int>());
+				enemyMoveVector_.push_back(std::vector<int>());
 			}
 
 			if (scaffoldingPoses_.size() <= stageNum) {
@@ -283,6 +299,8 @@ void GameScene::SetGlobalVariable() {
 				if (enemyPoses_[stageNum].size() <= enemyNum) {
 					enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
 					enemyType_[stageNum].push_back(0);
+					enemyMoveVector_[stageNum].push_back(0);
+					enemyIsHealer_[stageNum].push_back(0);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -294,6 +312,14 @@ void GameScene::SetGlobalVariable() {
 				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kType)];
 
 				globalVariables_->AddItem(g, item, enemyType_[stageNum][enemyNum]);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveVector)];
+
+				globalVariables_->AddItem(g, item, enemyMoveVector_[stageNum][enemyNum]);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kIsHealer)];
+
+				globalVariables_->AddItem(g, item, enemyIsHealer_[stageNum][enemyNum]);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -363,6 +389,8 @@ void GameScene::ApplyGlobalVariable() {
 		if (enemyPoses_.size() <= stageNum) {
 			enemyPoses_.push_back(std::vector<Vector3>());
 			enemyType_.push_back(std::vector<int>());
+			enemyMoveVector_.push_back(std::vector<int>());
+			enemyIsHealer_.push_back(std::vector<int>());
 		}
 
 		if (scaffoldingNums_.size() <= stageNum) {
@@ -439,6 +467,8 @@ void GameScene::ApplyGlobalVariable() {
 				if (enemyPoses_[stageNum].size() <= enemyNum) {
 					enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
 					enemyType_[stageNum].push_back(0);
+					enemyMoveVector_[stageNum].push_back(0);
+					enemyIsHealer_[stageNum].push_back(0);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -470,6 +500,34 @@ void GameScene::ApplyGlobalVariable() {
 				}
 
 				enemyType_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveVector)];
+
+				if (preMaxStageNum_ < kMaxStageNum_) {
+					globalVariables_->AddItem(g, item, enemyMoveVector_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_.size() > preEnemyNums_.size()) {
+					globalVariables_->AddItem(g, item, enemyMoveVector_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+					globalVariables_->AddItem(g, item, enemyMoveVector_[stageNum][enemyNum]);
+				}
+
+				enemyMoveVector_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kIsHealer)];
+
+				if (preMaxStageNum_ < kMaxStageNum_) {
+					globalVariables_->AddItem(g, item, enemyIsHealer_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_.size() > preEnemyNums_.size()) {
+					globalVariables_->AddItem(g, item, enemyIsHealer_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+					globalVariables_->AddItem(g, item, enemyIsHealer_[stageNum][enemyNum]);
+				}
+
+				enemyIsHealer_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -529,7 +587,8 @@ void GameScene::EnemyGeneration() {
 		for (int num = 0; num < enemyNums_[stage_][layer_->GetNowLayer()]; num++) {
 			if (num >= size) {
 
-				enemies_.push_back(std::make_unique<Enemy>(enemyType_[stage_][num], enemyPoses_[stage_][num], layer_->GetHighestPosY()));
+				enemies_.push_back(std::make_unique<Enemy>(enemyType_[stage_][num], enemyPoses_[stage_][num], layer_->GetHighestPosY(),
+					enemyMoveVector_[stage_][num],enemyIsHealer_[stage_][num]));
 
 			}
 		}
@@ -549,7 +608,8 @@ void GameScene::SetEnemyParametar() {
 		if (enemyNums_[stage_][layer_->GetNowLayer()] == i) {
 			break;
 		}
-		enemy->SetParametar(enemyType_[stage_][i], enemyPoses_[stage_][i], layer_->GetHighestPosY());
+		enemy->SetParametar(enemyType_[stage_][i], enemyPoses_[stage_][i], layer_->GetHighestPosY(),
+			enemyMoveVector_[stage_][i], enemyIsHealer_[stage_][i]);
 		i++;
 	}
 }
