@@ -27,19 +27,10 @@
             0.0
         ],
         "Enemy2Type": 0,
-        "Enemy3IsHealer": 0,
-        "Enemy3MoveRadius": 0.0,
-        "Enemy3MoveVector": 0,
-        "Enemy3Pos": [
-            100.0,
-            300.0,
-            0.0
-        ],
-        "Enemy3Type": 0,
         "Layer0EnemyNum": 3,
-        "Layer0HP": 10,
-        "Layer0ScaffoldingNum": 1,
-        "Layer1EnemyNum": 4,
+        "Layer0HP": 1,
+        "Layer0ScaffoldingNum": 0,
+        "Layer1EnemyNum": 3,
         "Layer1HP": 1,
         "Layer1ScaffoldingNum": 0,
         "LayerNum": 2
