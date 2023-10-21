@@ -18,8 +18,8 @@
             40.0,
             40.0
         ],
-        "kSpeedMajor": 100.0,
-        "kSpeedMiddle": 70.0,
-        "kSpeedSmall": 50.0
+        "kSpeedMajor": 200.0,
+        "kSpeedMiddle": 200.0,
+        "kSpeedSmall": 200.0
     }
 }

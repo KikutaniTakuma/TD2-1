@@ -25,7 +25,7 @@
         ],
         "Enemy3Type": 1,
         "Layer0EnemyNum": 3,
-        "Layer0HP": 1,
+        "Layer0HP": 10,
         "Layer0ScaffoldingNum": 1,
         "Layer1EnemyNum": 4,
         "Layer1HP": 1,
