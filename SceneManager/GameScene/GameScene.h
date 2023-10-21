@@ -50,6 +50,7 @@ public:
 		kPos, // ポジション
 		kMoveVector, // 移動方向
 		kIsHealer, // ヒーラーかどうか
+		kMoveRadius, // 移動の半径
 		kEnd, // 末尾。要素数を取り出すよう。
 	};
 
@@ -151,6 +152,7 @@ private:
 		"Pos", // 座標
 		"MoveVector", // 移動方向
 		"IsHealer", // ヒーラーかどうか
+		"MoveRadius", // 移動の半分の距離 
 	};
 
 	const std::string scaffoldingGruoopName_ = "Scaffolding";
@@ -220,6 +222,8 @@ private:
 	std::vector<std::vector<int>> enemyIsHealer_;
 
 	std::vector<std::vector<int>> enemyMoveVector_;
+
+	std::vector<std::vector<float>> enemyMoveRadius_;
 
 	// ステージ毎の、それぞれの足場のポジション
 	std::vector<std::vector<Vector3>> scaffoldingPoses_;

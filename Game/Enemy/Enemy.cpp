@@ -18,7 +18,7 @@ float Enemy::kReboundCoefficient_ = 0.9f;
 
 float Enemy::kLayerReboundCoefficient_ = 0.3f;
 
-Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVector, int isHealer, float scale) {
+Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVector, int isHealer, float moveRadius, float scale) {
 
 	tex_ = std::make_unique<Texture2D>();
 	tex_->LoadTexture("./Resources/Enemy/usabom.png");
@@ -41,6 +41,7 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 
 	InitializeFirstMove(firstMoveVector);
 	InitializeIsHealer(isHealer);
+	InitializeMoveRadius(moveRadius);
 	
 	if (type == static_cast<int>(Type::kFly)) {
 		type_ = Type::kFly;
@@ -106,7 +107,7 @@ void Enemy::ApplyGlobalVariable() {
 
 }
 
-void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int firstMoveVector, int isHealer) {
+void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int firstMoveVector, int isHealer, float moveRadius) {
 
 	if (type == static_cast<int>(Type::kFly)) {
 		type_ = Type::kFly;
@@ -127,6 +128,8 @@ void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int first
 	InitializeFirstMove(firstMoveVector);
 
 	InitializeIsHealer(isHealer);
+
+	InitializeMoveRadius(moveRadius);
 }
 
 void Enemy::CollisionEnemy(Enemy* enemy)
@@ -354,6 +357,16 @@ void Enemy::InitializeIsHealer(int isHealer)
 	}
 	else {
 		isHealer_ = true;
+	}
+}
+
+void Enemy::InitializeMoveRadius(float radius)
+{
+	if (radius < 5) {
+		moveRadius_ = 1280.0f;
+	}
+	else {
+		moveRadius_ = radius;
 	}
 }
 

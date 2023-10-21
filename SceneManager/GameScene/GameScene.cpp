@@ -41,7 +41,7 @@ GameScene::GameScene() {
 
 	globalVariables_ = std::make_unique<GlobalVariables>();
 
-	InitializeGlobalVariable();
+	//InitializeGlobalVariable();
 
 	SetGlobalVariable();
 
@@ -145,6 +145,7 @@ void GameScene::InitializeGlobalVariable() {
 				enemyType_.push_back(std::vector<int>());
 				enemyIsHealer_.push_back(std::vector<int>());
 				enemyMoveVector_.push_back(std::vector<int>());
+				enemyMoveRadius_.push_back(std::vector<float>());
 			}
 
 			if (scaffoldingPoses_.size() <= stageNum) {
@@ -160,6 +161,7 @@ void GameScene::InitializeGlobalVariable() {
 					enemyType_[stageNum].push_back(0);
 					enemyIsHealer_[stageNum].push_back(0);
 					enemyMoveVector_[stageNum].push_back(0);
+					enemyMoveRadius_[stageNum].push_back(0.0f);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -181,7 +183,9 @@ void GameScene::InitializeGlobalVariable() {
 
 				enemyIsHealer_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
 
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveRadius)];
 
+				enemyMoveRadius_[stageNum][enemyNum] = globalVariables_->GetFloatValue(g, item);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -287,6 +291,7 @@ void GameScene::SetGlobalVariable() {
 				enemyType_.push_back(std::vector<int>());
 				enemyIsHealer_.push_back(std::vector<int>());
 				enemyMoveVector_.push_back(std::vector<int>());
+				enemyMoveRadius_.push_back(std::vector<float>());
 			}
 
 			if (scaffoldingPoses_.size() <= stageNum) {
@@ -301,6 +306,7 @@ void GameScene::SetGlobalVariable() {
 					enemyType_[stageNum].push_back(0);
 					enemyMoveVector_[stageNum].push_back(0);
 					enemyIsHealer_[stageNum].push_back(0);
+					enemyMoveRadius_[stageNum].push_back(0.0f);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -320,6 +326,10 @@ void GameScene::SetGlobalVariable() {
 				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kIsHealer)];
 
 				globalVariables_->AddItem(g, item, enemyIsHealer_[stageNum][enemyNum]);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveRadius)];
+
+				globalVariables_->AddItem(g, item, enemyMoveRadius_[stageNum][enemyNum]);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -391,6 +401,7 @@ void GameScene::ApplyGlobalVariable() {
 			enemyType_.push_back(std::vector<int>());
 			enemyMoveVector_.push_back(std::vector<int>());
 			enemyIsHealer_.push_back(std::vector<int>());
+			enemyMoveRadius_.push_back(std::vector<float>());
 		}
 
 		if (scaffoldingNums_.size() <= stageNum) {
@@ -469,6 +480,7 @@ void GameScene::ApplyGlobalVariable() {
 					enemyType_[stageNum].push_back(0);
 					enemyMoveVector_[stageNum].push_back(0);
 					enemyIsHealer_[stageNum].push_back(0);
+					enemyMoveRadius_[stageNum].push_back(0.0f);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -528,6 +540,20 @@ void GameScene::ApplyGlobalVariable() {
 				}
 
 				enemyIsHealer_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveRadius)];
+
+				if (preMaxStageNum_ < kMaxStageNum_) {
+					globalVariables_->AddItem(g, item, enemyMoveRadius_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_.size() > preEnemyNums_.size()) {
+					globalVariables_->AddItem(g, item, enemyMoveRadius_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+					globalVariables_->AddItem(g, item, enemyMoveRadius_[stageNum][enemyNum]);
+				}
+
+				enemyMoveRadius_[stageNum][enemyNum] = globalVariables_->GetFloatValue(g, item);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -588,7 +614,7 @@ void GameScene::EnemyGeneration() {
 			if (num >= size) {
 
 				enemies_.push_back(std::make_unique<Enemy>(enemyType_[stage_][num], enemyPoses_[stage_][num], layer_->GetHighestPosY(),
-					enemyMoveVector_[stage_][num],enemyIsHealer_[stage_][num]));
+					enemyMoveVector_[stage_][num],enemyIsHealer_[stage_][num],enemyMoveRadius_[stage_][num]));
 
 			}
 		}
@@ -609,7 +635,7 @@ void GameScene::SetEnemyParametar() {
 			break;
 		}
 		enemy->SetParametar(enemyType_[stage_][i], enemyPoses_[stage_][i], layer_->GetHighestPosY(),
-			enemyMoveVector_[stage_][i], enemyIsHealer_[stage_][i]);
+			enemyMoveVector_[stage_][i], enemyIsHealer_[stage_][i], enemyMoveRadius_[stage_][i]);
 		i++;
 	}
 }

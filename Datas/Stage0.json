@@ -1,6 +1,7 @@
 {
     "Stage0": {
         "Enemy0IsHealer": 0,
+        "Enemy0MoveRadius": 0.0,
         "Enemy0MoveVector": 0,
         "Enemy0Pos": [
             -200.0,
@@ -9,6 +10,7 @@
         ],
         "Enemy0Type": 0,
         "Enemy1IsHealer": 0,
+        "Enemy1MoveRadius": 0.0,
         "Enemy1MoveVector": 0,
         "Enemy1Pos": [
             -100.0,
@@ -17,6 +19,7 @@
         ],
         "Enemy1Type": 0,
         "Enemy2IsHealer": 0,
+        "Enemy2MoveRadius": 0.0,
         "Enemy2MoveVector": 0,
         "Enemy2Pos": [
             0.0,
@@ -25,6 +28,7 @@
         ],
         "Enemy2Type": 0,
         "Enemy3IsHealer": 0,
+        "Enemy3MoveRadius": 0.0,
         "Enemy3MoveVector": 0,
         "Enemy3Pos": [
             100.0,

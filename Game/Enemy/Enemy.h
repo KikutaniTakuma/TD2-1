@@ -48,7 +48,7 @@ public:
 	/// <param name="pos">初期座標</param>
 	/// <param name="layerY">層の上のY座標</param>
 	/// <param name="scale">スケール</param>
-	Enemy(int type, const Vector3& pos, const float& layerY,int firstMoveVector = 0, int isHealer = 0, float scale = 40.0f);
+	Enemy(int type, const Vector3& pos, const float& layerY,int firstMoveVector = 0, int isHealer = 0, float moveRadius = 0.0f, float scale = 40.0f);
 	~Enemy() = default;
 	
 
@@ -108,7 +108,7 @@ public:
 	/// <summary>
 	/// 初期座標などのパラメーターをいれる
 	/// </summary>
-	void SetParametar(int type, const Vector3& pos, const float& y = 0, int firstMoveVector = 0, int isHealer = 0);
+	void SetParametar(int type, const Vector3& pos, const float& y = 0, int firstMoveVector = 0, int isHealer = 0, float moveRadius = 0.0f);
 
 	void CollisionEnemy(Enemy* enemy);
 
@@ -183,6 +183,8 @@ private:
 
 	void InitializeIsHealer(int isHealer);
 
+	void InitializeMoveRadius(float radius);
+
 private:
 	
 
@@ -219,6 +221,8 @@ private:
 	int firstMoveVector_;
 
 	Vector3 moveVector_;
+
+	float moveRadius_;
 
 	bool isHealer_;
 
