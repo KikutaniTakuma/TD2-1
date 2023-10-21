@@ -139,6 +139,9 @@ public:
 
 	UtilsLib::Flg isSameTexSize;
 
+	// テクスチャと同じスケールにしたときのスケール倍率
+	float texScalar;
+
 private:
 	D3D12_VERTEX_BUFFER_VIEW vertexView;
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;

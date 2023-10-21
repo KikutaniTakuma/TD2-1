@@ -69,7 +69,7 @@ public:
 	template<typename T>
 	T Get(const T& start, const T& end) {
 		static_assert(!std::is_pointer<T>::value, "Do not use pointer types");
-		return std::lerp<T>(start, end, ease_(t_));
+		return static_cast<T>(std::lerp<T>(start, end, ease_(t_)));
 	}
 
 	Vector2 Get(const Vector2& start, const Vector2& end) {

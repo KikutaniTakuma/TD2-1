@@ -9,7 +9,7 @@ float4 main(Output input) : SV_TARGET{
 
     finalColor.w = color.w;
 
-    clip(dot(color.xyz, float3(1.0f, 1.0f, 1.0f )) - 0.01f);
+    clip(dot(color.xyz, float3(1.0f, 1.0f, 1.0f )) - 0.9f);
 
     return finalColor;
 }

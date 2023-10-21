@@ -31,7 +31,8 @@ Texture2D::Texture2D() :
 	aniCount_(0.0f),
 	uvPibotSpd_(0.0f),
 	isAnimation_(0.0f),
-	isSameTexSize()
+	isSameTexSize(),
+	texScalar(1.0f)
 {
 	*wvpMat = MakeMatrixIndentity();
 	*colorBuf = Vector4::identity;
@@ -98,6 +99,8 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 
 	isSameTexSize = right.isSameTexSize;
 
+	texScalar = right.texScalar;
+
 	return *this;
 }
 
@@ -125,6 +128,7 @@ Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
 	uvPibotSpd_ = std::move(right.uvPibotSpd_);
 
 	isSameTexSize = std::move(right.isSameTexSize);
+	texScalar = std::move(right.texScalar);
 
 	return *this;
 }
@@ -258,7 +262,7 @@ void Texture2D::Update() {
 
 	if (tex && isLoad) {
 		if (isSameTexSize) {
-			scale = tex->getSize();
+			scale = tex->getSize() * texScalar;
 		}
 		else if(isSameTexSize.OnExit()) {
 			scale.x /= tex->getSize().x;
@@ -335,6 +339,9 @@ void Texture2D::Debug([[maybe_unused]]const std::string& guiName) {
 	*colorBuf = UintToVector4(color);
 	ImGui::Begin(guiName.c_str());
 	ImGui::Checkbox("is same scale and Texture", isSameTexSize.Data());
+	if (isSameTexSize) {
+		ImGui::DragFloat("tex scalar", &texScalar, 0.01f);
+	}
 	ImGui::DragFloat2("scale", &scale.x, 1.0f);
 	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
 	ImGui::DragFloat3("pos", &pos.x, 1.0f);

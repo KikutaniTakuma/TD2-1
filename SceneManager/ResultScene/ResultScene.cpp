@@ -1,5 +1,6 @@
 #include "ResultScene.h"
 #include "Engine/WinApp/WinApp.h"
+#include "externals/imgui/imgui.h"
 
 ResultScene::ResultScene():
 	BaseScene(BaseScene::ID::Result),
@@ -20,7 +21,14 @@ ResultScene::ResultScene():
 	clearTimeBasis_(),
 	score_(0),
 	updateStartTime_(),
-	isUpdate_(false)
+	isUpdate_(false),
+	timer_(),
+	timerUI_(),
+	nextStageMassage_(),
+	stageSelectMassage_(),
+	arrow_(),
+	nowChoose_(),
+	isCanSelect_(false)
 {
 	clearTimeBasis_ = {
 		std::chrono::milliseconds{30000},  // 30秒
@@ -58,16 +66,17 @@ void ResultScene::Initialize() {
 	);
 
 	// 吹き出し板ポリをロード
-	speechBubble_.LoadTexture("./Resources/Result/hukidasi.png");
+	speechBubble_.LoadTexture("./Resources/Result/speechBubble.png");
 	speechBubble_.scale = speechBubble_.GetTexSize() * 0.85f;
 	speechBubble_.pos = { 218.0f,26.0f,0.01f };
 
 
 	// 星の位置設定
 	for (size_t i = 0; i < stars_.size();i++) {
-		stars_[i].pos_.x = 51.0f + (178.0f * static_cast<float>(i));
+		stars_[i].pos_.x = 55.0f + (178.0f * static_cast<float>(i));
+		stars_[i].pos_.y = -55.0f;
 	}
-	stars_[1].pos_.y = 16.0f;
+	stars_[1].pos_.y += 16.0f;
 	stars_[2].isSpecial_ = true;
 
 	currentStar_ = 0;
@@ -119,6 +128,7 @@ void ResultScene::Initialize() {
 		i.Update();
 	}
 
+	// プレイヤーモデルのロード
 	player_.LoadObj("./Resources/Player/player.obj");
 	player_.light.ligDirection = { 0.0f, 0.0f, 1.0f };
 	player_.light.ligColor = Vector3::identity;
@@ -126,6 +136,116 @@ void ResultScene::Initialize() {
 	player_.rotate = { -0.1f, 2.962f, -0.12f };
 	player_.pos = { -357.0f, -33.7f,-400.0f };
 	player_.scale *= 170.0f;
+	playerScale_ = { Vector3{190.0f, 150.0f, 150.0f}, Vector3{ 150.0f,190.0f,190.0f  } };
+	playerScaleEase_.Start(
+		true,
+		0.75f,
+		Easeing::GetFunction(24)
+	);
+
+	// タイマーテクスチャ
+	timer_.LoadTexture("./Resources/Result/result_UI_time.png");
+	timer_.texScalar = 0.59f;
+	timer_.isSameTexSize = true;
+	timer_.pos = { 49.0f, 141.0f, 0.01f };
+	timerUI_.LoadTexture("./Resources/Result/result_UI_scoreLine.png");
+	timerUI_.texScalar = 0.58f;
+	timerUI_.isSameTexSize = true;
+	timerUI_.pos = { 243.0f, 107.0f, 0.01f };
+
+	// ステージセレクトUI
+	nextStageMassage_.LoadTexture("./Resources/Result/stageSelect_UI_stage.png");
+	nextStageMassage_.texScalar = 0.47f;
+	nextStageMassage_.isSameTexSize = true;
+	nextStageMassage_.pos = { 423.0f, -246.0f, 0.01f };
+	stageSelectMassage_.LoadTexture("./Resources/Result/stageSelect_UI_titlehe.png");
+	stageSelectMassage_.texScalar = 0.45f;
+	stageSelectMassage_.isSameTexSize = true;
+	stageSelectMassage_.pos = { 449.0f, -292.0f, 0.01f };
+	
+	arrow_.LoadTexture("./Resources/Result/arrow.png");
+	arrow_.texScalar = 0.23f;
+	arrow_.isSameTexSize = true;
+	arrow_.pos = { 242.0f, -212.0f, 0.01f };
+
+	arrowPosY_ = { -212.0f, -293.0f };
+	arrowPosX_ = { arrow_.pos.x - 10.0f, arrow_.pos.x + 10.0f };
+
+	if (score_ <= 0) {
+		isCanSelect_ = true;
+		isUpdate_ = true;
+	}
+
+	arrowEase_.Start(true, 0.5f, Easeing::InOutQuad);
+
+
+	// 時間表示
+	float clearSecond = (static_cast<float>(clearTime_.count()) / 1000.0f);
+	clearSecond = std::clamp(clearSecond, 0.0f, 5999.0f);
+	float minutes = std::floor(clearSecond / 60.0f);
+	float tenMinutes = std::floor(minutes / 10.0f);
+	float tenSeconds = std::floor((clearSecond - (minutes * 60.0f)) * 0.1f);
+	float seconds = std::floor(clearSecond - (minutes * 60.0f) - (tenSeconds * 10.0f));
+	tenMinutes_.LoadTexture("./Resources/Result/number.png");
+	tenMinutes_.uvSize.x = 0.1f;
+	tenMinutes_.uvPibot.x = tenMinutes * 0.1f;
+	tenMinutes_.pos = Vector2{ 166.0f, 143.0f };
+	tenMinutes_.scale *= 70.0f;
+	tenMinutes_.color = 0x0B0B0BFF;
+	minutes_.LoadTexture("./Resources/Result/number.png");
+	minutes_.uvSize.x = 0.1f;
+	minutes_.uvPibot.x = minutes * 0.1f;
+	minutes_.pos = Vector2{ 239.0f, 143.0f };
+	minutes_.scale *= 70.0f;
+	minutes_.color = 0x0B0B0BFF;
+	tenSeconds_.LoadTexture("./Resources/Result/number.png");
+	tenSeconds_.uvSize.x = 0.1f;
+	tenSeconds_.uvPibot.x = tenSeconds * 0.1f;
+	tenSeconds_.pos = Vector2{ 358.0f, 143.0f };
+	tenSeconds_.scale *= 70.0f;
+	tenSeconds_.color = 0x0B0B0BFF;
+	seconds_.LoadTexture("./Resources/Result/number.png");
+	seconds_.uvSize.x = 0.1f;
+	seconds_.uvPibot.x = seconds * 0.1f;
+	seconds_.pos = Vector2{ 431.0f, 143.0f };
+	seconds_.scale *= 70.0f;
+	seconds_.color = 0x0B0B0BFF;
+
+	colon1_.LoadTexture("./Resources/ball.png");
+	colon1_.isSameTexSize = true;
+	colon1_.texScalar = 0.13f;
+	colon1_.pos = { 300.0f, 160.0f, 0.01f };
+	colon1_.color = 0x0B0B0BFF;
+	colon2_.LoadTexture("./Resources/ball.png");
+	colon2_.isSameTexSize = true;
+	colon2_.texScalar = 0.13f;
+	colon2_.pos = { 300.0f, 126.0f, 0.01f };
+	colon2_.color = 0x0B0B0BFF;
+
+	resultUI_.LoadTexture("./Resources/Result/result_UI_stage.png");
+	resultUI_.isSameTexSize = true;
+	resultUI_.texScalar = 0.38f;
+	resultUI_.pos = Vector2{ 218.0f, 283.0f };
+
+	float stageTenNumber = std::floor(static_cast<float>(stageNumber_) / 10.0f);
+	float stageNumber = static_cast<float>(stageNumber_) - stageTenNumber * 10.0f;
+	stageTenNumberTex_.LoadTexture("./Resources/Result/number.png");
+	stageTenNumberTex_.uvSize.x = 0.1f;
+	stageTenNumberTex_.uvPibot.x = stageTenNumber * 0.1f;
+	stageTenNumberTex_.color = 0xce591dff;
+	stageTenNumberTex_.pos = Vector2{ 318, 260 };
+	stageTenNumberTex_.scale *= 70.0f;
+	stageNumberTex_.LoadTexture("./Resources/Result/number.png");
+	stageNumberTex_.uvSize.x = 0.1f;
+	stageNumberTex_.uvPibot.x = stageNumber * 0.1f;
+	stageNumberTex_.color = 0xce591dff;
+	if (stageNumber_ < 10) {
+		stageNumberTex_.pos = stageTenNumberTex_.pos;
+	}
+	else {
+		stageNumberTex_.pos = Vector2{ 380, 260 };
+	}
+	stageNumberTex_.scale *= 70.0f;
 }
 
 void ResultScene::SetClearTime(std::chrono::milliseconds clearTime) {
@@ -139,6 +259,14 @@ void ResultScene::SetClearTime(std::chrono::milliseconds clearTime) {
 	}
 
 	score_ = std::clamp(score_, 0, static_cast<int32_t>(clearTimeBasis_.size()));
+	if (score_ <= 0) {
+		isCanSelect_ = true;
+		isUpdate_ = true;
+	}
+}
+
+void ResultScene::SetStageNumber(int32_t stageNumber) {
+	stageNumber_ = std::clamp(stageNumber, 0, 99);
 }
 
 void ResultScene::Finalize() {
@@ -173,7 +301,7 @@ void ResultScene::Update() {
 		speechBubble_.Update();
 
 		// 星のアニメーション
-		if (currentStar_ < stars_.size() - score_ - 1 &&
+		if (currentStar_ < score_ && currentStar_ < stars_.size()&&
 			starEffectDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_))
 		{
 			stars_[currentStar_].Start();
@@ -181,10 +309,11 @@ void ResultScene::Update() {
 			currentStar_++;
 		}
 
-		if (stars_[score_-1].GetEndFlg().OnEnter()) {
+		if (score_ && stars_[score_-1].GetEndFlg().OnEnter()) {
 			for (size_t i = 0; i < stars_.size(); i++) {
 				stars_[i].NormalStart();
 			}
+			isCanSelect_ = true;
 		}
 
 		for (size_t i = 0; i < stars_.size(); i++) {
@@ -194,10 +323,63 @@ void ResultScene::Update() {
 		for (auto& i : starsGray_) {
 			i.Update();
 		}
+
+		if (isCanSelect_) {
+			if (input_->GetKey()->Pushed(DIK_W)||
+				input_->GetKey()->Pushed(DIK_UP)||
+				input_->GetGamepad()->Pushed(Gamepad::Button::UP)||
+				input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f
+				)
+			{
+				nowChoose_++;
+			}
+			else if (
+				input_->GetKey()->Pushed(DIK_S) ||
+				input_->GetKey()->Pushed(DIK_DOWN) || 
+				input_->GetGamepad()->Pushed(Gamepad::Button::DOWN) ||
+				input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f
+				)
+			{
+				nowChoose_--;
+			}
+			nowChoose_ = std::clamp(nowChoose_, 0, 1);
+
+			nextStageMassage_.Update();
+			stageSelectMassage_.Update();
+
+			if (nowChoose_ == 1) {
+				arrow_.pos.y = arrowPosY_.first;
+			}
+			else {
+				arrow_.pos.y = arrowPosY_.second;
+			}
+
+			arrow_.pos.x = arrowEase_.Get(arrowPosX_.first, arrowPosX_.second);
+
+			arrow_.Update();
+			arrowEase_.Update();
+		}
 	}
 
-	player_.Debug("player");
+	tenMinutes_.Update();
+	minutes_.Update();
+	tenSeconds_.Update();
+	seconds_.Update();
+	colon1_.Update();
+	colon2_.pos.x = colon1_.pos.x;
+	colon2_.Update();
+
+	resultUI_.Update();
+	stageNumberTex_.Update();
+	stageTenNumberTex_.Update();
+
+	//playerScaleEase_.Debug("playerScaleEase_");
+	player_.scale = playerScaleEase_.Get(playerScale_.first, playerScale_.second);
 	player_.Update();
+	playerScaleEase_.Update();
+
+	timer_.Update();
+	timerUI_.Update();
 }
 
 void ResultScene::Draw() {
@@ -232,5 +414,25 @@ void ResultScene::Draw() {
 		i.Draw(camera_.GetViewOthographics());
 	}
 
+	timer_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	timerUI_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+
+	if (isCanSelect_) {
+		nextStageMassage_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		stageSelectMassage_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		arrow_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
+
+	tenMinutes_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	minutes_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	tenSeconds_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	seconds_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	colon1_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	colon2_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	resultUI_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	stageNumberTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	if (10 <= stageNumber_) {
+		stageTenNumberTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
 	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
 }

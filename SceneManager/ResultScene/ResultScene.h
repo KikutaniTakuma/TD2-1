@@ -62,7 +62,7 @@ public:
 /// </summary>
 public:
 	void SetClearTime(std::chrono::milliseconds clearTime);
-
+	void SetStageNumber(int32_t stageNumber);
 
 
 
@@ -123,6 +123,40 @@ private:
 
 	// プレイヤーのモデル
 	Model player_;
+	std::pair<Vector3, Vector3> playerScale_;
+	Easeing playerScaleEase_;
+
+	// タイマー
+	Texture2D timer_;
+	Texture2D timerUI_;
+
+	// ステージセレクトUI
+	Texture2D nextStageMassage_;
+	Texture2D stageSelectMassage_;
+	Texture2D arrow_;
+	// 今選択しているところ(0:nextStage, 1:stageSelect)
+	int32_t nowChoose_;
+	std::pair<float, float> arrowPosY_;
+	// 矢印のイージング
+	std::pair<float, float> arrowPosX_;
+	Easeing arrowEase_;
+
+	// 次のステージかステージセレクトを選択できるか
+	UtilsLib::Flg isCanSelect_;
+
+	// 時間表示
+	Texture2D tenMinutes_;
+	Texture2D minutes_;
+	Texture2D tenSeconds_;
+	Texture2D seconds_;
+	Texture2D colon1_;
+	Texture2D colon2_;
+
+	// resultUI
+	Texture2D resultUI_;
+	Texture2D stageNumberTex_;
+	Texture2D stageTenNumberTex_;
+	int32_t stageNumber_;
 
 	///
 	/// =============================================

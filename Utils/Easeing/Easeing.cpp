@@ -63,22 +63,23 @@ void Easeing::Stop() {
 	spdT_ = 1.0f;
 }
 
-template<>
-Vector2 Easeing::Get(const Vector2& start, const Vector2& end) {
-	return Vector2::Lerp(start, end, ease_(t_));
-}
-
 void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 #ifdef _DEBUG
-	if (spdT_) {
-		easeTime_ = 1.0f / spdT_;
+	if (easeTime_ == 0.0f) {
+		spdT_ = 1.0f;
 	}
 	else {
-		easeTime_ = 1.0f;
+		spdT_ = 1.0f / easeTime_;
 	}
 	ImGui::Begin(debugName.c_str());
 	ImGui::SliderInt("easeType", &easeType_, 0, 30);
-	ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, 0.0f);
+	ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, std::numeric_limits<float>::max());
+	if(easeTime_ == 0.0f){
+		spdT_ = 1.0f;
+	}
+	else {
+		spdT_ = 1.0f / easeTime_;
+	}
 	ImGui::Checkbox("isLoop", isLoop_.Data());
 	if (ImGui::Button("Start")) {
 		isActive_ = true;
@@ -89,8 +90,7 @@ void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 		ease_ = GetFunction(easeType_);
 	}
 	else if (ImGui::Button("Stop")) {
-		isActive_ = false;
-		t_ = 0.0f;
+		Stop();
 	}
 	ImGui::End();
 
