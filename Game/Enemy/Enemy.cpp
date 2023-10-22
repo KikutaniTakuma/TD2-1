@@ -79,7 +79,7 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 		
 		velocity_ = {};
 
-		tex_->pos = pos;
+		tex_->pos = firstPos_;
 		tex_->scale *= enemyScale_;
 		break;
 	case Enemy::Type::kWalk:
@@ -89,7 +89,7 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 		firstPos_.y = layerY + tex_->scale.y / 2.0f;
 		velocity_ = {};
 
-		tex_->pos = pos;
+		tex_->pos = firstPos_;
 		tex_->rotate.z = std::numbers::pi_v<float>;
 		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
 
