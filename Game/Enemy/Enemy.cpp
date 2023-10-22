@@ -79,7 +79,7 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 		
 		velocity_ = {};
 
-		tex_->pos = pos;
+		tex_->pos = firstPos_;
 		tex_->scale *= enemyScale_;
 		break;
 	case Enemy::Type::kWalk:
@@ -89,7 +89,7 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 		firstPos_.y = layerY + tex_->scale.y / 2.0f;
 		velocity_ = {};
 
-		tex_->pos = pos;
+		tex_->pos = firstPos_;
 		tex_->rotate.z = std::numbers::pi_v<float>;
 		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
 
@@ -230,6 +230,7 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 					}
 					rotateAddAngle_ = angle * 6;
 				}
+				isCollisionLayer_ = false;
 			}
 		}
 		else if (type_ == Type::kWalk && status_ == Status::kNormal && enemy->GetType() == Type::kWalk && enemy->GetStatus() == Status::kNormal) {
@@ -284,7 +285,7 @@ void Enemy::CollisionPlayer(Player* player) {
 				else if (type_ == Type::kFly) {
 					if (status_ == Status::kNormal) {
 						player->EnemyStep(false);
-
+						player->Steped(tex_->pos);
 					}
 				}
 			}
@@ -608,7 +609,7 @@ void Enemy::FallingUpdate(const float& y) {
 				velocity_.x = std::sinf(theta) * moveSpeed;
 			}
 			else {
-				endRotate_ = -pi + 2.0f * pi * (static_cast<int>(memo));
+				endRotate_ = -pi - 2.0f * pi * (static_cast<int>(memo));
 				float theta = endRotate_ - memo;
 
 				if (-std::sinf(theta) <= 0) {
