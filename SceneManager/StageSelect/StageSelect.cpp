@@ -115,6 +115,9 @@ void StageSelect::Initialize() {
 		isClearTex_.pos.y - 10.0f,
 		isClearTex_.pos.y + 10.0f
 	};
+
+	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.ParticleStart();
 }
 
 void StageSelect::Finalize() {
@@ -194,6 +197,8 @@ void StageSelect::Update() {
 	bubbleEase_.Update();
 	arrowEase_.Update();
 
+	backGroundParticle_.Update();
+
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
 		) {
@@ -213,6 +218,8 @@ void StageSelect::Draw() {
 		i.Draw(camera_.GetViewOthographics());
 	}
 	backGroundBlur_.Draw(Pipeline::None);
+	backGroundParticle_.Draw(camera_.GetViewOthographics());
+
 	bubble_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	
 	stageTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);

@@ -77,4 +77,7 @@ private:
 
 	Texture2D isClearTex_;
 	std::pair<float, float> isClearTexY_;
+
+	// 背景パーティクル
+	Particle backGroundParticle_;
 };
