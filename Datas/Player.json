@@ -4,6 +4,6 @@
         "kGravity": -14.0,
         "kHipDropSpeed": -25.0,
         "kJampInitialVelocity": 9.0,
-        "kMoveSpeed": 300.0
+        "kMoveSpeed": 200.0
     }
 }
