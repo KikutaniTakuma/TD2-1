@@ -40,8 +40,8 @@ Player::Player() {
 	// 降下中の重力加速度
 	kFallingGravity_ = -20.0f;
 
-	isFallingGravity_ = false;
-	isHipdropJamp_ = false;
+	isFallingGravity_ = true;
+	isHipdropJamp_ = true;
 }
 
 void Player::SetGlobalVariable() {

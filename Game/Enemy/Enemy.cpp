@@ -243,45 +243,50 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 
 void Enemy::CollisionPlayer(Player* player) {
 
-	if (tex_->Collision(*player->GetTex())) {
+	if (player->GetStatus() != Player::Status::kFalling && (status_ == Status::kLeave || status_ == Status::kNormal)) {
+		if (tex_->Collision(*player->GetTex())) {
 
-		if (player->GetVelocity().y < 0.0f) {
-			StatusRequest(Enemy::Status::kFalling);
-			fallingSpeed_ = kFallingSpeed_ + player->GetVelocity().y;
+			if (player->GetVelocity().y < 0.0f) {
+				StatusRequest(Enemy::Status::kFalling);
+				fallingSpeed_ = kFallingSpeed_ + player->GetVelocity().y;
 
-			Vector3 vector = player->GetTex()->pos - tex_->pos;
+				Vector3 vector = player->GetTex()->pos - tex_->pos;
 
-			if (vector.x == 0) {
+				if (vector.x == 0) {
 
-				if (UtilsLib::Random(0, 1) == 0) {
-					rotateAddAngle_ = 6.0f;
+					if (UtilsLib::Random(0, 1) == 0) {
+						rotateAddAngle_ = 6.0f;
+					}
+					else {
+						rotateAddAngle_ = -6.0f;
+					}
 				}
 				else {
-					rotateAddAngle_ = -6.0f;
+					float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
+
+					if (angle >= std::numbers::pi_v<float> / 2) {
+						angle -= std::numbers::pi_v<float> / 2;
+					}
+					else if (angle <= -std::numbers::pi_v<float> / 2) {
+						angle += std::numbers::pi_v<float> / 2;
+					}
+					rotateAddAngle_ = angle * 6;
 				}
+
+				player->EnemyStep(true);
 			}
 			else {
-				float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
 
-				if (angle >= std::numbers::pi_v<float> / 2) {
-					angle -= std::numbers::pi_v<float> / 2;
+				if (type_ == Type::kWalk) {
+					moveVector_ *= -1;
+					player->KnockBack(tex_->pos);
 				}
-				else if (angle <= -std::numbers::pi_v<float> / 2) {
-					angle += std::numbers::pi_v<float> / 2;
+				else if (type_ == Type::kFly) {
+					if (status_ == Status::kNormal) {
+						player->EnemyStep(false);
+
+					}
 				}
-				rotateAddAngle_ = angle * 6;
-			}
-
-			player->EnemyStep(true);
-		}
-		else {
-
-			if (type_ == Type::kWalk) {
-				moveVector_ *= -1;
-				player->KnockBack(tex_->pos);
-			}
-			else if (type_ == Type::kFly) {
-				player->EnemyStep(false);
 			}
 		}
 	}
