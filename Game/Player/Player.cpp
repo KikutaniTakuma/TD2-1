@@ -129,6 +129,9 @@ void Player::Update(const float& y, const Camera* camera) {
 		case Player::Status::kFalling:
 			FallingInitialize(y);
 			break;
+		case Player::Status::kKnockBack:
+			KnockBackInitilize();
+			break;
 		default:
 			break;
 		}
@@ -152,6 +155,9 @@ void Player::Update(const float& y, const Camera* camera) {
 		break;
 	case Player::Status::kFalling:
 		FallingUpdate(y);
+		break;
+	case Player::Status::kKnockBack:
+		KnockBackUpdate(y);
 		break;
 	default:
 		break;
@@ -371,6 +377,34 @@ void Player::FallingUpdate(const float& y) {
 	}
 }
 
+void Player::KnockBackInitilize()
+{
+
+
+}
+
+void Player::KnockBackUpdate(const float& y)
+{
+	velocity_.y += kGravity_;
+
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
+
+	rotateTimeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+	float t = std::clamp<float>(rotateTimeCount_, 0.0f, rotateTime_) / rotateTime_;
+
+	models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::lerp(0.0f, endRotate_, t);
+
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
+		Collision(y);
+
+		velocity_.y = 0.0f;
+		velocity_.x = 0.0f;
+		statusRequest_ = Status::kNormal;
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
+	}
+}
+
 void Player::CollisionScaffolding(const Texture2D* tex)
 {
 
@@ -399,9 +433,37 @@ void Player::CollisionScaffolding(const Texture2D* tex)
 
 void Player::KnockBack(const Vector3& pos)
 {
-	Vector3 s = pos;
-	s = pos;
+	Vector3 vector = tex_->pos - pos;
 
+	Vector3 normal = vector.Normalize();
+
+	float theta = 1.0f;
+
+	if (vector.x < 0) {
+		theta *= -1;
+	}
+
+	float speed = 200.0f;
+	
+	velocity_.x = normal.x * std::cosf(theta) - normal.y * std::sinf(theta);
+	velocity_.y = normal.y * std::cosf(theta) + normal.x * std::sinf(theta);
+
+	velocity_ *= speed;
+
+	rotateTime_ = 2.0f * velocity_.y / (-kGravity_) * FrameInfo::GetInstance()->GetDelta();
+
+	float pi = std::numbers::pi_v<float>;
+	
+	if (velocity_.x >= 0) {
+		endRotate_ = pi * 2.0f;
+	}
+	else {
+		endRotate_ = -pi * 2.0f;
+	}
+
+	rotateTimeCount_ = 0.0f;
+
+	statusRequest_ = Status::kKnockBack;
 }
 
 void Player::Collision(const float& y) {
