@@ -28,8 +28,8 @@
         ],
         "Enemy2Type": 0,
         "Enemy3IsHealer": 0,
-        "Enemy3MoveRadius": 0.0,
-        "Enemy3MoveVector": 0,
+        "Enemy3MoveRadius": 60.0,
+        "Enemy3MoveVector": 1,
         "Enemy3Pos": [
             0.0,
             250.0,
@@ -45,7 +45,7 @@
             0.0
         ],
         "Enemy4Type": 0,
-        "Enemy5IsHealer": 0,
+        "Enemy5IsHealer": 1,
         "Enemy5MoveRadius": 0.0,
         "Enemy5MoveVector": 0,
         "Enemy5Pos": [
@@ -53,7 +53,7 @@
             450.0,
             0.0
         ],
-        "Enemy5Type": 0,
+        "Enemy5Type": 1,
         "Enemy6IsHealer": 0,
         "Enemy6MoveRadius": 0.0,
         "Enemy6MoveVector": 0,
