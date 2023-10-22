@@ -5,7 +5,7 @@
 #include "SceneManager/GameScene/GameScene.h"
 #include "Utils/Camera/Camera.h"
 #include <numbers>
-
+#include "Game/Enemy/Enemy.h"
 #include "externals/imgui/imgui.h"
 
 Player::Player() {
@@ -177,6 +177,9 @@ void Player::Update(const float& y, const Camera* camera) {
 	models_[static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[static_cast<uint16_t>(Parts::kMain)]->scale.y;
 	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
 	tex_->Update();
+
+	isCollisionLayer_.Update();
+	isCollisionEnemy_.Update();
 }
 
 void Player::NormalInitialize(const float& y) {
@@ -317,12 +320,12 @@ void Player::OnScaffoldingUpdate()
 		statusRequest_ = Status::kNormal;
 	}
 
-	velocity_.y += kGravity_ * deletaTime;
+	velocity_.y += kGravity_;
 
 	// 横の移動距離
-	velocity_.x = move.x * kMoveSpeed_ * deletaTime;
+	velocity_.x = move.x * kMoveSpeed_;
 
-	tex_->pos += velocity_;
+	tex_->pos += velocity_ * deletaTime;
 
 	MemoHighest();
 
@@ -351,7 +354,7 @@ void Player::LandingUpdate(const float& y) {
 void Player::FallingInitialize(const float& y) {
 
 	Collision(y);
-	velocity_ = {};
+	//velocity_ = {};
 
 }
 
@@ -360,20 +363,82 @@ void Player::FallingUpdate(const float& y) {
 	float deletaTime = FrameInfo::GetInstance()->GetDelta();
 
 	if (isFallingGravity_) {
-		velocity_.y += kFallingGravity_ * deletaTime;
+		velocity_.y += kFallingGravity_;
 	}
 	else {
-		velocity_.y += kGravity_ * deletaTime;
+		velocity_.y += kGravity_;
 	}
-	tex_->pos += velocity_;
 
-	// 地面との当たり判定。
+	tex_->pos += velocity_ * deletaTime;
+
+	if (isCollisionLayer_.OnStay()) {
+
+		rotateTimeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+		float t = std::clamp<float>(rotateTimeCount_, 0.0f, rotateTime_) / rotateTime_;
+
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::lerp(startRotate_, endRotate_, t);
+	}
+	else {
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z += rotateAddAngle_ * FrameInfo::GetInstance()->GetDelta();
+	}
+
+
 	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
 
+		Vector3 vect = velocity_;
+
 		Collision(y);
-		velocity_.y = 0.0f;
-		isFly_ = false;
-		statusRequest_ = Status::kNormal;
+
+		if (isCollisionLayer_.OnStay()) {
+			isCollisionLayer_ = false;
+			Collision(y);
+			velocity_.x = 0.0f;
+			velocity_.y = 0.0f;
+			isFly_ = false;
+			statusRequest_ = Status::kNormal;
+			models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
+		}
+		else {
+
+			isCollisionLayer_ = true;
+
+			velocity_.y = std::fabsf(vect.y) * kLayerReboundCoefficient_;
+
+			rotateTime_ = 2.0f * velocity_.y / std::fabsf(kFallingGravity_) * FrameInfo::GetInstance()->GetDelta();
+			startRotate_ = models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z;
+
+			float pi = std::numbers::pi_v<float>;
+			float memo = startRotate_ / 2.0f / pi;
+			float moveSpeed = 100.0f;
+			if (startRotate_ >= 0) {
+				endRotate_ = 2.0f * pi * (static_cast<int>(memo));
+				float theta = endRotate_ - memo;
+
+				if (std::sinf(theta) <= 0) {
+					velocity_.x = std::fabsf(std::cosf(theta)) * moveSpeed;
+				}
+				else {
+					velocity_.x = -std::fabsf(std::cosf(theta)) * moveSpeed;
+				}
+				velocity_.x = std::sinf(theta) * moveSpeed;
+			}
+			else {
+				endRotate_ = -2.0f * pi * (static_cast<int>(memo));
+				float theta = endRotate_ - memo;
+
+				if (-std::sinf(theta) <= 0) {
+					velocity_.x = std::fabsf(std::cosf(theta)) * moveSpeed;
+				}
+				else {
+					velocity_.x = -std::fabsf(std::cosf(theta)) * moveSpeed;
+				}
+				velocity_.x = -std::sinf(theta) * moveSpeed;
+			}
+
+			rotateTimeCount_ = 0.0f;
+
+		}
 	}
 }
 
@@ -464,6 +529,92 @@ void Player::KnockBack(const Vector3& pos)
 	rotateTimeCount_ = 0.0f;
 
 	statusRequest_ = Status::kKnockBack;
+}
+
+void Player::Steped(const Vector3& pos)
+{
+	
+	float speed = velocity_.Length() * kReboundCoefficient_;
+
+	Vector3 vector = pos - tex_->pos;
+
+	if (vector.x == 0) {
+
+		if (UtilsLib::Random(0, 1) == 0) {
+			rotateAddAngle_ = 6.0f;
+		}
+		else {
+			rotateAddAngle_ = -6.0f;
+		}
+	}
+	else {
+		float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
+
+		if (angle >= std::numbers::pi_v<float> / 2) {
+			angle -= std::numbers::pi_v<float> / 2;
+		}
+		else if (angle <= -std::numbers::pi_v<float> / 2) {
+			angle += std::numbers::pi_v<float> / 2;
+		}
+		rotateAddAngle_ = angle * 4;
+	}
+
+	isCollisionEnemy_ = true;
+	velocity_ = vector.Normalize() * speed;
+
+}
+
+void Player::FallingCollision(Enemy* enemy)
+{
+	if (status_ == Status::kFalling) {
+		if (tex_->Collision(*enemy->GetTex())) {
+			if (status_ == Status::kFalling) {
+				isCollisionEnemy_ = true;
+				if (isCollisionEnemy_.OnEnter()) {
+
+					Vector3 vector = tex_->pos - enemy->GetTex()->pos;
+
+					float speed = velocity_.Length() * kReboundCoefficient_;
+
+					if (vector.y <= 0 && velocity_.y <= 0) {
+						velocity_.x = vector.Normalize().x * speed;
+						velocity_.y = -vector.Normalize().y * speed;
+					}
+					else {
+						velocity_ = vector.Normalize() * speed;
+					}
+					velocity_.z = 0;
+
+					if (velocity_.x == 0) {
+
+						velocity_.x = std::sinf(rotateAddAngle_) * UtilsLib::Random(2, 6);
+
+						/*if (std::fabsf(rotateAddAngle_) <= 0.5f) {
+							rotateAddAngle_ = rotateAddAngle_ * UtilsLib::Random(3, 6);
+						}
+						velocity_.x = -std::sinf(rotateAddAngle_) * velocity_.y;
+						velocity_.y = std::cosf(rotateAddAngle_) * velocity_.y;*/
+					}
+					else {
+
+						float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
+
+						if (angle >= std::numbers::pi_v<float> / 2) {
+							angle -= std::numbers::pi_v<float> / 2;
+						}
+						else if (angle <= -std::numbers::pi_v<float> / 2) {
+							angle += std::numbers::pi_v<float> / 2;
+						}
+						rotateAddAngle_ = angle * 6;
+					}
+					isCollisionLayer_ = false;
+				}
+			}
+		}
+		else {
+			isCollisionEnemy_ = false;
+		}
+	}
 }
 
 void Player::Collision(const float& y) {

@@ -11,6 +11,8 @@ class GameScene;
 
 class Camera;
 
+class Enemy;
+
 class Player
 {
 public:
@@ -99,6 +101,10 @@ public:
 
 	void KnockBack(const Vector3& pos);
 
+	void Steped(const Vector3& pos);
+
+	void FallingCollision(Enemy* enemy);
+
 private:
 
 	/// <summary>
@@ -164,18 +170,28 @@ private:
 
 	/// <summary>
 	/// 最も高い位置の数値の保存
-	/// </summary>
+	/// <summary>
 	void MemoHighest();
 	
 private:
 
 	float rotateAddAngle_;
 
+	float startRotate_;
+
 	float endRotate_;
 
 	float rotateTimeCount_;
 
 	float rotateTime_;
+
+	float kReboundCoefficient_ = 0.9f;
+
+	float kLayerReboundCoefficient_ = 0.6f;
+
+	UtilsLib::Flg isCollisionLayer_;
+
+	UtilsLib::Flg isCollisionEnemy_;
 
 	GameScene* play_ = nullptr;
 
