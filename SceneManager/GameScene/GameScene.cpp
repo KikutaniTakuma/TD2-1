@@ -814,9 +814,9 @@ void GameScene::Update() {
 
 #ifdef _DEBUG
 
-	if (input_->GetKey()->Pushed(DIK_RETURN)) {
+	/*if (input_->GetKey()->Pushed(DIK_RETURN)) {
 		sceneManager_->SceneChange(new ResultScene{});
-	}
+	}*/
 
 #endif // _DEBUG
 
