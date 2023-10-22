@@ -22,6 +22,8 @@ public:
 		kOnScaffolding, // 足場の上に乗っている時
 		kLanding, // 着地
 		kFalling, // 落ちている
+		kKnockBack, // ノックバック
+
 	};
 
 	// モデルのパーツ
@@ -154,6 +156,10 @@ private:
 	/// </summary>
 	void FallingUpdate(const float& y);
 
+	void KnockBackInitilize();
+
+	void KnockBackUpdate(const float& y);
+
 	void Collision(const float& y);
 
 	/// <summary>
@@ -162,6 +168,14 @@ private:
 	void MemoHighest();
 	
 private:
+
+	float rotateAddAngle_;
+
+	float endRotate_;
+
+	float rotateTimeCount_;
+
+	float rotateTime_;
 
 	GameScene* play_ = nullptr;
 
