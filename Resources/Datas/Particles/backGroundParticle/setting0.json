@@ -18,21 +18,21 @@
             0.0
         ],
         "Emitter_Size": [
-            1280.0,
-            720.0,
+            1260.0,
+            700.0,
             0.0
         ],
         "Emitter_Type": 0,
-        "Emitter_vaildTime": 1000,
+        "Emitter_vaildTime": 10000,
         "Particle_colorEase": 0,
-        "Particle_colorFirst": 0,
+        "Particle_colorFirst": 255,
         "Particle_colorSecond": 0,
-        "Particle_deathFirst": 0,
-        "Particle_deathSecond": 0,
+        "Particle_deathFirst": 2000,
+        "Particle_deathSecond": 3000,
         "Particle_ease": 0,
-        "Particle_freqFirst": 0,
-        "Particle_freqSecond": 0,
-        "Particle_isSameHW": 0,
+        "Particle_freqFirst": 200,
+        "Particle_freqSecond": 300,
+        "Particle_isSameHW": 1,
         "Particle_moveRotateFirst": [
             0.0,
             0.0,
@@ -43,8 +43,8 @@
             0.0,
             0.0
         ],
-        "Particle_particleNumFirst": 0,
-        "Particle_particleNumSecond": 0,
+        "Particle_particleNumFirst": 2,
+        "Particle_particleNumSecond": 5,
         "Particle_rotate1": [
             0.0,
             0.0,
@@ -53,25 +53,25 @@
         "Particle_rotate2": [
             0.0,
             0.0,
-            0.0
+            3.140000104904175
         ],
         "Particle_rotateEase": 0,
         "Particle_rotateSecond1": [
             0.0,
             0.0,
-            0.0
+            -6.269999980926514
         ],
         "Particle_rotateSecond2": [
             0.0,
             0.0,
-            0.0
+            6.269999980926514
         ],
         "Particle_size1": [
-            0.0,
+            30.0,
             0.0
         ],
         "Particle_size2": [
-            0.0,
+            50.0,
             0.0
         ],
         "Particle_sizeEase": 0,
@@ -80,7 +80,7 @@
             0.0
         ],
         "Particle_sizeSecond2": [
-            0.0,
+            10.0,
             0.0
         ],
         "Particle_velocity1": [

@@ -251,6 +251,10 @@ void ResultScene::Initialize() {
 	stageNumberTex_.scale *= 70.0f;
 
 	sceneManager_->isClearStage_[stageNumber_-1] = true;
+
+
+	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.ParticleStart();
 }
 
 void ResultScene::SetClearTime(std::chrono::milliseconds clearTime) {
@@ -349,9 +353,7 @@ void ResultScene::Update() {
 			}
 			nowChoose_ = std::clamp(nowChoose_, 0, 1);
 
-			nextStageMassage_.Debug("nextStageMassage_");
 			nextStageMassage_.Update();
-			stageSelectMassage_.Debug("stageSelectMassage_");
 			stageSelectMassage_.Update();
 
 			if (nowChoose_ == 0) {
@@ -367,6 +369,8 @@ void ResultScene::Update() {
 			arrowEase_.Update();
 		}
 	}
+
+	backGroundParticle_.Update();
 
 	tenMinutes_.Update();
 	minutes_.Update();
@@ -416,6 +420,8 @@ void ResultScene::Draw() {
 		i.Draw(camera_.GetViewOthographics());
 	}
 	backGroundBlur_.Draw(Pipeline::None);
+
+	backGroundParticle_.Draw(camera_.GetViewOthographics(), Pipeline::Normal);
 
 	for (auto& model : models_) {
 		model.Draw(camera_.GetViewProjection(), camera_.GetPos());

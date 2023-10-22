@@ -158,6 +158,9 @@ private:
 	Texture2D stageTenNumberTex_;
 	int32_t stageNumber_;
 
+	// 背景パーティクル
+	Particle backGroundParticle_;
+
 	///
 	/// =============================================
 	/// 
