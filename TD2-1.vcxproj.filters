@@ -182,6 +182,9 @@
     <ClCompile Include="Result\Star\Star.cpp">
       <Filter>Result\Star</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager\TitleScene\TitleScene.cpp">
+      <Filter>SceneManager\TitleScene</Filter>
+    </ClCompile>
     <ClCompile Include="SceneManager\StageSelect\StageSelect.cpp">
       <Filter>SceneManager\StageSelect</Filter>
     </ClCompile>
@@ -363,6 +366,9 @@
     </Filter>
     <Filter Include="Result\Star">
       <UniqueIdentifier>{0763eb47-a13a-4fa0-a2fd-6ff026fce9c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\TitleScene">
+      <UniqueIdentifier>{aac3015f-815b-4311-a516-952af1ec124c}</UniqueIdentifier>
     </Filter>
     <Filter Include="SceneManager\StageSelect">
       <UniqueIdentifier>{56f30af1-2172-4084-9f60-eb33619b4ef6}</UniqueIdentifier>
@@ -557,6 +563,9 @@
     </ClInclude>
     <ClInclude Include="Result\Star\Star.h">
       <Filter>Result\Star</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\TitleScene\TitleScene.h">
+      <Filter>SceneManager\TitleScene</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager\StageSelect\StageSelect.h">
       <Filter>SceneManager\StageSelect</Filter>
