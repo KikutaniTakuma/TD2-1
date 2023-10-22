@@ -210,16 +210,20 @@ void Player::NormalUpdate(const float& y) {
 	Vector3 move = {};
 
 	// 左右移動
-	if (input_->GetKey()->LongPush(DIK_A) || input_->GetKey()->LongPush(DIK_LEFT)) {
+	if (input_->GetKey()->LongPush(DIK_A) || input_->GetKey()->LongPush(DIK_LEFT) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::LEFT) ||
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f) {
 		move.x--;
 	}
-	if (input_->GetKey()->LongPush(DIK_D) || input_->GetKey()->LongPush(DIK_RIGHT)) {
+	if (input_->GetKey()->LongPush(DIK_D) || input_->GetKey()->LongPush(DIK_RIGHT) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::RIGHT) ||
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f) {
 		move.x++;
 	}
 
 	// 空中にいる時の処理。
 	if (isFly_) {
-		if (input_->GetKey()->Pushed(DIK_SPACE)) {
+		if (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetGamepad()->Pushed(Gamepad::Button::A)) {
 			statusRequest_ = Status::kHipDrop;
 		}
 		/*else {
@@ -228,7 +232,8 @@ void Player::NormalUpdate(const float& y) {
 	}
 
 	// ジャンプ入力
-	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) || input_->GetKey()->Pushed(DIK_UP)))) {
+	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) ||
+		input_->GetKey()->Pushed(DIK_UP) || input_->GetGamepad()->Pushed(Gamepad::Button::A)))) {
 		isFly_ = true;
 		isStep_ = false;
 		// 初速を与える
