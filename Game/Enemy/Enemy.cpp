@@ -30,6 +30,10 @@ float Enemy::kFaintTime_ = 7.0f;
 
 float Enemy::kDeathTime_ = 5.0f;
 
+float Enemy::kHealTime_ = 7.0f;
+
+float Enemy::kHealerDeathTime_ = 10.0f;
+
 Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVector, int isHealer, float moveRadius) {
 
 	tex_ = std::make_unique<Texture2D>();
@@ -121,6 +125,10 @@ void Enemy::SetGlobalVariable() {
 
 	globalVariables_->AddItem(groupName_, "kDeathTime", kDeathTime_);
 
+	globalVariables_->AddItem(groupName_, "kHealerDeathTime", kHealerDeathTime_);
+
+	globalVariables_->AddItem(groupName_, "kHealTime", kHealTime_);
+
 	globalVariables_->LoadFile(groupName_);
 	ApplyGlobalVariable();
 }
@@ -140,10 +148,14 @@ void Enemy::ApplyGlobalVariable() {
 	kFaintTime_ = globalVariables_->GetFloatValue(groupName_, "kFaintTime");
 
 	kDeathTime_ = globalVariables_->GetFloatValue(groupName_, "kDeathTime");
+
+	kHealerDeathTime_ = globalVariables_->GetFloatValue(groupName_, "kHealerDeathTime");
+
+	kHealTime_ = globalVariables_->GetFloatValue(groupName_, "kHealTime");
+
 }
 
 void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int firstMoveVector, int isHealer, float moveRadius) {
-
 
 	if (type == static_cast<int>(Type::kFly)) {
 		type_ = Type::kFly;
@@ -232,6 +244,9 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 				}
 				isCollisionLayer_ = false;
 			}
+		}
+		else if (status_ == Status::kFaint || status_ == Status::kLeave) {
+			statusRequest_ = Status::kFaint;
 		}
 		else if (type_ == Type::kWalk && status_ == Status::kNormal && enemy->GetType() == Type::kWalk && enemy->GetStatus() == Status::kNormal) {
 
@@ -337,7 +352,7 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 		GenerationUpdate();
 		break;
 	case Enemy::Status::kNormal:
-		NormalUpdate(y);
+		NormalUpdate(y,layer);
 		break;
 	case Enemy::Status::kFalling:
 		FallingUpdate(y);
@@ -516,9 +531,11 @@ void Enemy::GenerationUpdate() {
 void Enemy::NormalInitialize() {
 
 	normalFallingSpeed_ = 0.0f;
+
+	timeCount_ = 0.0f;
 }
 
-void Enemy::NormalUpdate(const float y) {
+void Enemy::NormalUpdate(const float y, Layer* layer) {
 
 
 
@@ -532,6 +549,15 @@ void Enemy::NormalUpdate(const float y) {
 	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 
 	Collision(y);
+
+	if (isHealer_) {
+		timeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+		if (timeCount_ >= kHealTime_) {
+			timeCount_ = 0.0f;
+			layer->Heal();
+		}
+	}
 
 	if (firstMoveVector_ == 1 || firstMoveVector_ == 2) {
 		if (tex_->pos.x <= firstPos_.x - moveRadius_ || tex_->pos.x >= firstPos_.x + moveRadius_) {
@@ -685,16 +711,31 @@ void Enemy::DeathInitialize(Layer* layer) {
 
 void Enemy::DeathUpdate() {
 
-	timeCount_ += FrameInfo::GetInstance()->GetDelta();
+	if (isHealer_) {
+		timeCount_ += FrameInfo::GetInstance()->GetDelta();
 
-	float t = timeCount_ / kDeathTime_;
+		float t = timeCount_ / kHealerDeathTime_;
 
-	tex_->scale = Vector2(enemyScale_, enemyScale_) * (1.0f - t) + Vector2(0.0f, 0.0f) * t;
+		tex_->scale = Vector2(enemyScale_, enemyScale_) * (1.0f - t) + Vector2(0.0f, 0.0f) * t;
 
-	if (timeCount_ >= kDeathTime_) {
-		statusRequest_ = Status::kGeneration;
-		tex_->scale = {};
+		if (timeCount_ >= kHealerDeathTime_) {
+			statusRequest_ = Status::kGeneration;
+			tex_->scale = {};
 
+		}
+	}
+	else {
+		timeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+		float t = timeCount_ / kDeathTime_;
+
+		tex_->scale = Vector2(enemyScale_, enemyScale_) * (1.0f - t) + Vector2(0.0f, 0.0f) * t;
+
+		if (timeCount_ >= kDeathTime_) {
+			statusRequest_ = Status::kGeneration;
+			tex_->scale = {};
+
+		}
 	}
 }
 

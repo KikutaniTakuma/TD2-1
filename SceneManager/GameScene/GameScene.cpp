@@ -699,9 +699,10 @@ void GameScene::Collision() {
 
 		const Texture2D* enemyTex = enemy->GetTex();
 
+		player_->FallingCollision(enemy.get());
+
 		enemy->CollisionPlayer(player_.get());
 
-		player_->FallingCollision(enemy.get());
 
 		if (shockWaves_.size() != 0 && enemy->GetStatus() != Enemy::Status::kDeath && enemy->GetStatus() != Enemy::Status::kGeneration) {
 			for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
@@ -824,7 +825,7 @@ void GameScene::Draw() {
 
 	background_->Draw2D(camera2D_->GetViewOthographics());
 
-	layer_->Draw2DFar(camera2D_->GetViewOthographics());
+	//layer_->Draw2DFar(camera2D_->GetViewOthographics());
 
 	player_->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
 
@@ -855,7 +856,7 @@ void GameScene::Draw() {
 		shockWave->Draw2D(camera2D_->GetViewOthographics());
 	}
 
-	//layer_->Draw2DNear(camera2D_->GetViewOthographics());
+	layer_->Draw2DNear(camera2D_->GetViewOthographics());
 
 	//player_->Draw2D(camera2D_->GetViewOthographics());
 

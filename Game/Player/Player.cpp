@@ -605,7 +605,7 @@ void Player::FallingCollision(Enemy* enemy)
 						else if (angle <= -std::numbers::pi_v<float> / 2) {
 							angle += std::numbers::pi_v<float> / 2;
 						}
-						rotateAddAngle_ = angle * 6;
+						rotateAddAngle_ = angle * 4;
 					}
 					isCollisionLayer_ = false;
 				}

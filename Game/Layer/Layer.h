@@ -88,6 +88,8 @@ public:
 	/// </summary>
 	void AddDamage(int damage) { damage_ += damage; }
 
+	void Heal();
+
 	inline const std::chrono::milliseconds& GetPlayTime() const {
 		return gamePlayTime_;
 	}

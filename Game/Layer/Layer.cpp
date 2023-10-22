@@ -27,10 +27,10 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else if (i % 3 == 1) {
-			tex_[i]->color = 0xFF0000FF;
+			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else {
-			tex_[i]->color = 0xFFFF00FF;
+			tex_[i]->color = 0xFFFFFFFF;
 		}
 		tex_[i]->Update();
 
@@ -90,10 +90,10 @@ void Layer::ApplyGlobalVariable() {
 				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else if (i % 3 == 1) {
-				tex_[i]->color = 0xFF0000FF;
+				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else {
-				tex_[i]->color = 0xFFFF00FF;
+				tex_[i]->color = 0xFFFFFFFF;
 			}
 
 			models_.push_back(std::vector<std::unique_ptr<Model>>());
@@ -119,10 +119,10 @@ void Layer::ApplyGlobalVariable() {
 				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else if (i % 3 == 1) {
-				tex_[i]->color = 0xFF0000FF;
+				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else {
-				tex_[i]->color = 0xFFFF00FF;
+				tex_[i]->color = 0xFFFFFFFF;
 			}
 
 
@@ -142,10 +142,10 @@ void Layer::Reset() {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else if (i % 3 == 1) {
-			tex_[i]->color = 0xFF0000FF;
+			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else {
-			tex_[i]->color = 0xFFFF00FF;
+			tex_[i]->color = 0xFFFFFFFF;
 		}
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
@@ -254,6 +254,12 @@ void Layer::Update(const Camera* camera) {
 	}
 }
 
+void Layer::Heal() {
+	if (hitPoints_[nowLayer_] != kMaxHitPoints_[nowLayer_]) {
+		hitPoints_[nowLayer_]++;
+	}
+}
+
 void Layer::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 	for (int i = 0; i < kMaxLayerNum_; i++) {
 		if (hitPoints_[i] != 0) {
@@ -271,11 +277,12 @@ void Layer::Draw2DFar(const Mat4x4& viewProjection) {
 
 void Layer::Draw2DNear(const Mat4x4& viewProjection) {
 
-	for (int i = 0; i < kMaxLayerNum_; i++) {
+	/*for (int i = 0; i < kMaxLayerNum_; i++) {
 		if (hitPoints_[i] != 0) {
 			tex_[i]->Draw(viewProjection, Pipeline::Normal, false);
 		}
-	}
+	}*/
+	gauge_->Draw2D(viewProjection);
 }
 
 void Layer::TimerStart() {

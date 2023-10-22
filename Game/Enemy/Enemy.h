@@ -144,7 +144,7 @@ private:
 	/// <summary>
 	/// 通常のアップデート
 	/// </summary>
-	void NormalUpdate(const float y);
+	void NormalUpdate(const float y, Layer* layer);
 
 	/// <summary>
 	/// 落ちる時の初期化
@@ -220,6 +220,10 @@ private:
 	static float kFaintTime_;
 
 	static float kDeathTime_;
+
+	static float kHealTime_;
+
+	static float kHealerDeathTime_;
 
 private:
 
