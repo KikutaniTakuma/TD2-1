@@ -222,7 +222,7 @@ void StageSelect::Draw() {
 	arrowRight_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	arrowLeft_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 
-	if (sceneManager_->isClearStage_[currentStage_]) {
+	if (sceneManager_->isClearStage_[currentStage_-1]) {
 		isClearTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	}
 
