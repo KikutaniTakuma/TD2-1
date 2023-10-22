@@ -9,7 +9,7 @@
 
 Easeing::Easeing():
 #ifdef _DEBUG
-	easeType_(0),easeTime_(0.0f),
+	easeType_(0),easeTime_(1.0f),
 #endif // _DEBUG
 	ease_([](float num) {return num; }),
 	isActive_(false),
@@ -65,27 +65,20 @@ void Easeing::Stop() {
 
 void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 #ifdef _DEBUG
-	if (easeTime_ == 0.0f) {
-		spdT_ = 1.0f;
-	}
-	else {
-		spdT_ = 1.0f / easeTime_;
-	}
 	ImGui::Begin(debugName.c_str());
 	ImGui::SliderInt("easeType", &easeType_, 0, 30);
 	ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, std::numeric_limits<float>::max());
-	if(easeTime_ == 0.0f){
-		spdT_ = 1.0f;
-	}
-	else {
-		spdT_ = 1.0f / easeTime_;
-	}
 	ImGui::Checkbox("isLoop", isLoop_.Data());
 	if (ImGui::Button("Start")) {
 		isActive_ = true;
 		t_ = 0.0f;
 
-	    spdT_ = 1.0f / easeTime_;
+		if (easeTime_ == 0.0f) {
+			spdT_ = 1.0f;
+		}
+		else {
+			spdT_ = 1.0f / easeTime_;
+		}
 
 		ease_ = GetFunction(easeType_);
 	}

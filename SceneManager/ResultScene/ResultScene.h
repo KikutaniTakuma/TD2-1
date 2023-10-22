@@ -1,11 +1,11 @@
 #pragma once
 #include "SceneManager/SceneManager.h"
+#include "Drawers/PeraRender/PeraRender.h"
 #include "Drawers/Model/Model.h"
 #include "Drawers/Texture2D/Texture2D.h"
 #include "Drawers/Particle/Particle.h"
 #include "GlobalVariables/GlobalVariables.h"
 #include "Result/Star/Star.h"
-#include "Drawers/PeraRender/PeraRender.h"
 
 class ResultScene : public BaseScene {
 /// <summary>
