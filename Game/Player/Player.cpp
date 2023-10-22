@@ -163,6 +163,15 @@ void Player::Update(const float& y, const Camera* camera) {
 		break;
 	}
 
+	if (tex_->pos.x - tex_->scale.x < -640) {
+		tex_->pos.x -= tex_->pos.x - tex_->scale.x + 640;
+		velocity_.x *= -1;
+	}
+	else if (tex_->pos.x + tex_->scale.x > 640) {
+		tex_->pos.x -= tex_->pos.x + tex_->scale.x - 640;
+		velocity_.x *= -1;
+	}
+
 	float ratio = static_cast<float>(Engine::GetInstance()->clientHeight) /
 		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
 

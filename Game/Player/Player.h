@@ -105,6 +105,8 @@ public:
 
 	void FallingCollision(Enemy* enemy);
 
+	bool GetIsFly() { return isFly_; }
+
 private:
 
 	/// <summary>

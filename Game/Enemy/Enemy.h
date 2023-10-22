@@ -243,6 +243,8 @@ private:
 
 	int firstMoveVector_;
 
+	bool isCollisionType_ = false;
+
 	bool isChange_;
 
 	Vector3 moveVector_;
