@@ -701,7 +701,7 @@ void GameScene::Collision() {
 
 		enemy->CollisionPlayer(player_.get());
 
-		if (shockWaves_.size() != 0) {
+		if (shockWaves_.size() != 0 && enemy->GetStatus() != Enemy::Status::kDeath && enemy->GetStatus() != Enemy::Status::kGeneration) {
 			for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
 				const std::list<std::unique_ptr<Texture2D>>& shockWaveTextures = shockWave->GetTextures();
 
