@@ -3,7 +3,7 @@
         "kFallingGravity": -60.0,
         "kGravity": -20.0,
         "kHipDropSpeed": -60.0,
-        "kJampInitialVelocity": 10.5,
-        "kMoveSpeed": 200.0
+        "kJampInitialVelocity": 10.699999809265137,
+        "kMoveSpeed": 225.0
     }
 }

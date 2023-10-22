@@ -1,10 +1,12 @@
 {
     "StaticEnemy": {
         "kDeathTime": 1.5,
-        "kEnemyScale": 40.0,
+        "kEnemyScale": 50.0,
         "kFaintTime": 2.0,
-        "kFallingSpeed": -9.800000190734863,
+        "kFallingSpeed": -20.0,
         "kGenerationTime": 2.0,
+        "kHealTime": 7.0,
+        "kHealerDeathTime": 10.0,
         "kLeaveTime": 1.0,
         "kMoveSpeed": 50.0
     }
