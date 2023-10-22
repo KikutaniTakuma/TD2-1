@@ -47,5 +47,6 @@ private:
 	// 床
 	Texture2D floor_;
 
-	//Particle backGroundParticle_;
+	// 背景パーティクル
+	Particle backGroundParticle_;
 };

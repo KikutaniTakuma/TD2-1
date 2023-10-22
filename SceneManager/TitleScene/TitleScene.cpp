@@ -57,7 +57,8 @@ void TitleScene::Initialize() {
 	floor_.scale = Vector2{ 1280.0f, 112.0f };
 	floor_.pos.y = -303.0f;
 
-	//backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.ParticleStart();
 }
 
 void TitleScene::Finalize() {
@@ -76,6 +77,7 @@ void TitleScene::Update() {
 	floor_.Update();
 	playerScaleEaseing_.Update();
 	playerPosEaseing_.Update();
+	backGroundParticle_.Update();
 
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
@@ -96,11 +98,11 @@ void TitleScene::Draw() {
 		i.Draw(camera_.GetViewOthographics());
 	}
 	backGroundBlur_.Draw(Pipeline::None);
+	backGroundParticle_.Draw(camera_.GetViewOthographics());
 
 	floor_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	titleTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 
 	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
 
-	//backGroundParticle_.Draw(camera_.GetViewOthographics());
 }
