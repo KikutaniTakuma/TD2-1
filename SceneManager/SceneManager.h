@@ -2,8 +2,9 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
-#include "Utils/Camera/Camera.h"
 #include <vector>
+#include <bitset>
+#include "Utils/Camera/Camera.h"
 #include "Fade/Fade.h"
 #include "MeshManager/MeshManager.h"
 #include "TextureManager/TextureManager.h"
@@ -12,6 +13,8 @@
 #include "Input/Input.h"
 
 class BaseScene {
+	friend class SceneManager;
+
 public:
 	enum class ID {
 		Game,
@@ -55,8 +58,6 @@ protected:
 
 	Input* input_;
 
-	static bool isPad_;
-
 	BaseScene::ID sceneID_;
 
 protected:
@@ -87,6 +88,11 @@ public:
 
 	void Game();
 
+public:
+	inline bool GetIsPad() const {
+		return isPad_;
+	}
+
 private:
 	std::unique_ptr<BaseScene> scene_;
 	std::unique_ptr<BaseScene> next_;
@@ -97,4 +103,9 @@ private:
 
 	FrameInfo* frameInfo_;
 	Input* input_;
+
+	bool isPad_;
+
+public:
+	std::bitset<10> isClearStage_;
 };

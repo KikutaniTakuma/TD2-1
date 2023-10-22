@@ -70,6 +70,8 @@ void GameScene::Initialize() {
 	scaffoldings_.clear();
 
 	ScaffoldingGeneration();
+
+	startTime_ = std::chrono::steady_clock::now();
 }
 
 void GameScene::Finalize() {
@@ -731,8 +733,15 @@ void GameScene::Update() {
 
 #ifdef _DEBUG
 
-	if (input_->GetKey()->Pushed(DIK_RETURN)) {
-		sceneManager_->SceneChange(new ResultScene{});
+	if (layer_->GetClearFlag().OnEnter()) {
+		auto nowTime = std::chrono::steady_clock::now();
+		std::chrono::milliseconds playTime = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
+
+		auto result = new ResultScene{};
+		assert(result);
+		result->SetClearTime(playTime);
+		result->SetStageNumber(stage_ + 1);
+		sceneManager_->SceneChange(result);
 	}
 
 #endif // _DEBUG

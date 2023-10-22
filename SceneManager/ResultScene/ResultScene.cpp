@@ -1,6 +1,8 @@
 #include "ResultScene.h"
 #include "Engine/WinApp/WinApp.h"
 #include "externals/imgui/imgui.h"
+#include "SceneManager/GameScene/GameScene.h"
+#include "SceneManager/StageSelect/StageSelect.h"
 
 ResultScene::ResultScene():
 	BaseScene(BaseScene::ID::Result),
@@ -28,7 +30,8 @@ ResultScene::ResultScene():
 	stageSelectMassage_(),
 	arrow_(),
 	nowChoose_(),
-	isCanSelect_(false)
+	isCanSelect_(false),
+	stageNumber_()
 {
 	clearTimeBasis_ = {
 		std::chrono::milliseconds{30000},  // 30秒
@@ -246,6 +249,8 @@ void ResultScene::Initialize() {
 		stageNumberTex_.pos = Vector2{ 380, 260 };
 	}
 	stageNumberTex_.scale *= 70.0f;
+
+	sceneManager_->isClearStage_[stageNumber_-1] = true;
 }
 
 void ResultScene::SetClearTime(std::chrono::milliseconds clearTime) {
@@ -331,7 +336,7 @@ void ResultScene::Update() {
 				input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f
 				)
 			{
-				nowChoose_++;
+				nowChoose_--;
 			}
 			else if (
 				input_->GetKey()->Pushed(DIK_S) ||
@@ -340,14 +345,14 @@ void ResultScene::Update() {
 				input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f
 				)
 			{
-				nowChoose_--;
+				nowChoose_++;
 			}
 			nowChoose_ = std::clamp(nowChoose_, 0, 1);
 
 			nextStageMassage_.Update();
 			stageSelectMassage_.Update();
 
-			if (nowChoose_ == 1) {
+			if (nowChoose_ == 0) {
 				arrow_.pos.y = arrowPosY_.first;
 			}
 			else {
@@ -380,6 +385,25 @@ void ResultScene::Update() {
 
 	timer_.Update();
 	timerUI_.Update();
+
+	if (input_->GetKey()->Pushed(DIK_SPACE) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::A)
+		) {
+		if (nowChoose_ == 0) {
+			auto gameScene = new GameScene;
+			assert(gameScene);
+			gameScene->SetStageNumber(stageNumber_);
+
+			sceneManager_->SceneChange(gameScene);
+		}
+		// ここはタイトルになる予定
+		else {
+			auto stageSelect = new StageSelect;
+			assert(stageSelect);
+
+			sceneManager_->SceneChange(stageSelect);
+		}
+	}
 }
 
 void ResultScene::Draw() {
@@ -431,7 +455,7 @@ void ResultScene::Draw() {
 	colon2_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	resultUI_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	stageNumberTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	if (10 <= stageNumber_) {
+	if (static_cast<int32_t>(sceneManager_->isClearStage_.size()) <= stageNumber_) {
 		stageTenNumberTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	}
 	player_.Draw(camera_.GetViewOthographics(), camera_.pos);

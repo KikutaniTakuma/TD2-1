@@ -1,8 +1,6 @@
 #include "SceneManager.h"
 #include "Engine/Engine.h"
 
-bool BaseScene::isPad_ = false;
-
 BaseScene::BaseScene(BaseScene::ID sceneID):
 	sceneManager_(nullptr),
 	meshManager_(nullptr),
@@ -58,6 +56,13 @@ void SceneManager::SceneChange(BaseScene* next) {
 }
 
 void SceneManager::Update() {
+	if (input_->GetGamepad()->PushAnyKey()) {
+		isPad_ = true;
+	}
+	else if (input_->GetMouse()->PushAnyKey() || input_->GetKey()->PushAnyKey()) {
+		isPad_ = false;
+	}
+
 	if (scene_ && !next_ && !fade_->InStay()) {
 		scene_->Update();
 	}

@@ -135,6 +135,13 @@ private:
 	/// </summary>
 	void Collision();
 
+public:
+	// ステージ番号のセッター
+	void SetStageNumber(int32_t stage) {
+		stage_ = stage;
+		preStage_ = stage_;
+	}
+
 private:
 
 	// グローバル変数
@@ -218,6 +225,10 @@ private:
 
 	// ステージ毎の、それぞれの足場のスケール
 	std::vector<std::vector<Vector2>> scaffoldingScales_;
+
+
+	// プレイ時間
+	std::chrono::steady_clock::time_point startTime_;
 
 	///
 	/// =============================================
