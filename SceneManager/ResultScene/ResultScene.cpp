@@ -157,19 +157,19 @@ void ResultScene::Initialize() {
 	timerUI_.pos = { 243.0f, 107.0f, 0.01f };
 
 	// ステージセレクトUI
-	nextStageMassage_.LoadTexture("./Resources/Result/stageSelect_UI_stage.png");
-	nextStageMassage_.texScalar = 0.47f;
+	nextStageMassage_.LoadTexture("./Resources/Result/result_UI_next.png");
+	nextStageMassage_.texScalar = 0.37f;
 	nextStageMassage_.isSameTexSize = true;
-	nextStageMassage_.pos = { 423.0f, -246.0f, 0.01f };
-	stageSelectMassage_.LoadTexture("./Resources/Result/stageSelect_UI_titlehe.png");
-	stageSelectMassage_.texScalar = 0.45f;
+	nextStageMassage_.pos = { 447.0f, -208.0f, 0.01f };
+	stageSelectMassage_.LoadTexture("./Resources/Result/result_UI_stageSele.png");
+	stageSelectMassage_.texScalar = 0.35f;
 	stageSelectMassage_.isSameTexSize = true;
-	stageSelectMassage_.pos = { 449.0f, -292.0f, 0.01f };
+	stageSelectMassage_.pos = { 457.0f, -290.0f, 0.01f };
 	
 	arrow_.LoadTexture("./Resources/Result/arrow.png");
 	arrow_.texScalar = 0.23f;
 	arrow_.isSameTexSize = true;
-	arrow_.pos = { 242.0f, -212.0f, 0.01f };
+	arrow_.pos = { 232.0f, -212.0f, 0.01f };
 
 	arrowPosY_ = { -212.0f, -293.0f };
 	arrowPosX_ = { arrow_.pos.x - 10.0f, arrow_.pos.x + 10.0f };
@@ -349,7 +349,9 @@ void ResultScene::Update() {
 			}
 			nowChoose_ = std::clamp(nowChoose_, 0, 1);
 
+			nextStageMassage_.Debug("nextStageMassage_");
 			nextStageMassage_.Update();
+			stageSelectMassage_.Debug("stageSelectMassage_");
 			stageSelectMassage_.Update();
 
 			if (nowChoose_ == 0) {
