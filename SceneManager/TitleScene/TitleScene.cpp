@@ -77,7 +77,7 @@ void TitleScene::Initialize() {
 }
 
 void TitleScene::Finalize() {
-
+	bgm_->Stop();
 }
 
 void TitleScene::Update() {

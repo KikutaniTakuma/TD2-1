@@ -79,10 +79,13 @@ void GameScene::Initialize() {
 	backGroundParticle_.ParticleStart();
 
 	pause_.Initialize();
+
+	bgm_ = audioManager_->LoadWav("./Resources/Audio/BGM/BGM/game.wav", true);
+	bgm_->Start(0.1f);
 }
 
 void GameScene::Finalize() {
-
+	bgm_->Stop();
 }
 
 void GameScene::InitializeGlobalVariable() {
@@ -829,9 +832,9 @@ void GameScene::Update() {
 
 		layer_->Update(camera2D_.get());
 
-#ifdef _DEBUG
-
 		if (layer_->GetClearFlag().OnEnter()) {
+			bgm_->Stop();
+
 			auto nowTime = std::chrono::steady_clock::now();
 			std::chrono::milliseconds playTime = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
 
@@ -841,8 +844,6 @@ void GameScene::Update() {
 			result->SetStageNumber(stage_ + 1);
 			sceneManager_->SceneChange(result);
 		}
-
-#endif // _DEBUG
 	}
 
 	pause_.ActiveUpdate();
@@ -851,9 +852,17 @@ void GameScene::Update() {
 		) 
 	{
 		pause_.isActive_ = !pause_.isActive_;
+		if (pause_.isActive_) {
+			bgm_->SetAudio(0.025f);
+		}
+		else {
+			bgm_->SetAudio(0.1f);
+		}
 	}
 
 	backGroundParticle_.Update();
+
+	bgm_->Debug("bgm_");
 }
 
 void GameScene::Draw() {

@@ -217,19 +217,22 @@ void Layer::Update(const Camera* camera) {
 		hitPoints_[nowLayer_] = 0;
 
 		if (nowLayer_ == kMaxLayerNum_ - 1) {
-			breakEffect_.ParticleStart();
-
-			// クリア処理
-			isClear_ = true;
-
-			// クリアした時間を計算して代入
-			if (isClear_.OnEnter()) {
-				TimerStop();
+			if (!breakEffect_.GetIsParticleStart() && !breakEffect_.GetIsParticleStart().OnExit()) {
+				breakEffect_.ParticleStart();
 			}
 
-			// 今は仮で層のリセット
-			Reset();
+			if (breakEffect_.GetIsParticleStart().OnExit()) {
+				// クリア処理
+				isClear_ = true;
 
+				// クリアした時間を計算して代入
+				if (isClear_.OnEnter()) {
+					TimerStop();
+				}
+
+				//// 今は仮で層のリセット
+				//Reset();
+			}
 		}
 		else {
 			nowLayer_++;

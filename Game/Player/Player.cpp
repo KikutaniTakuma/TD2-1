@@ -7,6 +7,7 @@
 #include <numbers>
 #include "Game/Enemy/Enemy.h"
 #include "externals/imgui/imgui.h"
+#include "AudioManager/AudioManager.h"
 
 Player::Player() {
 	
@@ -99,6 +100,9 @@ void Player::Initialize() {
 
 	// 敵に踏まれたか
 	isSteped_ = false;
+
+	jumpSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/jamp1.wav", false);
+	fallSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/otiru.wav", false);
 }
 
 void Player::Update(const float& y, const Camera* camera) {
@@ -193,6 +197,9 @@ void Player::Update(const float& y, const Camera* camera) {
 
 	isCollisionLayer_.Update();
 	isCollisionEnemy_.Update();
+
+	jumpSE_->Debug("jumpSE_");
+	fallSE_->Debug("fallSE_");
 }
 
 void Player::NormalInitialize(const float& y) {
@@ -229,6 +236,9 @@ void Player::NormalUpdate(const float& y) {
 	if (isFly_) {
 		if (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetGamepad()->Pushed(Gamepad::Button::A)) {
 			statusRequest_ = Status::kHipDrop;
+
+			// 音を出す
+			fallSE_->Start(0.4f);
 		}
 		/*else {
 			velocity_.y += kGravity_ * deletaTime;
@@ -242,6 +252,9 @@ void Player::NormalUpdate(const float& y) {
 		isStep_ = false;
 		// 初速を与える
 		velocity_.y = kJampInitialVelocity_;
+
+		// 音を出す
+		jumpSE_->Start(0.4f);
 	}
 
 	if (isFallingGravity_) {

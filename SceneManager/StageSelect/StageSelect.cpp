@@ -126,7 +126,7 @@ void StageSelect::Initialize() {
 }
 
 void StageSelect::Finalize() {
-
+	bgm_->Stop();
 }
 
 void StageSelect::Update() {

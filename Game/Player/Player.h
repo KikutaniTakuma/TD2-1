@@ -248,4 +248,7 @@ private:
 
 	// 敵に踏まれたか
 	bool isSteped_;
+
+	class Audio* jumpSE_;
+	class Audio* fallSE_;
 };
