@@ -771,15 +771,6 @@ void Engine::FrameEnd() {
 		return;
 	}
 
-	// 描画先をRTVを設定する
-	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
-	auto dsvH = engine->dsvHeap->GetCPUDescriptorHandleForHeapStart();
-	engine->commandList->OMSetRenderTargets(1, &engine->rtvHandles[backBufferIndex], false, &dsvH);
-
-	// SRV用のヒープ
-	static auto srvDescriptorHeap = ShaderResourceHeap::GetInstance();
-
-	engine->commandList->SetDescriptorHeaps(1, srvDescriptorHeap->GetAddressOf());
 
 #ifdef _DEBUG
 	// ImGui描画
@@ -787,6 +778,8 @@ void Engine::FrameEnd() {
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), engine->commandList.Get());
 #endif // DEBUG
 
+	// 描画先をRTVを設定する
+	UINT backBufferIndex = engine->swapChain->GetCurrentBackBufferIndex();
 	Barrier(
 		engine->swapChainResource[backBufferIndex].Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
