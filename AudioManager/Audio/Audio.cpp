@@ -2,6 +2,7 @@
 #include <fstream>
 #include "AudioManager/AudioManager.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
+#include "externals/imgui/imgui.h"
 
 Audio::Audio():
 	wfet(),
@@ -9,7 +10,8 @@ Audio::Audio():
 	bufferSize(0u),
 	pSourceVoice(nullptr),
 	loopFlg(false),
-	isStart(false)
+	isStart(false),
+	volume_(1.0f)
 {}
 
 Audio::~Audio() {
@@ -152,4 +154,33 @@ void Audio::Stop() {
 	pSourceVoice = nullptr;
 
 	isStart = false;
+}
+
+void Audio::SetAudio(float volume) {
+	volume_ = volume;
+	if (pSourceVoice && isStart) {
+		pSourceVoice->SetVolume(volume_);
+	}
+}
+
+void Audio::Debug(const std::string& guiName) {
+#ifdef _DEBUG
+	ImGui::Begin(guiName.c_str());
+	ImGui::DragFloat("volume", &volume_, 0.001f, 0.0f, 1.0f);
+	ImGui::Checkbox("isLoop", &loopFlg);
+	if (ImGui::Button("start")) {
+		Start(volume_);
+	}
+	if (ImGui::Button("stop")) {
+		Stop();
+	}
+	if (ImGui::Button("ReStart")) {
+		ReStart();
+	}
+	if (ImGui::Button("pause")) {
+		Pause();
+	}
+
+	ImGui::End();
+#endif // _DEBUG
 }

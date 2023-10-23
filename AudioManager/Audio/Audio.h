@@ -40,6 +40,10 @@ public:
 		return isStart;
 	}
 
+	void SetAudio(float volume);
+
+	void Debug(const std::string& guiName);
+
 private:
 	void Load(const std::string& fileName, bool loopFlg_);
 
@@ -50,4 +54,5 @@ private:
 	IXAudio2SourceVoice* pSourceVoice;
 	bool loopFlg;
 	bool isStart;
+	float volume_;
 };
