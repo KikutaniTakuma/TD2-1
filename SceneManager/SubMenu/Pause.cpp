@@ -4,6 +4,7 @@
 #include "SceneManager/SceneManager.h"
 #include "SceneManager/StageSelect/StageSelect.h"
 #include "SceneManager/TitleScene/TitleScene.h"
+#include "AudioManager/AudioManager.h"
 
 void Pause::Initialize() {
 	backGround_.scale = WinApp::GetInstance()->GetWindowSize();
@@ -52,6 +53,15 @@ void Pause::Initialize() {
 	sceneManager_ = SceneManager::GetInstace();
 
 	currentChoose_ = 0;
+
+
+	audioManager_ = AudioManager::GetInstance();
+	audios_ = {
+		audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_kettei.wav", false),
+		audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_modoru.wav", false),
+		audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_sentaku.wav", false),
+		audioManager_->LoadWav("./Resources/Audio/kouka/kouka/pose.wav", false)
+	};
 }
 
 void Pause::Finalize() {
@@ -75,6 +85,7 @@ void Pause::Update() {
 		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f
 		) {
 		currentChoose_--;
+		audios_[2]->Start(1.0f);
 	}
 	else if (input_->GetKey()->Pushed(DIK_S) ||
 		input_->GetKey()->Pushed(DIK_DOWN) ||
@@ -82,6 +93,7 @@ void Pause::Update() {
 		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f
 		) {
 		currentChoose_++;
+		audios_[2]->Start(1.0f);
 	}
 
 	currentChoose_ = std::clamp(currentChoose_, 0, static_cast<int32_t>(arrowPosY_.size())-1);
@@ -95,12 +107,15 @@ void Pause::Update() {
 		) {
 		if (currentChoose_ == 0) {
 			isActive_ = false;
+			audios_[1]->Start(1.0f);
 		}
 		else if (currentChoose_ == 1) {
 			sceneManager_->SceneChange(new StageSelect{});
+			audios_[0]->Start(1.0f);
 		}
 		else if (currentChoose_ == 2) {
 			sceneManager_->SceneChange(new TitleScene{});
+			audios_[0]->Start(1.0f);
 		}
 	}
 
@@ -118,5 +133,9 @@ void Pause::Draw() {
 		goToGame_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 		pauseTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 		arrow_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+
+		if (isActive_.OnEnter()) {
+			audios_[3]->Start(1.0f);
+		}
 	}
 }

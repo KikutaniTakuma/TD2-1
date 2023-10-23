@@ -48,4 +48,7 @@ private:
 	
 	class Input* input_;
 	class SceneManager* sceneManager_;
+	class AudioManager* audioManager_;
+
+	std::array<class Audio*, 4> audios_;
 };
