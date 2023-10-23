@@ -4,7 +4,7 @@
         "Enemy0MoveRadius": 0.0,
         "Enemy0MoveVector": 0,
         "Enemy0Pos": [
-            -125.0,
+            -150.0,
             125.0,
             0.0
         ],
@@ -13,7 +13,7 @@
         "Enemy1MoveRadius": 0.0,
         "Enemy1MoveVector": 0,
         "Enemy1Pos": [
-            100.0,
+            125.0,
             125.0,
             0.0
         ],
@@ -22,7 +22,7 @@
         "Enemy2MoveRadius": 0.0,
         "Enemy2MoveVector": 0,
         "Enemy2Pos": [
-            -275.0,
+            -300.0,
             250.0,
             0.0
         ],
@@ -40,7 +40,7 @@
         "Enemy4MoveRadius": 0.0,
         "Enemy4MoveVector": 0,
         "Enemy4Pos": [
-            275.0,
+            300.0,
             250.0,
             0.0
         ],
@@ -49,7 +49,7 @@
         "Enemy5MoveRadius": 0.0,
         "Enemy5MoveVector": 0,
         "Enemy5Pos": [
-            125.0,
+            150.0,
             450.0,
             0.0
         ],
