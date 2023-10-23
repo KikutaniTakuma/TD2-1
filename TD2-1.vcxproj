@@ -204,6 +204,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="SceneManager\GameScene\GameScene.cpp" />
     <ClCompile Include="SceneManager\ResultScene\ResultScene.cpp" />
     <ClCompile Include="SceneManager\SceneManager.cpp" />
+    <ClCompile Include="SceneManager\SubMenu\SubMenu.cpp" />
     <ClCompile Include="SceneManager\TitleScene\TitleScene.cpp" />
     <ClCompile Include="SceneManager\StageSelect\StageSelect.cpp" />
     <ClCompile Include="TextureManager\TextureManager.cpp" />
@@ -277,6 +278,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="SceneManager\GameScene\GameScene.h" />
     <ClInclude Include="SceneManager\ResultScene\ResultScene.h" />
     <ClInclude Include="SceneManager\SceneManager.h" />
+    <ClInclude Include="SceneManager\SubMenu\SubMenu.h" />
     <ClInclude Include="SceneManager\TitleScene\TitleScene.h" />
     <ClInclude Include="SceneManager\StageSelect\StageSelect.h" />
     <ClInclude Include="TextureManager\TextureManager.h" />

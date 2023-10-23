@@ -101,10 +101,10 @@ private:
 
 	Camera fadeCamera_;
 
-	FrameInfo* frameInfo_;
-	Input* input_;
+	FrameInfo* frameInfo_ = nullptr;
+	Input* input_ = nullptr;
 
-	bool isPad_;
+	bool isPad_ = false;
 
 public:
 	std::bitset<10> isClearStage_;

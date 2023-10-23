@@ -188,6 +188,9 @@
     <ClCompile Include="SceneManager\StageSelect\StageSelect.cpp">
       <Filter>SceneManager\StageSelect</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager\SubMenu\SubMenu.cpp">
+      <Filter>SceneManager\SubMenu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -372,6 +375,12 @@
     </Filter>
     <Filter Include="SceneManager\StageSelect">
       <UniqueIdentifier>{56f30af1-2172-4084-9f60-eb33619b4ef6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\SubMenu">
+      <UniqueIdentifier>{e110b5d4-1bac-4391-98d0-9d7dcf1f4a61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager\SubMenu\Pause">
+      <UniqueIdentifier>{04a9be3d-ee96-4702-aed8-2163bdef5d5d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -569,6 +578,9 @@
     </ClInclude>
     <ClInclude Include="SceneManager\StageSelect\StageSelect.h">
       <Filter>SceneManager\StageSelect</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\SubMenu\SubMenu.h">
+      <Filter>SceneManager\SubMenu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
