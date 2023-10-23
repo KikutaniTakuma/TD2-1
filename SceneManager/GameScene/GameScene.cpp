@@ -845,6 +845,7 @@ void GameScene::Update() {
 #endif // _DEBUG
 	}
 
+	pause_.ActiveUpdate();
 	if (input_->GetKey()->Pushed(DIK_TAB) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::START)
 		) 
@@ -853,8 +854,6 @@ void GameScene::Update() {
 	}
 
 	backGroundParticle_.Update();
-
-	pause_.ActiveUpdate();
 }
 
 void GameScene::Draw() {

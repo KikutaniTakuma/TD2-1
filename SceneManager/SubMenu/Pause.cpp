@@ -85,7 +85,7 @@ void Pause::Update() {
 		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f
 		) {
 		currentChoose_--;
-		audios_[2]->Start(1.0f);
+		audios_[2]->Start(0.2f);
 	}
 	else if (input_->GetKey()->Pushed(DIK_S) ||
 		input_->GetKey()->Pushed(DIK_DOWN) ||
@@ -93,7 +93,7 @@ void Pause::Update() {
 		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f
 		) {
 		currentChoose_++;
-		audios_[2]->Start(1.0f);
+		audios_[2]->Start(0.2f);
 	}
 
 	currentChoose_ = std::clamp(currentChoose_, 0, static_cast<int32_t>(arrowPosY_.size())-1);
@@ -107,16 +107,20 @@ void Pause::Update() {
 		) {
 		if (currentChoose_ == 0) {
 			isActive_ = false;
-			audios_[1]->Start(1.0f);
+			audios_[1]->Start(0.2f);
 		}
 		else if (currentChoose_ == 1) {
 			sceneManager_->SceneChange(new StageSelect{});
-			audios_[0]->Start(1.0f);
+			audios_[0]->Start(0.125f);
 		}
 		else if (currentChoose_ == 2) {
 			sceneManager_->SceneChange(new TitleScene{});
-			audios_[0]->Start(1.0f);
+			audios_[0]->Start(0.125f);
 		}
+	}
+
+	for (size_t i = 0; i < audios_.size();i++) {
+		audios_[i]->Debug("se" + std::to_string(i));
 	}
 
 	arrowEase_.Update();
@@ -135,7 +139,10 @@ void Pause::Draw() {
 		arrow_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 
 		if (isActive_.OnEnter()) {
-			audios_[3]->Start(1.0f);
+			audios_[3]->Start(0.25f);
 		}
+	}
+	if (isActive_.OnExit()) {
+		audios_[1]->Start(0.2f);
 	}
 }
