@@ -77,6 +77,7 @@ void TitleScene::Update() {
 	floor_.Update();
 	playerScaleEaseing_.Update();
 	playerPosEaseing_.Update();
+	//backGroundParticle_.Debug("backGroundParticle_");
 	backGroundParticle_.Update();
 
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
