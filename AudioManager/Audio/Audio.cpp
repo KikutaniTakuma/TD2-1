@@ -164,7 +164,7 @@ void Audio::SetAudio(float volume) {
 	}
 }
 
-void Audio::Debug(const std::string& guiName) {
+void Audio::Debug([[maybe_unused]]const std::string& guiName) {
 #ifdef _DEBUG
 	ImGui::Begin(guiName.c_str());
 	ImGui::DragFloat("volume", &volume_, 0.001f, 0.0f, 1.0f);
