@@ -318,14 +318,19 @@ void Player::OnScaffoldingUpdate()
 	Vector3 move = {};
 
 	// 左右移動
-	if (input_->GetKey()->LongPush(DIK_A) || input_->GetKey()->LongPush(DIK_LEFT)) {
+	if (input_->GetKey()->LongPush(DIK_A) || input_->GetKey()->LongPush(DIK_LEFT) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::LEFT) ||
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f) {
 		move.x--;
 	}
-	if (input_->GetKey()->LongPush(DIK_D) || input_->GetKey()->LongPush(DIK_RIGHT)) {
+	if (input_->GetKey()->LongPush(DIK_D) || input_->GetKey()->LongPush(DIK_RIGHT) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::RIGHT) ||
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f) {
 		move.x++;
 	}
 
-	if ((!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) || input_->GetKey()->Pushed(DIK_UP)))) {
+	if ((!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) ||
+		input_->GetKey()->Pushed(DIK_UP) || input_->GetGamepad()->Pushed(Gamepad::Button::A)))) {
 		isFly_ = true;
 		isStep_ = false;
 		// 初速を与える
