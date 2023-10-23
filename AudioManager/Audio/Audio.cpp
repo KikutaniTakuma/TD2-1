@@ -107,6 +107,7 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 
 void Audio::Start(float volume) {
 	HRESULT hr;
+	volume_ = volume;
 
 	Stop();
 	if (!pSourceVoice) {
@@ -128,7 +129,7 @@ void Audio::Start(float volume) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Start() : Start() failed", "Audio");
 		return;
 	}
-	pSourceVoice->SetVolume(volume);
+	pSourceVoice->SetVolume(volume_);
 
 	isStart = true;
 }
@@ -167,17 +168,19 @@ void Audio::Debug(const std::string& guiName) {
 #ifdef _DEBUG
 	ImGui::Begin(guiName.c_str());
 	ImGui::DragFloat("volume", &volume_, 0.001f, 0.0f, 1.0f);
+	SetAudio(volume_);
+	
 	ImGui::Checkbox("isLoop", &loopFlg);
-	if (ImGui::Button("start")) {
+	if (ImGui::Button("Start")) {
 		Start(volume_);
 	}
-	if (ImGui::Button("stop")) {
+	if (ImGui::Button("Stop")) {
 		Stop();
 	}
 	if (ImGui::Button("ReStart")) {
 		ReStart();
 	}
-	if (ImGui::Button("pause")) {
+	if (ImGui::Button("Pause")) {
 		Pause();
 	}
 
