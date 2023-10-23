@@ -11,6 +11,8 @@ class GameScene;
 
 class Camera;
 
+class Enemy;
+
 class Player
 {
 public:
@@ -22,6 +24,8 @@ public:
 		kOnScaffolding, // 足場の上に乗っている時
 		kLanding, // 着地
 		kFalling, // 落ちている
+		kKnockBack, // ノックバック
+
 	};
 
 	// モデルのパーツ
@@ -95,6 +99,14 @@ public:
 
 	void CollisionScaffolding(const Texture2D* tex);
 
+	void KnockBack(const Vector3& pos);
+
+	void Steped(const Vector3& pos);
+
+	void FallingCollision(Enemy* enemy);
+
+	bool GetIsFly() { return isFly_; }
+
 private:
 
 	/// <summary>
@@ -152,14 +164,36 @@ private:
 	/// </summary>
 	void FallingUpdate(const float& y);
 
+	void KnockBackInitilize();
+
+	void KnockBackUpdate(const float& y);
+
 	void Collision(const float& y);
 
 	/// <summary>
 	/// 最も高い位置の数値の保存
-	/// </summary>
+	/// <summary>
 	void MemoHighest();
 	
 private:
+
+	float rotateAddAngle_;
+
+	float startRotate_;
+
+	float endRotate_;
+
+	float rotateTimeCount_;
+
+	float rotateTime_;
+
+	float kReboundCoefficient_ = 0.9f;
+
+	float kLayerReboundCoefficient_ = 0.6f;
+
+	UtilsLib::Flg isCollisionLayer_;
+
+	UtilsLib::Flg isCollisionEnemy_;
 
 	GameScene* play_ = nullptr;
 

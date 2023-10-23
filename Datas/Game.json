@@ -2,7 +2,7 @@
     "Game": {
         "Camera2DPos": [
             0.0,
-            0.0,
+            200.0,
             -10.0
         ],
         "kMaxStageNum": 4

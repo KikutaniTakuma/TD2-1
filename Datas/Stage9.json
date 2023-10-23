@@ -1,7 +1,6 @@
 {
-    "Stage1": {
+    "Stage9": {
         "Enemy0IsHealer": 0,
-        "Enemy0MoveRadius": 0.0,
         "Enemy0MoveVector": 0,
         "Enemy0Pos": [
             -200.0,

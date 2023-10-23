@@ -27,10 +27,10 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else if (i % 3 == 1) {
-			tex_[i]->color = 0xFF0000FF;
+			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else {
-			tex_[i]->color = 0xFFFF00FF;
+			tex_[i]->color = 0xFFFFFFFF;
 		}
 		tex_[i]->Update();
 
@@ -80,6 +80,7 @@ void Layer::ApplyGlobalVariable() {
 
 	if (static_cast<int>(tex_.size()) != kMaxLayerNum_) {
 		tex_.clear();
+		models_.clear();
 		for (int i = 0; i < kMaxLayerNum_; i++) {
 			tex_.push_back(std::make_unique<Texture2D>());
 			tex_[i]->scale = kLayer2DScale_;
@@ -89,11 +90,23 @@ void Layer::ApplyGlobalVariable() {
 				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else if (i % 3 == 1) {
-				tex_[i]->color = 0xFF0000FF;
+				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else {
-				tex_[i]->color = 0xFFFF00FF;
+				tex_[i]->color = 0xFFFFFFFF;
 			}
+
+			models_.push_back(std::vector<std::unique_ptr<Model>>());
+
+			for (int j = 0; j < static_cast<int>(Parts::kEnd); j++) {
+				models_[i].push_back(std::make_unique<Model>());
+			}
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
+
 			tex_[i]->Update();
 		}
 	}
@@ -106,11 +119,13 @@ void Layer::ApplyGlobalVariable() {
 				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else if (i % 3 == 1) {
-				tex_[i]->color = 0xFF0000FF;
+				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else {
-				tex_[i]->color = 0xFFFF00FF;
+				tex_[i]->color = 0xFFFFFFFF;
 			}
+
+
 			tex_[i]->Update();
 		}
 	}
@@ -127,10 +142,10 @@ void Layer::Reset() {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else if (i % 3 == 1) {
-			tex_[i]->color = 0xFF0000FF;
+			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else {
-			tex_[i]->color = 0xFFFF00FF;
+			tex_[i]->color = 0xFFFFFFFF;
 		}
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
@@ -147,6 +162,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 	nowLayer_ = 0;
 
 	tex_.clear();
+	models_.clear();
 
 	for (int i = 0; i < kMaxLayerNum_; i++) {
 		tex_.push_back(std::make_unique<Texture2D>());
@@ -162,6 +178,18 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 			tex_[i]->color = 0xFFFF00FF;
 		}
 		tex_[i]->LoadTexture("./Resources/white2x2.png");
+
+		models_.push_back(std::vector<std::unique_ptr<Model>>());
+
+		for (int j = 0; j < static_cast<int>(Parts::kEnd); j++) {
+			models_[i].push_back(std::make_unique<Model>());
+		}
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
+
 		tex_[i]->Update();
 	}
 
@@ -213,16 +241,22 @@ void Layer::Update(const Camera* camera) {
 		float ratio = static_cast<float>(Engine::GetInstance()->clientHeight) /
 			(std::tanf(camera->fov / 2) * (models_[i][static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
 
-		float indication = 200.0f;
+		float indication = 185.0f;
 
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->pos.x = tex_[i]->pos.x / ratio + camera->pos.x - camera->pos.x / ratio;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->pos.y = tex_[i]->pos.y / ratio + camera->pos.y - camera->pos.y / ratio;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.y = tex_[i]->scale.y / (indication * std::tanf(camera->fov / 2) * 2) *
 			(models_[i][static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
-		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.y;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.y * 10;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->Update();
 
 		tex_[i]->Update();
+	}
+}
+
+void Layer::Heal() {
+	if (hitPoints_[nowLayer_] != kMaxHitPoints_[nowLayer_]) {
+		hitPoints_[nowLayer_]++;
 	}
 }
 
@@ -243,11 +277,12 @@ void Layer::Draw2DFar(const Mat4x4& viewProjection) {
 
 void Layer::Draw2DNear(const Mat4x4& viewProjection) {
 
-	for (int i = 0; i < kMaxLayerNum_; i++) {
+	/*for (int i = 0; i < kMaxLayerNum_; i++) {
 		if (hitPoints_[i] != 0) {
 			tex_[i]->Draw(viewProjection, Pipeline::Normal, false);
 		}
-	}
+	}*/
+	gauge_->Draw2D(viewProjection);
 }
 
 void Layer::TimerStart() {

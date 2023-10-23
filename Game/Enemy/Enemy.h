@@ -5,10 +5,13 @@
 #include "Drawers/Model/Model.h"
 
 #include "GlobalVariables/GlobalVariables.h"
+#include "Utils/UtilsLib/UtilsLib.h"
 
 class Layer;
 
 class Camera;
+
+class Player;
 
 class Enemy
 {
@@ -20,6 +23,7 @@ public:
 		kNormal, // 通常時
 		kFalling, // 落ちている
 		kFaint, // 気絶
+		kLeave, // 離脱
 		kDeath, // 死亡
 	};
 
@@ -45,7 +49,7 @@ public:
 	/// <param name="pos">初期座標</param>
 	/// <param name="layerY">層の上のY座標</param>
 	/// <param name="scale">スケール</param>
-	Enemy(int type, const Vector3& pos, const float& layerY, float scale = 40.0f);
+	Enemy(int type, const Vector3& pos, const float& layerY,int firstMoveVector = 0, int isHealer = 0, float moveRadius = 0.0f);
 	~Enemy() = default;
 	
 
@@ -84,6 +88,8 @@ public:
 	/// <returns>状態</returns>
 	Status GetStatus() { return status_; }
 
+	Type GetType() { return type_; }
+
 	/// <summary>
 	/// テクスチャの参照。あたり判定用。
 	/// </summary>
@@ -103,7 +109,11 @@ public:
 	/// <summary>
 	/// 初期座標などのパラメーターをいれる
 	/// </summary>
-	void SetParametar(int type, const Vector3& pos, const float& y = 0);
+	void SetParametar(int type, const Vector3& pos, const float& y = 0, int firstMoveVector = 0, int isHealer = 0, float moveRadius = 0.0f);
+
+	void CollisionEnemy(Enemy* enemy);
+
+	void CollisionPlayer(Player* player);
 
 private:
 
@@ -120,7 +130,7 @@ private:
 	/// <summary>
 	/// 生成の初期化。登場時のパーティクルとか
 	/// </summary>
-	void GenerationInitialize();
+	void GenerationInitialize(const float y);
 
 	/// <summary>
 	/// 生成の更新
@@ -134,7 +144,7 @@ private:
 	/// <summary>
 	/// 通常のアップデート
 	/// </summary>
-	void NormalUpdate();
+	void NormalUpdate(const float y, Layer* layer);
 
 	/// <summary>
 	/// 落ちる時の初期化
@@ -144,6 +154,10 @@ private:
 	/// 落ちる時のアップデート
 	/// </summary>
 	void FallingUpdate(const float& y);
+
+	void LeaveInitialize();
+
+	void LeaveUpdate(const float& y);
 
 	/// <summary>
 	/// 落ち切った時の初期化
@@ -168,7 +182,18 @@ private:
 	/// </summary>
 	void Collision(const float& y);
 
+	void ModelUpdate(const Camera* camera);
+
+	void InitializeFirstMove(int move);
+
+	void InitializeFirstMove();
+
+	void InitializeIsHealer(int isHealer);
+
+	void InitializeMoveRadius(float radius);
+
 private:
+	
 
 	// 落下スピード
 	static float kFallingSpeed_;
@@ -179,6 +204,27 @@ private:
 	// 静的メンバ定数のグローバル変数のグループネーム
 	static const std::string groupName_;
 
+	// 反発係数
+	static float kReboundCoefficient_;
+	
+	static float kLayerReboundCoefficient_;
+
+	static float enemyScale_;
+
+	static float kMoveSpeed_;
+
+	static float kGenerationTime_;
+
+	static float kLeaveTime_;
+
+	static float kFaintTime_;
+
+	static float kDeathTime_;
+
+	static float kHealTime_;
+
+	static float kHealerDeathTime_;
+
 private:
 
 	// Enemyのテクスチャ
@@ -186,10 +232,28 @@ private:
 
 	std::vector<std::unique_ptr<Model>> models_;
 
+	float rotateAcceleration_;
+
+	float timeCount_;
+
 	// 初期座標の保存用。倒した敵を生成するのに使うイメージ。
 	Vector3 firstPos_;
 
 	Type type_;
+
+	int firstMoveVector_;
+
+	bool isCollisionType_ = false;
+
+	bool isChange_;
+
+	Vector3 moveVector_;
+
+	float moveRadius_;
+
+	float normalFallingSpeed_;
+
+	bool isHealer_;
 
 	// 今のエネミーの状態
 	Status status_ = Status::kGeneration;
@@ -200,5 +264,19 @@ private:
 	// 速度
 	Vector3 velocity_;
 
+	float rotateAddAngle_;
 
+	float fallingSpeed_;
+
+	float startRotate_;
+
+	float endRotate_;
+
+	float rotateTimeCount_;
+
+	float rotateTime_;
+
+	UtilsLib::Flg isCollisionEnemy_;
+
+	UtilsLib::Flg isCollisionLayer_;
 };
