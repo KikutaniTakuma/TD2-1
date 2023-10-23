@@ -111,6 +111,10 @@ void Enemy::SetGlobalVariable() {
 
 	globalVariables_->CreateGroup(groupName_);
 
+	globalVariables_->AddItem(groupName_, "kReboundCoefficient", kReboundCoefficient_);
+
+	globalVariables_->AddItem(groupName_, "kLayerReboundCoefficient", kLayerReboundCoefficient_);
+
 	globalVariables_->AddItem(groupName_, "kFallingSpeed", kFallingSpeed_);
 
 	globalVariables_->AddItem(groupName_, "kMoveSpeed", kMoveSpeed_);
@@ -134,6 +138,10 @@ void Enemy::SetGlobalVariable() {
 }
 
 void Enemy::ApplyGlobalVariable() {
+
+	kReboundCoefficient_ = globalVariables_->GetFloatValue(groupName_, "kReboundCoefficient");
+
+	kLayerReboundCoefficient_ = globalVariables_->GetFloatValue(groupName_, "kLayerReboundCoefficient");
 
 	kFallingSpeed_ = globalVariables_->GetFloatValue(groupName_, "kFallingSpeed");
 

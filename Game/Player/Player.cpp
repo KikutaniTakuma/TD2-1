@@ -47,11 +47,13 @@ Player::Player() {
 void Player::SetGlobalVariable() {
 	
 	globalVariables_->CreateGroup(groupName_);
-
+	globalVariables_->AddItem(groupName_, "kReboundCoefficient", kReboundCoefficient_);
+	globalVariables_->AddItem(groupName_, "kLayerReboundCoefficient", kLayerReboundCoefficient_);
 	globalVariables_->AddItem(groupName_, "kJampInitialVelocity", kJampInitialVelocity_);
 	globalVariables_->AddItem(groupName_, "kMoveSpeed", kMoveSpeed_);
 	globalVariables_->AddItem(groupName_, "kGravity", kGravity_);
 	globalVariables_->AddItem(groupName_, "kHipDropSpeed", kHipDropSpeed_);
+	globalVariables_->AddItem(groupName_, "kFallingGravity", kFallingGravity_);
 	globalVariables_->AddItem(groupName_, "kFallingGravity", kFallingGravity_);
 
 	globalVariables_->LoadFile(groupName_);
@@ -60,6 +62,8 @@ void Player::SetGlobalVariable() {
 
 void Player::ApplyGlobalVariable() {
 
+	kReboundCoefficient_ = globalVariables_->GetFloatValue(groupName_, "kReboundCoefficient");
+	kLayerReboundCoefficient_ = globalVariables_->GetFloatValue(groupName_, "kLayerReboundCoefficient");
 	kJampInitialVelocity_ = globalVariables_->GetFloatValue(groupName_, "kJampInitialVelocity");
 	kMoveSpeed_ = globalVariables_->GetFloatValue(groupName_, "kMoveSpeed");
 	kGravity_ = globalVariables_->GetFloatValue(groupName_, "kGravity");
