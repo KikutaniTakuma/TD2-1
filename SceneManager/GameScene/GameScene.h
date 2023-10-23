@@ -244,6 +244,7 @@ private:
 
 	// プレイ時間
 	std::chrono::steady_clock::time_point startTime_;
+	std::chrono::milliseconds playTime_;
 
 	// 背景パーティクル
 	Particle backGroundParticle_;
