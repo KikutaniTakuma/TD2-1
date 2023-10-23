@@ -40,6 +40,15 @@ void Audio::Load(const std::string& fileName, bool loopFlg_) {
 
 	FormatChunk format{};
 	file.read((char*)&format, sizeof(ChunkHeader));
+	while (strncmp(format.chunk.id.data(), "fmt ", 4) != 0) {
+		file.seekg(1, std::ios_base::cur);
+		file.read((char*)&format, sizeof(ChunkHeader));
+		if (file.eof()) {
+			ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found fmt", "Audio");
+			return;
+		}
+	}
+
 	if (strncmp(format.chunk.id.data(), "fmt ", 4) != 0) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Load() : Not found fmt", "Audio");
 		return;
