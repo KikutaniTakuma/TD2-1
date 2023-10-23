@@ -5,7 +5,7 @@
         "Enemy0MoveVector": 0,
         "Enemy0Pos": [
             -125.0,
-            100.0,
+            125.0,
             0.0
         ],
         "Enemy0Type": 0,
@@ -13,8 +13,8 @@
         "Enemy1MoveRadius": 0.0,
         "Enemy1MoveVector": 0,
         "Enemy1Pos": [
-            125.0,
             100.0,
+            125.0,
             0.0
         ],
         "Enemy1Type": 0,
@@ -28,7 +28,7 @@
         ],
         "Enemy2Type": 0,
         "Enemy3IsHealer": 0,
-        "Enemy3MoveRadius": 0.0,
+        "Enemy3MoveRadius": 1.0,
         "Enemy3MoveVector": 0,
         "Enemy3Pos": [
             0.0,
@@ -63,12 +63,30 @@
             0.0
         ],
         "Enemy6Type": 0,
-        "Layer0EnemyNum": 7,
+        "Layer0EnemyNum": 5,
         "Layer0HP": 4,
         "Layer0ScaffoldingNum": 0,
-        "Layer1EnemyNum": 3,
+        "Layer1EnemyNum": 7,
         "Layer1HP": 1,
         "Layer1ScaffoldingNum": 0,
-        "LayerNum": 1
+        "LayerNum": 1,
+        "Scaffolding0Pos": [
+            -450.0,
+            100.0,
+            0.0
+        ],
+        "Scaffolding0Scale": [
+            75.0,
+            10.0
+        ],
+        "Scaffolding1Pos": [
+            450.0,
+            100.0,
+            0.0
+        ],
+        "Scaffolding1Scale": [
+            100.0,
+            10.0
+        ]
     }
 }

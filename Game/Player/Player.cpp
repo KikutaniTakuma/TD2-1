@@ -638,7 +638,6 @@ void Player::FallingCollision(Enemy* enemy)
 			isCollisionEnemy_ = false;
 		}
 	}
-
 }
 
 void Player::Collision(const float& y) {
