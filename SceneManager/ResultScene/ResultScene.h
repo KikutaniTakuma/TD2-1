@@ -125,6 +125,15 @@ private:
 	Model player_;
 	std::pair<Vector3, Vector3> playerScale_;
 	Easeing playerScaleEase_;
+	std::vector<Texture*> playerAnimationTex_;
+	std::chrono::milliseconds playerAnimationDuration_;
+	std::chrono::steady_clock::time_point playerAnimationStartTime_;
+	int32_t currentPlayerAnimation_;
+	bool isPlayerAnimationTurnBack_;
+	std::chrono::milliseconds playerAnimationCoolTime_;
+	std::chrono::steady_clock::time_point playerAnimationCoolStartTime_;
+	bool isPlayerAnimationCoolTime_;
+
 
 	// タイマー
 	Texture2D timer_;
