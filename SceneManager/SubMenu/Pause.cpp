@@ -119,9 +119,9 @@ void Pause::Update() {
 		}
 	}
 
-	for (size_t i = 0; i < audios_.size();i++) {
+	/*for (size_t i = 0; i < audios_.size();i++) {
 		audios_[i]->Debug("se" + std::to_string(i));
-	}
+	}*/
 
 	arrowEase_.Update();
 }
