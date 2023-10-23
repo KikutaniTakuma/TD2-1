@@ -105,6 +105,8 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 	}
 
 	tex_->Update();
+
+	enemyStepOnParticle_.LopadSettingDirectory("smoke");
 }
 
 void Enemy::SetGlobalVariable() {
@@ -298,6 +300,8 @@ void Enemy::CollisionPlayer(Player* player) {
 						rotateAddAngle_ = angle * 6;
 					}
 
+					// ここ
+					enemyStepOnParticle_.ParticleStart();
 					player->EnemyStep(true);
 				}
 				else {
@@ -342,6 +346,8 @@ void Enemy::CollisionPlayer(Player* player) {
 						rotateAddAngle_ = angle * 6;
 					}
 
+					// ここ
+					enemyStepOnParticle_.ParticleStart();
 					player->EnemyStep(true);
 				}
 				else {
@@ -440,6 +446,9 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 
 	isCollisionEnemy_.Update();
 	isCollisionLayer_.Update();
+
+	enemyStepOnParticle_.emitterPos_ = tex_->pos;
+	enemyStepOnParticle_.Update();
 }
 
 void Enemy::Collision(const float& y) {
@@ -808,6 +817,11 @@ void Enemy::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 	for (const std::unique_ptr<Model>& model : models_) {
 		model->Draw(viewProjection, cameraPos);
 	}
+
+}
+
+void Enemy::DrawParticle(const Mat4x4& viewProjection) {
+	enemyStepOnParticle_.Draw(viewProjection);
 }
 
 void Enemy::Draw2D(const Mat4x4& viewProjection) {

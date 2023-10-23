@@ -198,6 +198,8 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 	TimerStart();
 
 	gamePlayTime_ = std::chrono::milliseconds(0);
+
+	breakEffect_.LopadSettingDirectory("break");
 }
 
 void Layer::Update(const Camera* camera) {
@@ -215,6 +217,7 @@ void Layer::Update(const Camera* camera) {
 		hitPoints_[nowLayer_] = 0;
 
 		if (nowLayer_ == kMaxLayerNum_ - 1) {
+			breakEffect_.ParticleStart();
 
 			// クリア処理
 			isClear_ = true;
@@ -231,6 +234,9 @@ void Layer::Update(const Camera* camera) {
 		else {
 			nowLayer_++;
 			hitPoints_[nowLayer_] = kMaxHitPoints_[nowLayer_];
+			// ここ
+
+			breakEffect_.ParticleStart();
 		}
 	}
 
@@ -252,6 +258,9 @@ void Layer::Update(const Camera* camera) {
 
 		tex_[i]->Update();
 	}
+
+
+	breakEffect_.Update();
 }
 
 void Layer::Heal() {
@@ -268,6 +277,10 @@ void Layer::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 			}
 		}
 	}
+}
+
+void Layer::ParticleDraw(const Mat4x4& viewProjections) {
+	breakEffect_.Draw(viewProjections);
 }
 
 void Layer::Draw2DFar(const Mat4x4& viewProjection) {

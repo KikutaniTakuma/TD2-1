@@ -12,6 +12,7 @@
 #include "Game/Layer/Layer.h"
 #include "Game/Scaffolding/Scaffolding.h"
 #include "Game/Background/Background.h"
+#include "SceneManager/SubMenu/Pause.h"
 
 class GameScene : public BaseScene {
 public:
@@ -243,6 +244,13 @@ private:
 
 	// プレイ時間
 	std::chrono::steady_clock::time_point startTime_;
+
+	// 背景パーティクル
+	Particle backGroundParticle_;
+
+
+	// ポーズ画面
+	Pause pause_;
 
 	///
 	/// =============================================

@@ -3,6 +3,7 @@
 #include "Utils/Math/Mat4x4.h"
 #include "Drawers/Texture2D/Texture2D.h"
 #include "Drawers/Model/Model.h"
+#include "Drawers/Particle/Particle.h"
 
 #include "GlobalVariables/GlobalVariables.h"
 #include "Utils/UtilsLib/UtilsLib.h"
@@ -68,6 +69,8 @@ public:
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
 	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
+
+	void DrawParticle(const Mat4x4& viewProjection);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
@@ -279,4 +282,8 @@ private:
 	UtilsLib::Flg isCollisionEnemy_;
 
 	UtilsLib::Flg isCollisionLayer_;
+
+
+	// 敵をぶち殺したときのエフェクト
+	Particle enemyStepOnParticle_;
 };

@@ -74,6 +74,11 @@ void GameScene::Initialize() {
 	ScaffoldingGeneration();
 
 	startTime_ = std::chrono::steady_clock::now();
+
+	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.ParticleStart();
+
+	pause_.Initialize();
 }
 
 void GameScene::Finalize() {
@@ -750,93 +755,106 @@ void GameScene::Collision() {
 }
 
 void GameScene::Update() {
-	if (cameraLocalPos_.y <= player_->GetTex()->pos.y) {
-		camera2D_->pos.y = player_->GetTex()->pos.y;
-	}
-	else {
-		camera2D_->pos.y = cameraLocalPos_.y;
-	}
+	if (!pause_.isActive_) {
 
-	camera2D_->Update();
-
-#ifdef _DEBUG
-
-	preStage_ = stage_;
-	preMaxStageNum_ = kMaxStageNum_;
-	preEnemyNums_ = enemyNums_;
-	preScaffoldingNums_ = scaffoldingNums_;
-	preLayerNums_ = kLayerNums_;
-
-	ImGui::Begin("PlayScene");
-	ImGui::SliderInt("NowStage 0 = 1stage", &stage_, 0, kMaxStageNum_ - 1);
-	ImGui::End();
-
-	globalVariables_->Update();
-
-	//SetGlobalVariable();
-	Enemy::GlobalVariablesUpdate();
-	ShockWave::GlobalVariablesUpdate();
-	ShockWave::ApplyGlobalVariable();
-	Layer::GlobalVariablesUpdate();
-
-#endif // _DEBUG
-
-	ApplyGlobalVariable();
-
-	if (kMaxStageNum_ <= 0) {
-		kMaxStageNum_ = 1;
-	}
-
-	EnemyGeneration();
-	ScaffoldingGeneration();
-
-#ifdef _DEBUG
-
-	SetEnemyParametar();
-	SetScaffoldingParametar();
-	CreateLayer();
-	SetLayerParametar();
-
-#endif // _DEBUG
-
-	background_->Update();
-
-	player_->Update(layer_->GetHighestPosY(), camera2D_.get());
-
-	int i = 0;
-
-	for (std::unique_ptr<Enemy>& enemy : enemies_) {
-		if (enemyNums_[stage_][layer_->GetNowLayer()] == i) {
-			break;
+		if (cameraLocalPos_.y <= player_->GetTex()->pos.y) {
+			camera2D_->pos.y = player_->GetTex()->pos.y;
 		}
-		enemy->Update(layer_.get(), layer_->GetHighestPosY(), camera2D_.get());
-		i++;
-	}
-	for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
-		shockWave->Update();
-	}
+		else {
+			camera2D_->pos.y = cameraLocalPos_.y;
+		}
 
-	DeleteShockWave();
-
-	Collision();
-
-	layer_->Update(camera2D_.get());
+		camera2D_->Update();
 
 #ifdef _DEBUG
 
-	if (layer_->GetClearFlag().OnEnter()) {
-		auto nowTime = std::chrono::steady_clock::now();
-		std::chrono::milliseconds playTime = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
+		preStage_ = stage_;
+		preMaxStageNum_ = kMaxStageNum_;
+		preEnemyNums_ = enemyNums_;
+		preScaffoldingNums_ = scaffoldingNums_;
+		preLayerNums_ = kLayerNums_;
 
-		auto result = new ResultScene{};
-		assert(result);
-		result->SetClearTime(playTime);
-		result->SetStageNumber(stage_ + 1);
-		sceneManager_->SceneChange(result);
-	}
+		ImGui::Begin("PlayScene");
+		ImGui::SliderInt("NowStage 0 = 1stage", &stage_, 0, kMaxStageNum_ - 1);
+		ImGui::End();
+
+		globalVariables_->Update();
+
+		//SetGlobalVariable();
+		Enemy::GlobalVariablesUpdate();
+		ShockWave::GlobalVariablesUpdate();
+		ShockWave::ApplyGlobalVariable();
+		Layer::GlobalVariablesUpdate();
 
 #endif // _DEBUG
 
+		ApplyGlobalVariable();
+
+		if (kMaxStageNum_ <= 0) {
+			kMaxStageNum_ = 1;
+		}
+
+		EnemyGeneration();
+		ScaffoldingGeneration();
+
+#ifdef _DEBUG
+
+		SetEnemyParametar();
+		SetScaffoldingParametar();
+		CreateLayer();
+		SetLayerParametar();
+
+#endif // _DEBUG
+
+		background_->Update();
+
+		player_->Update(layer_->GetHighestPosY(), camera2D_.get());
+
+		int i = 0;
+
+		for (std::unique_ptr<Enemy>& enemy : enemies_) {
+			if (enemyNums_[stage_][layer_->GetNowLayer()] == i) {
+				break;
+			}
+			enemy->Update(layer_.get(), layer_->GetHighestPosY(), camera2D_.get());
+			i++;
+		}
+		for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
+			shockWave->Update();
+		}
+
+		DeleteShockWave();
+
+		Collision();
+
+		layer_->Update(camera2D_.get());
+
+#ifdef _DEBUG
+
+		if (layer_->GetClearFlag().OnEnter()) {
+			auto nowTime = std::chrono::steady_clock::now();
+			std::chrono::milliseconds playTime = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
+
+			auto result = new ResultScene{};
+			assert(result);
+			result->SetClearTime(playTime);
+			result->SetStageNumber(stage_ + 1);
+			sceneManager_->SceneChange(result);
+		}
+
+#endif // _DEBUG
+	}
+
+	if (input_->GetKey()->Pushed(DIK_TAB) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::START)
+		) 
+	{
+		pause_.isActive_ = !pause_.isActive_;
+	}
+
+	backGroundParticle_.Update();
+
+	pause_.ActiveUpdate();
 }
 
 void GameScene::Draw() {
@@ -844,11 +862,14 @@ void GameScene::Draw() {
 
 	background_->Draw2D(camera2D_->GetViewOthographics());
 
+	backGroundParticle_.Draw(camera2D_->GetViewOthographics());
+
 	//layer_->Draw2DFar(camera2D_->GetViewOthographics());
 
 	player_->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
 
 	layer_->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
+	layer_->ParticleDraw(camera2D_->GetViewOthographics());
 
 	int i = 0;
 
@@ -857,6 +878,7 @@ void GameScene::Draw() {
 			break;
 		}
 		enemy->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
+		enemy->DrawParticle(camera2D_->GetViewOthographics());
 
 		//enemy->Draw2D(camera2D_->GetViewOthographics());
 		i++;
@@ -879,5 +901,5 @@ void GameScene::Draw() {
 
 	//player_->Draw2D(camera2D_->GetViewOthographics());
 
-
+	pause_.Draw();
 }
