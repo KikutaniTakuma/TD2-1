@@ -51,7 +51,4 @@ private:
 
 	// 背景パーティクル
 	Particle backGroundParticle_;
-
-	// ポーズ画面
-	Pause pause_;
 };
