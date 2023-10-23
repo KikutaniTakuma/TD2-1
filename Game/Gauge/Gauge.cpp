@@ -8,12 +8,14 @@ Gauge::Gauge() {
 
 	for (int i = 0; i < static_cast<int>(TextureNames::kEnd); i++) {
 		textures_.push_back(std::make_unique<Texture2D>());
-		textures_[i]->LoadTexture("./Resources/white2x2.png");
+		textures_[i]->LoadTexture("./Resources/Gauge/gage_nakami.png");
 	}
 
-	textures_[static_cast<int>(TextureNames::kMostBack)]->color = 0x111111FF;
+	textures_[static_cast<int>(TextureNames::kMostBack)]->LoadTexture("./Resources/Gauge/gage_flame.png");
+
+	textures_[static_cast<int>(TextureNames::kMostBack)]->color = 0xFFFFFFFF;
 	textures_[static_cast<int>(TextureNames::kGaugeBack)]->color = 0x444444FF;
-	textures_[static_cast<int>(TextureNames::kGaugeMain)]->color = 0x33FF99FF;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->color = 0xFFFFFFFF;
 
 	num_ = 1;
 	kMax_ = 1;

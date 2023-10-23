@@ -8,6 +8,7 @@
 #include "Drawers/Model/Model.h"
 
 #include "Utils/UtilsLib/UtilsLib.h"
+#include "Drawers/Particle/Particle.h"
 
 class Camera;
 
@@ -41,6 +42,8 @@ public:
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
 	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
+
+	void ParticleDraw(const Mat4x4& viewProjections);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
@@ -87,6 +90,8 @@ public:
 	/// ダメージの加算
 	/// </summary>
 	void AddDamage(int damage) { damage_ += damage; }
+
+	void Heal();
 
 	inline const std::chrono::milliseconds& GetPlayTime() const {
 		return gamePlayTime_;
@@ -152,4 +157,7 @@ private:
 
 	std::chrono::milliseconds gamePlayTime_;
 	std::chrono::steady_clock::time_point playStartTime_;
+
+	// 破壊時エフェクト
+	Particle breakEffect_;
 };
