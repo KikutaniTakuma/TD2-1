@@ -47,11 +47,13 @@ Player::Player() {
 void Player::SetGlobalVariable() {
 	
 	globalVariables_->CreateGroup(groupName_);
-
+	globalVariables_->AddItem(groupName_, "kReboundCoefficient", kReboundCoefficient_);
+	globalVariables_->AddItem(groupName_, "kLayerReboundCoefficient", kLayerReboundCoefficient_);
 	globalVariables_->AddItem(groupName_, "kJampInitialVelocity", kJampInitialVelocity_);
 	globalVariables_->AddItem(groupName_, "kMoveSpeed", kMoveSpeed_);
 	globalVariables_->AddItem(groupName_, "kGravity", kGravity_);
 	globalVariables_->AddItem(groupName_, "kHipDropSpeed", kHipDropSpeed_);
+	globalVariables_->AddItem(groupName_, "kFallingGravity", kFallingGravity_);
 	globalVariables_->AddItem(groupName_, "kFallingGravity", kFallingGravity_);
 
 	globalVariables_->LoadFile(groupName_);
@@ -60,6 +62,8 @@ void Player::SetGlobalVariable() {
 
 void Player::ApplyGlobalVariable() {
 
+	kReboundCoefficient_ = globalVariables_->GetFloatValue(groupName_, "kReboundCoefficient");
+	kLayerReboundCoefficient_ = globalVariables_->GetFloatValue(groupName_, "kLayerReboundCoefficient");
 	kJampInitialVelocity_ = globalVariables_->GetFloatValue(groupName_, "kJampInitialVelocity");
 	kMoveSpeed_ = globalVariables_->GetFloatValue(groupName_, "kMoveSpeed");
 	kGravity_ = globalVariables_->GetFloatValue(groupName_, "kGravity");
@@ -163,6 +167,15 @@ void Player::Update(const float& y, const Camera* camera) {
 		break;
 	}
 
+	if (tex_->pos.x - tex_->scale.x < -640) {
+		tex_->pos.x -= tex_->pos.x - tex_->scale.x + 640;
+		velocity_.x *= -1;
+	}
+	else if (tex_->pos.x + tex_->scale.x > 640) {
+		tex_->pos.x -= tex_->pos.x + tex_->scale.x - 640;
+		velocity_.x *= -1;
+	}
+
 	float ratio = static_cast<float>(Engine::GetInstance()->clientHeight) /
 		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
 
@@ -201,16 +214,20 @@ void Player::NormalUpdate(const float& y) {
 	Vector3 move = {};
 
 	// 左右移動
-	if (input_->GetKey()->LongPush(DIK_A) || input_->GetKey()->LongPush(DIK_LEFT)) {
+	if (input_->GetKey()->LongPush(DIK_A) || input_->GetKey()->LongPush(DIK_LEFT) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::LEFT) ||
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f) {
 		move.x--;
 	}
-	if (input_->GetKey()->LongPush(DIK_D) || input_->GetKey()->LongPush(DIK_RIGHT)) {
+	if (input_->GetKey()->LongPush(DIK_D) || input_->GetKey()->LongPush(DIK_RIGHT) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::RIGHT) ||
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f) {
 		move.x++;
 	}
 
 	// 空中にいる時の処理。
 	if (isFly_) {
-		if (input_->GetKey()->Pushed(DIK_SPACE)) {
+		if (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetGamepad()->Pushed(Gamepad::Button::A)) {
 			statusRequest_ = Status::kHipDrop;
 		}
 		/*else {
@@ -219,7 +236,8 @@ void Player::NormalUpdate(const float& y) {
 	}
 
 	// ジャンプ入力
-	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) || input_->GetKey()->Pushed(DIK_UP)))) {
+	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) ||
+		input_->GetKey()->Pushed(DIK_UP) || input_->GetGamepad()->Pushed(Gamepad::Button::A)))) {
 		isFly_ = true;
 		isStep_ = false;
 		// 初速を与える
@@ -304,14 +322,19 @@ void Player::OnScaffoldingUpdate()
 	Vector3 move = {};
 
 	// 左右移動
-	if (input_->GetKey()->LongPush(DIK_A) || input_->GetKey()->LongPush(DIK_LEFT)) {
+	if (input_->GetKey()->LongPush(DIK_A) || input_->GetKey()->LongPush(DIK_LEFT) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::LEFT) ||
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f) {
 		move.x--;
 	}
-	if (input_->GetKey()->LongPush(DIK_D) || input_->GetKey()->LongPush(DIK_RIGHT)) {
+	if (input_->GetKey()->LongPush(DIK_D) || input_->GetKey()->LongPush(DIK_RIGHT) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::RIGHT) ||
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f) {
 		move.x++;
 	}
 
-	if ((!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) || input_->GetKey()->Pushed(DIK_UP)))) {
+	if ((!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) ||
+		input_->GetKey()->Pushed(DIK_UP) || input_->GetGamepad()->Pushed(Gamepad::Button::A)))) {
 		isFly_ = true;
 		isStep_ = false;
 		// 初速を与える

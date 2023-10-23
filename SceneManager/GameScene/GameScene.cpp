@@ -18,6 +18,8 @@ GameScene::GameScene() {
 
 	camera2D_ = std::make_unique<Camera>();
 
+	cameraLocalPos_ = { 0.0f,200.0f,0.0f };
+
 	player_ = std::make_unique<Player>();
 	player_->SetGameScene(this);
 
@@ -364,7 +366,7 @@ void GameScene::ApplyGlobalVariable() {
 
 	kMaxStageNum_ = globalVariables_->GetIntValue("Game", "kMaxStageNum");
 
-	camera2D_->pos = globalVariables_->GetVector3Value("Game", "Camera2DPos");
+	cameraLocalPos_ = globalVariables_->GetVector3Value("Game", "Camera2DPos");
 
 	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
 
@@ -744,6 +746,14 @@ void GameScene::Collision() {
 }
 
 void GameScene::Update() {
+	if (cameraLocalPos_.y <= player_->GetTex()->pos.y) {
+		camera2D_->pos.y = player_->GetTex()->pos.y;
+	}
+	else {
+		camera2D_->pos.y = cameraLocalPos_.y;
+	}
+
+	camera2D_->Update();
 
 #ifdef _DEBUG
 
@@ -807,8 +817,6 @@ void GameScene::Update() {
 	Collision();
 
 	layer_->Update(camera2D_.get());
-
-	camera2D_->Update();
 
 #ifdef _DEBUG
 

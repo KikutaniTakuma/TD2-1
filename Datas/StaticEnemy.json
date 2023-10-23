@@ -1,13 +1,15 @@
 {
-    "StaticEnemy": {
-        "kDeathTime": 1.5,
-        "kEnemyScale": 50.0,
-        "kFaintTime": 2.0,
-        "kFallingSpeed": -20.0,
-        "kGenerationTime": 2.0,
-        "kHealTime": 7.0,
-        "kHealerDeathTime": 10.0,
-        "kLeaveTime": 1.0,
-        "kMoveSpeed": 50.0
-    }
+  "StaticEnemy": {
+    "kDeathTime": 1.5,
+    "kEnemyScale": 50.0,
+    "kFaintTime": 2.0,
+    "kFallingSpeed": -20.0,
+    "kGenerationTime": 2.0,
+    "kHealTime": 7.0,
+    "kHealerDeathTime": 10.0,
+    "kLeaveTime": 1.0,
+    "kLayerReboundCoefficient": 0.30000001192092896,
+    "kReboundCoefficient": 0.8999999761581421,
+    "kMoveSpeed": 50.0
+  }
 }
