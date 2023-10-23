@@ -146,6 +146,23 @@ void ResultScene::Initialize() {
 		Easeing::GetFunction(24)
 	);
 
+	playerAnimationTex_.reserve(5);
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face.png"));
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face2.png"));
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face3.png"));
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face4.png"));
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face5.png"));
+
+	playerAnimationDuration_ = std::chrono::milliseconds{ 66 };
+	currentPlayerAnimation_ = 0;
+	isPlayerAnimationTurnBack_ = false;
+	playerAnimationStartTime_ = std::chrono::steady_clock::now();
+
+	playerAnimationCoolTime_ = std::chrono::milliseconds{ 800 };
+	isPlayerAnimationCoolTime_ = true;
+	playerAnimationCoolStartTime_ = playerAnimationStartTime_;
+
+
 	// タイマーテクスチャ
 	timer_.LoadTexture("./Resources/Result/result_UI_time.png");
 	timer_.texScalar = 0.59f;
@@ -386,6 +403,25 @@ void ResultScene::Update() {
 
 	//playerScaleEase_.Debug("playerScaleEase_");
 	player_.scale = playerScaleEase_.Get(playerScale_.first, playerScale_.second);
+	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
+		isPlayerAnimationCoolTime_ = false;
+	}
+	
+	if (!isPlayerAnimationCoolTime_ && playerAnimationDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationStartTime_)) {
+		isPlayerAnimationTurnBack_ ? --currentPlayerAnimation_ : ++currentPlayerAnimation_;
+		if (currentPlayerAnimation_ >= static_cast<int32_t>(playerAnimationTex_.size())-1) {
+			isPlayerAnimationTurnBack_ = true;
+		}
+		else if (currentPlayerAnimation_ <= 0) {
+			isPlayerAnimationTurnBack_ = false;
+			isPlayerAnimationCoolTime_ = true;
+			playerAnimationCoolStartTime_ = nowTime;
+		}
+		currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(playerAnimationTex_.size())-1);
+		player_.ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]->GetFileName());
+		playerAnimationStartTime_ = nowTime;
+	}
+
 	player_.Update();
 	playerScaleEase_.Update();
 
