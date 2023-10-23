@@ -51,4 +51,7 @@ private:
 
 	// 背景パーティクル
 	Particle backGroundParticle_;
+
+	Audio* bgm_;
+	Audio* decideSE_;
 };

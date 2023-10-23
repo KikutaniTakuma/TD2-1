@@ -70,6 +70,10 @@ void TitleScene::Initialize() {
 	playerScaleEaseing_.Update();
 	playerPosEaseing_.Update();
 	backGroundParticle_.Update();
+
+	bgm_ = audioManager_->LoadWav("./Resources/Audio/BGM/BGM/title.wav", true);
+	decideSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_kettei.wav", false);
+	bgm_->Start(0.15f);
 }
 
 void TitleScene::Finalize() {
@@ -94,6 +98,9 @@ void TitleScene::Update() {
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
 		) {
+		bgm_->Stop();
+		decideSE_->Start(0.2f);
+
 
 		auto nextScene = new StageSelect{};
 		assert(nextScene);
