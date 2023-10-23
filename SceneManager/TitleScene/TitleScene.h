@@ -6,6 +6,8 @@
 #include "Utils/Easeing/Easeing.h"
 #include "Drawers/Particle/Particle.h"
 
+#include "SceneManager/SubMenu/Pause.h"
+
 class TitleScene : public BaseScene {
 public:
 	TitleScene();
@@ -49,4 +51,7 @@ private:
 
 	// 背景パーティクル
 	Particle backGroundParticle_;
+
+	// ポーズ画面
+	Pause pause_;
 };

@@ -72,6 +72,7 @@ void SceneManager::Update() {
 
 	if (fade_->OutEnd()) {
 		fade_->InStart();
+		scene_->Finalize();
 		scene_.reset(next_.release());
 		next_.reset();
 		scene_->Initialize();

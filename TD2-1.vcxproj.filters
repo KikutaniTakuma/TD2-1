@@ -191,6 +191,9 @@
     <ClCompile Include="SceneManager\SubMenu\SubMenu.cpp">
       <Filter>SceneManager\SubMenu</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager\SubMenu\Pause.cpp">
+      <Filter>SceneManager\SubMenu\Pause</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -581,6 +584,9 @@
     </ClInclude>
     <ClInclude Include="SceneManager\SubMenu\SubMenu.h">
       <Filter>SceneManager\SubMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager\SubMenu\Pause.h">
+      <Filter>SceneManager\SubMenu\Pause</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

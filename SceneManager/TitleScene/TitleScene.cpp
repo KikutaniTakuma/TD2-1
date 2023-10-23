@@ -59,6 +59,20 @@ void TitleScene::Initialize() {
 
 	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
 	backGroundParticle_.ParticleStart();
+
+	for (auto& i : backGround_) {
+		i.Update();
+	}
+
+	player_.Update();
+	titleTex_.Update();
+	floor_.Update();
+	playerScaleEaseing_.Update();
+	playerPosEaseing_.Update();
+	backGroundParticle_.Update();
+
+	pause_.Initialize();
+	pause_.isActive_ = true;
 }
 
 void TitleScene::Finalize() {
@@ -66,32 +80,36 @@ void TitleScene::Finalize() {
 }
 
 void TitleScene::Update() {
-	for (auto& i : backGround_) {
-		i.Update();
-	}
+	pause_.ActiveUpdate();
 
-	player_.scale = playerScaleEaseing_.Get(playerScale_.first, playerScale_.second);
-	player_.pos = playerPosEaseing_.Get(playerPos_.first, playerPos_.second);
-	player_.Update();
-	titleTex_.Update();
-	floor_.Update();
-	playerScaleEaseing_.Update();
-	playerPosEaseing_.Update();
-	//backGroundParticle_.Debug("backGroundParticle_");
-	backGroundParticle_.Update();
+	if(!pause_.isActive_) {
+		for (auto& i : backGround_) {
+			i.Update();
+		}
 
-	if (input_->GetKey()->Pushed(DIK_SPACE) ||
-		input_->GetGamepad()->Pushed(Gamepad::Button::A)
-		) {
+		player_.scale = playerScaleEaseing_.Get(playerScale_.first, playerScale_.second);
+		player_.pos = playerPosEaseing_.Get(playerPos_.first, playerPos_.second);
+		player_.Update();
+		titleTex_.Update();
+		floor_.Update();
+		playerScaleEaseing_.Update();
+		playerPosEaseing_.Update();
+		backGroundParticle_.Update();
 
-		auto nextScene = new StageSelect{};
-		assert(nextScene);
+		if (input_->GetKey()->Pushed(DIK_SPACE) ||
+			input_->GetGamepad()->Pushed(Gamepad::Button::A)
+			) {
 
-		sceneManager_->SceneChange(nextScene);
+			auto nextScene = new StageSelect{};
+			assert(nextScene);
+
+			sceneManager_->SceneChange(nextScene);
+		}
 	}
 }
 
 void TitleScene::Draw() {
+
 	camera_.Update();
 
 	backGroundBlur_.PreDraw();
@@ -106,4 +124,5 @@ void TitleScene::Draw() {
 
 	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
 
+	pause_.Draw();
 }

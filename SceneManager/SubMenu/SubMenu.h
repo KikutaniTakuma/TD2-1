@@ -1,5 +1,7 @@
 #pragma once
 #include "Utils/UtilsLib/UtilsLib.h"
+#include "Utils/Camera/Camera.h"
+
 
 class SubMenu {
 public:
@@ -23,4 +25,7 @@ protected:
 
 public:
 	UtilsLib::Flg isActive_;
+
+protected:
+	Camera camera_;
 };
