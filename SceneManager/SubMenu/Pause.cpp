@@ -62,6 +62,8 @@ void Pause::Initialize() {
 		audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_sentaku.wav", false),
 		audioManager_->LoadWav("./Resources/Audio/kouka/kouka/pose.wav", false)
 	};
+
+	isStick_ = false;
 }
 
 void Pause::Finalize() {
@@ -70,6 +72,11 @@ void Pause::Finalize() {
 
 void Pause::Update() {
 	arrow_.Debug("arrow_");
+
+	if (input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > -0.3f &&
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < 0.3f) {
+		isStick_ = false;
+	}
 
 	backGround_.Update();
 	backGround2_.Update();
@@ -82,18 +89,26 @@ void Pause::Update() {
 	if (input_->GetKey()->Pushed(DIK_W) ||
 		input_->GetKey()->Pushed(DIK_UP) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::UP) || 
-		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f
+		(input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f
+			&& !isStick_)
 		) {
+		if (currentChoose_ != 0) {
+			audios_[2]->Start(0.2f);
+		}
 		currentChoose_--;
-		audios_[2]->Start(0.2f);
+		isStick_ = true;
 	}
 	else if (input_->GetKey()->Pushed(DIK_S) ||
 		input_->GetKey()->Pushed(DIK_DOWN) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::DOWN) ||
-		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f
+		(input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f&&
+			!isStick_)
 		) {
+		if (currentChoose_ != 2) {
+			audios_[2]->Start(0.2f);
+		}
 		currentChoose_++;
-		audios_[2]->Start(0.2f);
+		isStick_ = true;
 	}
 
 	currentChoose_ = std::clamp(currentChoose_, 0, static_cast<int32_t>(arrowPosY_.size())-1);

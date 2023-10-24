@@ -264,6 +264,17 @@ private:
 
 	Audio* bgm_;
 
+	// hud
+	Texture2D aButtonHud_;
+	Texture2D stickHud_;
+	Texture2D puaseHud_;
+
+	Texture2D spaceHud_;
+	Texture2D rightKeyHud_;
+	Texture2D leftKeyHud_;
+	Texture2D puaseKeyHud_;
+
+
 	///
 	/// =============================================
 	/// 

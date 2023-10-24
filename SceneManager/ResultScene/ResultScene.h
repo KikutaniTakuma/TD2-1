@@ -193,6 +193,8 @@ private:
 	Audio* starSE_;
 	Audio* specialStarSE_;
 
+	bool isStick_;
+
 	///
 	/// =============================================
 	/// 

@@ -1,6 +1,7 @@
 #include "StageSelect.h"
 #include "Engine/WinApp/WinApp.h"
 #include "SceneManager/GameScene/GameScene.h"
+#include "SceneManager/TitleScene/TitleScene.h"
 #include <numbers>
 
 StageSelect::StageSelect():
@@ -182,6 +183,30 @@ void StageSelect::Initialize() {
 	bgm_->Start(0.2f);
 	choiceSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_sentaku.wav", false);
 	decideSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_kettei.wav", false);
+	backSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_modoru.wav", false);
+
+	aButtonHud_.LoadTexture("./Resources/HUD/controler_UI_A.png");
+	aButtonHud_.uvSize.x = 0.5f;
+	aButtonHud_.scale = { 81.0f, 81.0f };
+	aButtonHud_.pos.y = -182.0f;
+	spaceHud_.LoadTexture("./Resources/HUD/keys_UI_space.png");
+	spaceHud_.uvSize.x = 0.5f;
+	spaceHud_.scale = { 122.0f, 171.0f };
+	spaceHud_.pos.y = -182.0f;
+	keyEscHud_.LoadTexture("./Resources/HUD/keys_UI_esc.png");
+	keyEscHud_.uvSize.x = 0.5f;
+	keyEscHud_.scale = Vector2{ 115.0f, 113.0f };
+	keyEscHud_.pos = Vector2{ -555.0f,291.0f };
+	padStartHud_.LoadTexture("./Resources/HUD/controler_UI_pose.png");
+	padStartHud_.uvSize.x = 0.5f;
+	padStartHud_.scale = Vector2{ 70.0f, 70.0f };
+	padStartHud_.pos = Vector2{ -555.0f,291.0f };
+	backToHud_.LoadTexture("./Resources/HUD/stageSelect_UI_titlehe.png");
+	backToHud_.isSameTexSize = true;
+	backToHud_.texScalar = 0.25f;
+	backToHud_.pos = Vector2{ -549.0f, 232.0f };
+
+	hudAlphaEase_.Start(true, 1.0f, Easeing::InOutQuad);
 }
 
 void StageSelect::Finalize() {
@@ -191,10 +216,17 @@ void StageSelect::Finalize() {
 void StageSelect::Update() {
 	auto nowTime = std::chrono::steady_clock::now();
 
+	if (-0.3f <= input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) && 
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) <= 0.3f) {
+		isStick_ = false;
+	}
+
 	if (input_->GetKey()->Pushed(DIK_RIGHT) ||
 		input_->GetKey()->Pushed(DIK_D) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::RIGHT_SHOULDER) || 
 		input_->GetGamepad()->Pushed(Gamepad::Button::RIGHT) ||
-		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f
+		(
+		 input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f && !isStick_)
 		) 
 	{
 		currentStage_++;
@@ -202,6 +234,8 @@ void StageSelect::Update() {
 		moonRotateY_.first = moon_.rotate.z;
 
 		choiceSE_->Start(0.25f);
+
+		isStick_ = true;
 
 		currentPlayerEaseing_ = 0;
 		playerEase_[currentPlayerEaseing_].Start(
@@ -213,8 +247,10 @@ void StageSelect::Update() {
 
 	else if (input_->GetKey()->Pushed(DIK_LEFT) ||
 		input_->GetKey()->Pushed(DIK_A) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::LEFT_SHOULDER) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::LEFT) ||
-		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f
+		(
+			input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f && !isStick_)
 		)
 	{
 		currentStage_--;
@@ -222,6 +258,8 @@ void StageSelect::Update() {
 		moonRotateY_.first = moon_.rotate.z;
 
 		choiceSE_->Start(0.25f);
+
+		isStick_ = true;
 
 		currentPlayerEaseing_ = 0;
 		playerEase_[currentPlayerEaseing_].Start(
@@ -334,6 +372,47 @@ void StageSelect::Update() {
 
 	backGroundParticle_.Update();
 
+	if (input_->GetKey()->GetKey(DIK_SPACE) ||
+		input_->GetGamepad()->GetButton(Gamepad::Button::A)) {
+		aButtonHud_.uvPibot.x = 0.5f;
+		spaceHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		aButtonHud_.uvPibot.x = 0.0f;
+		spaceHud_.uvPibot.x = 0.0f;
+	}
+	aButtonHud_.Update();
+	spaceHud_.Update();
+	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
+	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
+	hudAlphaEase_.Update();
+
+	if (input_->GetGamepad()->GetButton(Gamepad::Button::START)) {
+		padStartHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		padStartHud_.uvPibot.x = 0.0f;
+	}
+	if (input_->GetKey()->GetKey(DIK_ESCAPE)) {
+		keyEscHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		keyEscHud_.uvPibot.x = 0.0f;
+	}
+	padStartHud_.Update();
+	keyEscHud_.Update();
+
+	backToHud_.Update();
+
+	if (input_->GetGamepad()->Pushed(Gamepad::Button::START)||
+		input_->GetKey()->Pushed(DIK_ESCAPE)
+		) {
+		bgm_->Stop();
+		backSE_->Start(0.2f);
+		sceneManager_->SceneChange(new TitleScene{});
+	}
+
+
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
 		) {
@@ -373,4 +452,15 @@ void StageSelect::Draw() {
 	moon_.Draw(camera_.GetViewOthographics(), camera_.pos);
 
 	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
+
+	if (sceneManager_->GetIsPad()) {
+		aButtonHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		padStartHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
+	else {
+		spaceHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		keyEscHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
+
+	backToHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 }

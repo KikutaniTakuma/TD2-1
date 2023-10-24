@@ -329,6 +329,11 @@ void ResultScene::Finalize() {
 void ResultScene::Update() {
 	auto nowTime = std::chrono::steady_clock::now();
 
+	if (-0.3f <= input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) &&
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) <= 0.3f) {
+		isStick_ = false;
+	}
+
 	if (0 < score_ &&
 		!isUpdate_ && 
 		updateStartTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_)) {
@@ -418,20 +423,28 @@ void ResultScene::Update() {
 			if (input_->GetKey()->Pushed(DIK_W)||
 				input_->GetKey()->Pushed(DIK_UP)||
 				input_->GetGamepad()->Pushed(Gamepad::Button::UP)||
-				input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f
-				)
+				(
+					input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f && !isStick_)
+				) 
 			{
-				choiceSE_->Start(0.25f);
+				isStick_ = true;
+				if (nowChoose_ == 1) {
+					choiceSE_->Start(0.25f);
+				}
 				nowChoose_--;
 			}
 			else if (
 				input_->GetKey()->Pushed(DIK_S) ||
 				input_->GetKey()->Pushed(DIK_DOWN) || 
 				input_->GetGamepad()->Pushed(Gamepad::Button::DOWN) ||
-				input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f
+				(
+					input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f && !isStick_)
 				)
 			{
-				choiceSE_->Start(0.25f);
+				isStick_ = true;
+				if (nowChoose_ == 0) {
+					choiceSE_->Start(0.25f);
+				}
 				nowChoose_++;
 			}
 			nowChoose_ = std::clamp(nowChoose_, 0, 1);

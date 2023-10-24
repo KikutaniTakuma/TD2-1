@@ -68,7 +68,7 @@ private:
 	std::chrono::steady_clock::time_point playerAnimationCoolStartTime_;
 	bool isPlayerAnimationCoolTime_;
 
-
+	bool isStick_;
 
 	Texture2D bubble_;
 	std::pair<float, float> bubbleY_;
@@ -101,4 +101,13 @@ private:
 	Audio* bgm_;
 	Audio* choiceSE_;
 	Audio* decideSE_;
+	Audio* backSE_;
+
+	// Hud
+	Texture2D aButtonHud_;
+	Texture2D spaceHud_;
+	Easeing hudAlphaEase_;
+	Texture2D keyEscHud_;
+	Texture2D padStartHud_;
+	Texture2D backToHud_;
 };

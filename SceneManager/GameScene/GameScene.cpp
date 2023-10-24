@@ -86,6 +86,39 @@ void GameScene::Initialize() {
 
 	bgm_ = audioManager_->LoadWav("./Resources/Audio/BGM/BGM/game.wav", true);
 	bgm_->Start(0.1f);
+
+	// コントローラーHUD
+	aButtonHud_.LoadTexture("./Resources/HUD/controler_UI_A.png");
+	aButtonHud_.scale = Vector2{ 70.0f, 70.0f };
+	aButtonHud_.pos = Vector2{ 544.0f,291.0f };
+	stickHud_.LoadTexture("./Resources/HUD/UI_stick.png");
+	stickHud_.scale = Vector2{ 70.0f, 80.0f };
+	stickHud_.pos = Vector2{ 453.0f,291.0f };
+	puaseHud_.LoadTexture("./Resources/HUD/controler_UI_pose.png");
+	puaseHud_.scale = Vector2{ 70.0f, 70.0f };
+	puaseHud_.pos = Vector2{ -555.0f,291.0f };
+
+	// キーボードHUD
+	spaceHud_.LoadTexture("./Resources/HUD/keys_UI_space.png");
+	spaceHud_.scale = Vector2{ 92.0f, 124.0f };
+	spaceHud_.pos = Vector2{ 544.0f,298.0f };
+	rightKeyHud_.LoadTexture("./Resources/HUD/keys_UI_right.png");
+	rightKeyHud_.scale = Vector2{ 93.0f, 69.0f };
+	rightKeyHud_.pos = Vector2{ 438.0f,291.0f };
+	leftKeyHud_.LoadTexture("./Resources/HUD/keys_UI_left.png");
+	leftKeyHud_.scale = Vector2{ 93.0f, 69.0f };
+	leftKeyHud_.pos = Vector2{ 359.0f,291.0f };
+	puaseKeyHud_.LoadTexture("./Resources/HUD/keys_UI_pose.png");
+	puaseKeyHud_.scale = Vector2{ 115.0f, 113.0f };
+	puaseKeyHud_.pos = Vector2{ -555.0f,291.0f };
+
+	aButtonHud_.uvSize.x = 0.5f;
+	spaceHud_.uvSize.x = 0.5f;
+	stickHud_.uvSize.x = 1.0f / 3.0f;
+	rightKeyHud_.uvSize.x = 0.5f;
+	leftKeyHud_.uvSize.x = 0.5f;
+	puaseHud_.uvSize.x = 0.5f;
+	puaseKeyHud_.uvSize.x = 0.5f;
 }
 
 void GameScene::Finalize() {
@@ -893,6 +926,72 @@ void GameScene::Update() {
 		}
 	}
 
+	if (input_->GetGamepad()->GetButton(Gamepad::Button::A)) {
+		aButtonHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		aButtonHud_.uvPibot.x = 0.0f;
+	}
+	if (input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f ||
+		input_->GetGamepad()->GetButton(Gamepad::Button::LEFT)) {
+		stickHud_.uvPibot.x = 1.0f / 3.0f;
+	}
+	else if (input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f||
+		input_->GetGamepad()->GetButton(Gamepad::Button::RIGHT)) {
+		stickHud_.uvPibot.x = 2.0f / 3.0f;
+	}
+	else {
+		stickHud_.uvPibot.x = 0.0f;
+	}
+
+	if (input_->GetGamepad()->GetButton(Gamepad::Button::START)) {
+		puaseHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		puaseHud_.uvPibot.x = 0.0f;
+	}
+
+	if (input_->GetKey()->GetKey(DIK_SPACE)) {
+		spaceHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		spaceHud_.uvPibot.x = 0.0f;
+	}
+	if (input_->GetKey()->GetKey(DIK_RIGHT)||
+		input_->GetKey()->GetKey(DIK_D)
+		) {
+		rightKeyHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		rightKeyHud_.uvPibot.x = 0.0f;
+	}
+	if (input_->GetKey()->GetKey(DIK_LEFT)||
+		input_->GetKey()->GetKey(DIK_A)) {
+		leftKeyHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		leftKeyHud_.uvPibot.x = 0.0f;
+	}
+	if (input_->GetKey()->GetKey(DIK_TAB)) {
+		puaseKeyHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		puaseKeyHud_.uvPibot.x = 0.0f;
+	}
+
+	aButtonHud_.Update();
+	stickHud_.Update();
+	puaseHud_.Update();
+
+	spaceHud_.Update();
+	rightKeyHud_.Update();
+	leftKeyHud_.Update();
+	puaseKeyHud_.Update();
+
+
+
+
+
 	pause_.ActiveUpdate();
 	if (input_->GetKey()->Pushed(DIK_TAB) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::START)
@@ -910,8 +1009,6 @@ void GameScene::Update() {
 	}
 
 	backGroundParticle_.Update();
-
-	bgm_->Debug("bgm_");
 }
 
 void GameScene::Draw() {
@@ -958,5 +1055,16 @@ void GameScene::Draw() {
 
 	//player_->Draw2D(camera2D_->GetViewOthographics());
 
+	if (sceneManager_->GetIsPad()) {
+		aButtonHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		stickHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		puaseHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
+	else {
+		spaceHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		rightKeyHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		leftKeyHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		puaseKeyHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
 	pause_.Draw();
 }
