@@ -80,4 +80,8 @@ private:
 
 	// 背景パーティクル
 	Particle backGroundParticle_;
+
+	Audio* bgm_;
+	Audio* choiceSE_;
+	Audio* decideSE_;
 };

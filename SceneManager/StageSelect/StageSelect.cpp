@@ -118,10 +118,15 @@ void StageSelect::Initialize() {
 
 	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
 	backGroundParticle_.ParticleStart();
+
+	bgm_ = audioManager_->LoadWav("./Resources/Audio/BGM/BGM/stageSelect.wav", true);
+	bgm_->Start(0.2f);
+	choiceSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_sentaku.wav", false);
+	decideSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_kettei.wav", false);
 }
 
 void StageSelect::Finalize() {
-
+	bgm_->Stop();
 }
 
 void StageSelect::Update() {
@@ -134,6 +139,8 @@ void StageSelect::Update() {
 		currentStage_++;
 		rotateEase_.Start(false, 0.2f, Easeing::OutElastic);
 		moonRotateY_.first = moon_.rotate.z;
+
+		choiceSE_->Start(0.25f);
 	}
 
 	else if (input_->GetKey()->Pushed(DIK_LEFT) ||
@@ -145,6 +152,8 @@ void StageSelect::Update() {
 		currentStage_--;
 		rotateEase_.Start(false, 0.2f, Easeing::OutElastic);
 		moonRotateY_.first = moon_.rotate.z;
+
+		choiceSE_->Start(0.25f);
 	}
 	if (maxStage_ < currentStage_) {
 		currentStage_ = 1;
@@ -202,6 +211,8 @@ void StageSelect::Update() {
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
 		) {
+		bgm_->Stop();
+		decideSE_->Start(0.2f);
 		auto gameScene = new GameScene;
 		assert(gameScene);
 		gameScene->SetStageNumber(currentStage_-1);
