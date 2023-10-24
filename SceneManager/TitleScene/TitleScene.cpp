@@ -45,7 +45,8 @@ void TitleScene::Initialize() {
 	player_.light.ligDirection = { 0.0f, 0.0f, 1.0f };
 	player_.light.ligColor = Vector3::identity;
 	player_.light.ptRange = std::numeric_limits<float>::max();
-	player_.scale *= 50.0f;
+	player_.scale *= 60.0f;
+	player_.pos.x = -400.0f;
 	player_.pos.y = -160.5f;
 	player_.rotate.y = std::numbers::pi_v<float>;
 	playerScale_.first = Vector3{ player_.scale.x + 20.0f, player_.scale.y - 10.0f, player_.scale.z };
@@ -53,7 +54,7 @@ void TitleScene::Initialize() {
 	playerScaleEaseing_.Start(true, 0.3f, Easeing::OutCirc);
 	playerPos_.first = player_.pos;
 	playerPos_.second = player_.pos;
-	playerPos_.second.y = 0.0f;
+	playerPos_.second.y = 20.0f;
 	playerPosEaseing_.Start(true, 0.3f, Easeing::OutCirc);
 
 	playerAnimationTex_.reserve(5);
@@ -79,7 +80,14 @@ void TitleScene::Initialize() {
 
 	titleTex_.LoadTexture("./Resources/Title/titleLOGO.png");
 	titleTex_.isSameTexSize = true;
-	titleTex_.pos = Vector2{ 19.0f, 116.0f };
+	titleTex_.texScalar = 1.37f;
+	titleScaleDuration_ = { titleTex_.texScalar * 0.9f, titleTex_.texScalar * 1.0f };
+	titleTex_.pos = Vector2{ 202.0f, 43.0f };
+	titleTex_.rotate.z = 0.11f;
+	titleEase_.Start(
+		true, 0.2f, Easeing::InExpo
+	);
+
 	floor_.LoadTexture("./Resources/layer/layer1.png");
 	floor_.scale = Vector2{ 1280.0f, 151.0f };
 	floor_.pos.y = -286.0f;
@@ -103,6 +111,22 @@ void TitleScene::Initialize() {
 	bgm_->Start(0.15f);
 
 	smoke_.LoadSettingDirectory("smoke");
+
+	aButtonHud_.LoadTexture("./Resources/HUD/controler_UI_A.png");
+	aButtonHud_.uvSize.x = 0.5f;
+	aButtonHud_.scale = { 81.0f, 81.0f };
+	aButtonHud_.pos = { -488.0f, -285.0f };
+	spaceHud_.LoadTexture("./Resources/HUD/keys_UI_space.png");
+	spaceHud_.uvSize.x = 0.5f;
+	spaceHud_.scale = { 122.0f, 171.0f };
+	spaceHud_.pos = { -488.0f, -275.0f };
+
+	startHud_.LoadTexture("./Resources/HUD/title_UI_start.png");
+	startHud_.isSameTexSize = true;
+	startHud_.texScalar = 0.31f;
+	startHud_.pos = Vector2{ -315.0f, -291.0f };
+
+	hudAlphaEase_.Start(true, 0.5f, Easeing::InOutQuad);
 }
 
 void TitleScene::Finalize() {
@@ -116,13 +140,13 @@ void TitleScene::Update() {
 		i.Update();
 	}
 
-	/*player_.scale = playerScaleEaseing_.Get(playerScale_.first, playerScale_.second);
+	player_.scale = playerScaleEaseing_.Get(playerScale_.first, playerScale_.second);
 	player_.pos = playerPosEaseing_.Get(playerPos_.first, playerPos_.second);
 	if (player_.pos.y <= playerPos_.first.y) {
 		smoke_.ParticleStart();
 		smoke_.emitterPos_ = player_.pos;
 		smoke_.emitterPos_.y -= 40.0f;
-	}*/
+	}
 
 
 	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
@@ -147,16 +171,33 @@ void TitleScene::Update() {
 		playerAnimationStartTime_ = nowTime;
 	}
 	
-	player_.Debug("player_");
 	player_.Update();
-	titleTex_.Debug("titleTex_");
+	titleTex_.texScalar = titleEase_.Get(titleScaleDuration_.first, titleScaleDuration_.second);
 	titleTex_.Update();
-	floor_.Debug("floor_");
 	floor_.Update();
 	playerScaleEaseing_.Update();
 	playerPosEaseing_.Update();
+	titleEase_.Update();
 	backGroundParticle_.Update();
 	smoke_.Update();
+
+	if (input_->GetKey()->GetKey(DIK_SPACE) ||
+		input_->GetGamepad()->GetButton(Gamepad::Button::A)) {
+		aButtonHud_.uvPibot.x = 0.5f;
+		spaceHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		aButtonHud_.uvPibot.x = 0.0f;
+		spaceHud_.uvPibot.x = 0.0f;
+	}
+	
+	aButtonHud_.Update();
+	spaceHud_.Update();
+	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.0f }));
+	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.0f }));
+	startHud_.Update();
+
+	hudAlphaEase_.Update();
 
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
@@ -189,4 +230,12 @@ void TitleScene::Draw() {
 	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
 
 	smoke_.Draw(camera_.GetViewOthographics());
+
+	if (sceneManager_->GetIsPad()) {
+		aButtonHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
+	else {
+		spaceHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
+	startHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 }

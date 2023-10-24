@@ -59,6 +59,14 @@ private:
 
 	// タイトル
 	Texture2D titleTex_;
+	std::pair<float, float> titleScaleDuration_;
+	Easeing titleEase_;
+
+	// hud
+	Texture2D aButtonHud_;
+	Texture2D spaceHud_;
+	Texture2D startHud_;
+	Easeing hudAlphaEase_;
 
 	// 床
 	Texture2D floor_;
