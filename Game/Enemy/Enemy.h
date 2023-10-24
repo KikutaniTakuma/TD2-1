@@ -292,4 +292,19 @@ private:
 	//class Audio* otitaSE_;
 	class Audio* explorsionSE_;
 	Particle enemyDeathParticle_;
+
+
+	// プレイヤーアニメーション
+	std::vector<Texture*> normalAnimationTex_;
+	std::vector<Texture*> stanAnimationTex_;
+	std::vector<Texture*> healAnimationTex_;
+	std::vector<Texture*> healStanAnimationTex_;
+	std::chrono::milliseconds playerAnimationDuration_;
+	std::chrono::steady_clock::time_point playerAnimationStartTime_;
+	int32_t currentPlayerAnimation_;
+	bool isPlayerAnimationTurnBack_;
+	std::chrono::milliseconds playerAnimationCoolTime_;
+	std::pair<int32_t, int32_t> playerAnimationCoolTimeDuration_;
+	std::chrono::steady_clock::time_point playerAnimationCoolStartTime_;
+	bool isPlayerAnimationCoolTime_;
 };
