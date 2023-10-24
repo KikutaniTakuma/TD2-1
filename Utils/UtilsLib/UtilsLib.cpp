@@ -130,6 +130,10 @@ namespace UtilsLib {
 		const std::filesystem::path& extension
 	) {
 		std::vector<std::filesystem::path> result;
+		if (!std::filesystem::exists(directoryName)) {
+			return result;
+		}
+
 		std::filesystem::directory_iterator directory{ directoryName };
 
 		// ディレクトリ内を探索

@@ -1,5 +1,6 @@
 #include "SceneManager.h"
 #include "Engine/Engine.h"
+#include "Utils/UtilsLib/UtilsLib.h"
 
 BaseScene::BaseScene(BaseScene::ID sceneID):
 	sceneManager_(nullptr),
@@ -37,6 +38,35 @@ void SceneManager::Initialize(BaseScene* firstScene) {
 
 	frameInfo_ = FrameInfo::GetInstance();
 	input_ = Input::GetInstance();
+
+	auto textureManager = TextureManager::GetInstance();
+
+	auto texNames = UtilsLib::GetFilePathFormDir("./Resources/", ".png");
+	for (auto& i : texNames) {
+		textureManager->LoadTexture(i.string());
+	}
+
+	auto meshManager = MeshManager::GetInstance();
+
+	auto meshNames = UtilsLib::GetFilePathFormDir("./Resources/", ".obj");
+
+	for (auto& i : meshNames) {
+		meshManager->LoadObj(i.string());
+	}
+
+	auto audioManager = AudioManager::GetInstance();
+
+	auto seNames = UtilsLib::GetFilePathFormDir("./Resources/Audio/kouka/", ".wav");
+
+	for (auto& i : seNames) {
+		audioManager->LoadWav(i.string(), false);
+	}
+
+	auto bgmNames = UtilsLib::GetFilePathFormDir("./Resources/Audio/BGM/", ".wav");
+
+	for (auto& i : bgmNames) {
+		audioManager->LoadWav(i.string(), true);
+	}
 
 	assert(firstScene != nullptr);
 	scene_.reset(firstScene);
