@@ -143,6 +143,26 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 	 healStanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/HealStan/enemy_naosu_stan_face3.png"));
 	 healStanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/HealStan/enemy_naosu_stan_face4.png"));
 	 healStanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/HealStan/enemy_naosu_stan_face5.png"));
+
+
+	 playerAnimationDuration_ = std::chrono::milliseconds{ 33 };
+	 currentPlayerAnimation_ = 0;
+	 isPlayerAnimationTurnBack_ = false;
+	 playerAnimationStartTime_ = std::chrono::steady_clock::now();
+
+	 playerAnimationCoolTime_ = std::chrono::milliseconds{ 1600 };
+	 playerAnimationCoolTimeDuration_ = {
+		 800,
+		 1600
+	 };
+	 isPlayerAnimationCoolTime_ = true;
+	 playerAnimationCoolStartTime_ = playerAnimationStartTime_;
+	 if (!isHealer_) {
+		 models_[0]->ChangeTexture("face", normalAnimationTex_[0]);
+	 }
+	 else {
+		 models_[0]->ChangeTexture("face", healAnimationTex_[0]);
+	 }
 }
 
 void Enemy::SetGlobalVariable() {
@@ -551,18 +571,17 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 		}
 		currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(normalAnimationTex_.size()) - 1);
 		if (!isHealer_ && status_ == Status::kFaint) {
-			models_[0]->ChangeTexture("face", normalAnimationTex_[currentPlayerAnimation_]);
-		}
-		else if (!isHealer_ && status_ != Status::kFaint)
-		{
 			models_[0]->ChangeTexture("face", stanAnimationTex_[currentPlayerAnimation_]);
 		}
+		else if (!isHealer_ && status_ != Status::kFaint){
+			models_[0]->ChangeTexture("face", normalAnimationTex_[currentPlayerAnimation_]);
+		}
 		else if (isHealer_ && status_ == Status::kFaint) {
-			models_[0]->ChangeTexture("face", healAnimationTex_[currentPlayerAnimation_]);
+			models_[0]->ChangeTexture("face", healStanAnimationTex_[currentPlayerAnimation_]);
 		}
 		else if (isHealer_ && status_ != Status::kFaint)
 		{
-			models_[0]->ChangeTexture("face", healStanAnimationTex_[currentPlayerAnimation_]);
+			models_[0]->ChangeTexture("face", healAnimationTex_[currentPlayerAnimation_]);
 		}
 
 		playerAnimationStartTime_ = nowTime;
