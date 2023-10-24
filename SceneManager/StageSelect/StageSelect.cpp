@@ -182,6 +182,17 @@ void StageSelect::Initialize() {
 	bgm_->Start(0.2f);
 	choiceSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_sentaku.wav", false);
 	decideSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_kettei.wav", false);
+
+	aButtonHud_.LoadTexture("./Resources/HUD/controler_UI_A.png");
+	aButtonHud_.uvSize.x = 0.5f;
+	aButtonHud_.scale = { 81.0f, 81.0f };
+	aButtonHud_.pos.y = -182.0f;
+	spaceHud_.LoadTexture("./Resources/HUD/keys_UI_space.png");
+	spaceHud_.uvSize.x = 0.5f;
+	spaceHud_.scale = { 122.0f, 171.0f };
+	spaceHud_.pos.y = -182.0f;
+
+	hudAlphaEase_.Start(true, 0.5f, Easeing::InOutQuad);
 }
 
 void StageSelect::Finalize() {
@@ -191,10 +202,17 @@ void StageSelect::Finalize() {
 void StageSelect::Update() {
 	auto nowTime = std::chrono::steady_clock::now();
 
+	if (-0.3f <= input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) && 
+		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) <= 0.3f) {
+		isStick_ = false;
+	}
+
 	if (input_->GetKey()->Pushed(DIK_RIGHT) ||
 		input_->GetKey()->Pushed(DIK_D) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::RIGHT_SHOULDER) || 
 		input_->GetGamepad()->Pushed(Gamepad::Button::RIGHT) ||
-		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f
+		(
+		 input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f && !isStick_)
 		) 
 	{
 		currentStage_++;
@@ -202,6 +220,8 @@ void StageSelect::Update() {
 		moonRotateY_.first = moon_.rotate.z;
 
 		choiceSE_->Start(0.25f);
+
+		isStick_ = true;
 
 		currentPlayerEaseing_ = 0;
 		playerEase_[currentPlayerEaseing_].Start(
@@ -213,8 +233,10 @@ void StageSelect::Update() {
 
 	else if (input_->GetKey()->Pushed(DIK_LEFT) ||
 		input_->GetKey()->Pushed(DIK_A) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::LEFT_SHOULDER) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::LEFT) ||
-		input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f
+		(
+			input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f && !isStick_)
 		)
 	{
 		currentStage_--;
@@ -222,6 +244,8 @@ void StageSelect::Update() {
 		moonRotateY_.first = moon_.rotate.z;
 
 		choiceSE_->Start(0.25f);
+
+		isStick_ = true;
 
 		currentPlayerEaseing_ = 0;
 		playerEase_[currentPlayerEaseing_].Start(
@@ -334,6 +358,22 @@ void StageSelect::Update() {
 
 	backGroundParticle_.Update();
 
+	if (input_->GetKey()->GetKey(DIK_SPACE) ||
+		input_->GetGamepad()->GetButton(Gamepad::Button::A)) {
+		aButtonHud_.uvPibot.x = 0.5f;
+		spaceHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		aButtonHud_.uvPibot.x = 0.0f;
+		spaceHud_.uvPibot.x = 0.0f;
+	}
+	aButtonHud_.Update();
+	spaceHud_.Update();
+	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.0f }));
+	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.0f }));
+	hudAlphaEase_.Update();
+
+
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
 		) {
@@ -373,4 +413,11 @@ void StageSelect::Draw() {
 	moon_.Draw(camera_.GetViewOthographics(), camera_.pos);
 
 	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
+
+	if (sceneManager_->GetIsPad()) {
+		aButtonHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
+	else {
+		spaceHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	}
 }
