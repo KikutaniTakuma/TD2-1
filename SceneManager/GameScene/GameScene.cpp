@@ -57,6 +57,10 @@ GameScene::GameScene() {
 
 void GameScene::Initialize() {
 
+	textureManager_->LoadTexture("./Resources/ShockWave/player_wave.png");
+
+	textureManager_->LoadTexture("./Resources/ShockWave/player_wave_gyaku.png");
+
 	shockWaves_.clear();
 
 	layer_->Initialize(kLayerNums_[stage_], kLayerHitPoints_[stage_]);

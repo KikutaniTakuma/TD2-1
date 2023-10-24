@@ -115,7 +115,7 @@ private:
 	static float kSpeed_[static_cast<uint16_t>(Size::kEnd)];
 
 	// 消えるまでのフレーム数
-	static int kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)];
+	static float kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)];
 
 	// 高さの基準
 	static float kHighCriteria_[static_cast<uint16_t>(Size::kEnd)];
@@ -131,7 +131,7 @@ private:
 	Size type_;
 
 	// 消えるまでのカウント
-	int deleteCount_;
+	float deleteCount_;
 
 	// 消すかどうかのフラグ
 	bool isDelete_;
