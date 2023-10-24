@@ -11,7 +11,7 @@
         "Enemy0Type": 0,
         "Layer0EnemyNum": 1,
         "Layer0HP": 1,
-        "Layer0ScaffoldingNum": 1,
+        "Layer0ScaffoldingNum": 0,
         "LayerNum": 1,
         "Scaffolding0Pos": [
             -200.0,
