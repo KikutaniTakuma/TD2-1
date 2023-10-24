@@ -192,7 +192,7 @@ void StageSelect::Initialize() {
 	spaceHud_.scale = { 122.0f, 171.0f };
 	spaceHud_.pos.y = -182.0f;
 
-	hudAlphaEase_.Start(true, 0.5f, Easeing::InOutQuad);
+	hudAlphaEase_.Start(true, 1.0f, Easeing::InOutQuad);
 }
 
 void StageSelect::Finalize() {
@@ -369,8 +369,8 @@ void StageSelect::Update() {
 	}
 	aButtonHud_.Update();
 	spaceHud_.Update();
-	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.0f }));
-	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.0f }));
+	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
+	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
 	hudAlphaEase_.Update();
 
 
