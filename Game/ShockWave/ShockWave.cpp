@@ -53,6 +53,7 @@ ShockWave::ShockWave(const Vector3& pos, float highest, float layerY) {
 			tex->pos.x += tex->scale.x;
 		}
 		tex->uvSize.x = 1.0f / 7;
+		tex->uvPibotSpd_ = 1.0f / 7;
 		tex->AnimationStart(0.0f);
 		tex->Update();
 		i++;
@@ -183,7 +184,7 @@ void ShockWave::Update() {
 	}
 
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
-		tex->Animation(size_t(kDeleteFrame_[static_cast<uint16_t>(type_)]), false, 0.0f, 6.0f);
+		tex->Animation(size_t(kDeleteFrame_[static_cast<uint16_t>(type_)]) / 7 * 1000 , false, 0.0f, 6.0f);
 		tex->Update();
 	}
 }

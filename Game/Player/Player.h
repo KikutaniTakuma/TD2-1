@@ -180,6 +180,7 @@ private:
 	Easeing easeScale_;
 	float easeTime_;
 	float easeCount_;
+	bool isEaseReturn_;
 
 	Vector2 scaleStart_;
 	Vector2 scaleEnd_;

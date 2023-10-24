@@ -374,20 +374,48 @@ void Player::LandingInitialize(const float& y) {
 
 	play_->CreatShockWave(tex_->pos, highest_, y);
 
-	/*scaleStart_ = tex_->scale;
-	scaleEnd_ = { scale_.x * 0.6f,scale_.y * 1.4f };
-	easeCount_ = 0.0f;
-	easeTime_ = 0.5f;*/
+	scaleStart_ = tex_->scale;
 
-	/*if (highest_ > ShockWave::kHighCriteria_[static_cast<uint16_t>(ShockWave::Size::kSmall)] - y) {
-		play_->CreatShockWave(tex_->pos, highest_, y);
-	}*/
+	if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMajor))) {
+		scaleEnd_ = { scale_.x * 10.0f,scale_.y * 0.3f };
+		easeTime_ = 0.7f;
+	}
+	else if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMiddle))) {
+		scaleEnd_ = { scale_.x * 5.0f,scale_.y * 0.5f };
+		easeTime_ = 0.5f;
+	}
+	else {
+		scaleEnd_ = { scale_.x * 2.0f,scale_.y * 0.8f };
+		easeTime_ = 0.3f;
+	}
+
+	easeCount_ = 0.0f;
+	isEaseReturn_ = false;
+
 }
 
 void Player::LandingUpdate(const float& y) {
 
+	velocity_.y += kFallingGravity_;
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 	Collision(y);
-	statusRequest_ = Status::kNormal;
+
+	easeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+	if (easeCount_ >= easeTime_ / 2 && !isEaseReturn_) {
+		isEaseReturn_ = true;
+		easeCount_ -= easeTime_ / 2;
+		scaleStart_ = tex_->scale;
+		scaleEnd_ = scale_;
+	}
+
+	tex_->scale = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_ * 2.0f);
+
+	if (easeCount_ >= easeTime_ / 2 && isEaseReturn_) {
+		statusRequest_ = Status::kNormal;
+		tex_->scale = scale_;
+		isEaseReturn_ = false;
+	}
 
 }
 
@@ -395,6 +423,14 @@ void Player::FallingInitialize(const float& y) {
 
 	Collision(y);
 	//velocity_ = {};
+
+	scaleStart_ = tex_->scale;
+
+	scaleEnd_ = scale_;
+
+	easeCount_ = 0.0f;
+	easeTime_ = 0.5f;
+	isEaseReturn_ = false;
 
 }
 
@@ -408,6 +444,14 @@ void Player::FallingUpdate(const float& y) {
 	else {
 		velocity_.y += kGravity_;
 	}
+
+	easeCount_ += deletaTime;
+
+	if (easeCount_ > easeTime_) {
+		easeCount_ = easeTime_;
+	}
+
+	tex_->scale = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_);
 
 	tex_->pos += velocity_ * deletaTime;
 
