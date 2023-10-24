@@ -43,6 +43,27 @@ Player::Player() {
 
 	isFallingGravity_ = true;
 	isHipdropJamp_ = true;
+
+	auto textureManager = TextureManager::GetInstance();
+	playerAnimationTex_.reserve(5);
+	playerAnimationTex_.push_back(textureManager->LoadTexture("./Resources/Player/player_face.png"));
+	playerAnimationTex_.push_back(textureManager->LoadTexture("./Resources/Player/player_face2.png"));
+	playerAnimationTex_.push_back(textureManager->LoadTexture("./Resources/Player/player_face3.png"));
+	playerAnimationTex_.push_back(textureManager->LoadTexture("./Resources/Player/player_face4.png"));
+	playerAnimationTex_.push_back(textureManager->LoadTexture("./Resources/Player/player_face5.png"));
+
+	playerAnimationDuration_ = std::chrono::milliseconds{ 33 };
+	currentPlayerAnimation_ = 0;
+	isPlayerAnimationTurnBack_ = false;
+	playerAnimationStartTime_ = std::chrono::steady_clock::now();
+
+	playerAnimationCoolTime_ = std::chrono::milliseconds{ 1600 };
+	playerAnimationCoolTimeDuration_ = {
+		800,
+		1600
+	};
+	isPlayerAnimationCoolTime_ = true;
+	playerAnimationCoolStartTime_ = playerAnimationStartTime_;
 }
 
 void Player::SetGlobalVariable() {
@@ -110,6 +131,7 @@ void Player::Initialize() {
 }
 
 void Player::Update(const float& y, const Camera* camera) {
+	auto nowTime = std::chrono::steady_clock::now();
 
 #ifdef _DEBUG
 	ImGui::Begin("PlayerFlag");
@@ -205,6 +227,28 @@ void Player::Update(const float& y, const Camera* camera) {
 	easeScale_.Update();
 	isCollisionLayer_.Update();
 	isCollisionEnemy_.Update();
+
+	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
+		isPlayerAnimationCoolTime_ = false;
+	}
+
+	if (!isPlayerAnimationCoolTime_ && playerAnimationDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationStartTime_)) {
+		isPlayerAnimationTurnBack_ ? --currentPlayerAnimation_ : ++currentPlayerAnimation_;
+		if (currentPlayerAnimation_ >= static_cast<int32_t>(playerAnimationTex_.size()) - 1) {
+			isPlayerAnimationTurnBack_ = true;
+			playerAnimationCoolTime_ = std::chrono::milliseconds{
+				UtilsLib::Random(playerAnimationCoolTimeDuration_.first, playerAnimationCoolTimeDuration_.second)
+			};
+		}
+		else if (currentPlayerAnimation_ <= 0) {
+			isPlayerAnimationTurnBack_ = false;
+			isPlayerAnimationCoolTime_ = true;
+			playerAnimationCoolStartTime_ = nowTime;
+		}
+		currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(playerAnimationTex_.size()) - 1);
+		models_[0]->ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]);
+		playerAnimationStartTime_ = nowTime;
+	}
 
 	jumpSE_->Debug("jumpSE_");
 	fallSE_->Debug("fallSE_");
