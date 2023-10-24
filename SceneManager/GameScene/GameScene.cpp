@@ -771,13 +771,19 @@ void GameScene::Collision() {
 
 
 		if (shockWaves_.size() != 0 && enemy->GetStatus() != Enemy::Status::kDeath && enemy->GetStatus() != Enemy::Status::kGeneration) {
-			for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
-				const std::list<std::unique_ptr<Texture2D>>& shockWaveTextures = shockWave->GetTextures();
 
-				for (const std::unique_ptr<Texture2D>& shockWaveTex : shockWaveTextures) {
+			if (enemy->GetStatus() == Enemy::Status::kNormal && enemy->GetType() == Enemy::Type::kFly) {
 
-					if (shockWaveTex->Collision(*enemyTex)) {
-						enemy->StatusRequest(Enemy::Status::kDeath);
+			}
+			else {
+				for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
+					const std::list<std::unique_ptr<Texture2D>>& shockWaveTextures = shockWave->GetTextures();
+
+					for (const std::unique_ptr<Texture2D>& shockWaveTex : shockWaveTextures) {
+
+						if (shockWaveTex->Collision(*enemyTex)) {
+							enemy->StatusRequest(Enemy::Status::kDeath);
+						}
 					}
 				}
 			}
