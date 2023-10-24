@@ -270,7 +270,7 @@ void ResultScene::Initialize() {
 	sceneManager_->isClearStage_[stageNumber_-1] = true;
 
 
-	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.LoadSettingDirectory("backGroundParticle");
 	backGroundParticle_.ParticleStart();
 
 

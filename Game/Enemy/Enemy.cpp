@@ -106,7 +106,7 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 
 	tex_->Update();
 
-	enemyStepOnParticle_.LopadSettingDirectory("smoke");
+	enemyStepOnParticle_.LoadSettingDirectory("smoke");
 }
 
 void Enemy::SetGlobalVariable() {

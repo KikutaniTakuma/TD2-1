@@ -54,6 +54,9 @@ private:
 	std::chrono::steady_clock::time_point playerAnimationCoolStartTime_;
 	bool isPlayerAnimationCoolTime_;
 
+	// パーティクル
+	Particle smoke_;
+
 	// タイトル
 	Texture2D titleTex_;
 

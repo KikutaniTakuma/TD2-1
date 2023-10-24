@@ -193,7 +193,7 @@ private:
 	static Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
 
 public:
-	void LopadSettingDirectory(const std::string& directoryName);
+	void LoadSettingDirectory(const std::string& directoryName);
 
 	void SaveSettingFile(const std::string& groupName);
 private:

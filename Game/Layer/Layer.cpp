@@ -199,7 +199,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 
 	gamePlayTime_ = std::chrono::milliseconds(0);
 
-	breakEffect_.LopadSettingDirectory("break");
+	breakEffect_.LoadSettingDirectory("break");
 }
 
 void Layer::Update(const Camera* camera) {

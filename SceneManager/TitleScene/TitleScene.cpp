@@ -77,7 +77,7 @@ void TitleScene::Initialize() {
 	floor_.scale = Vector2{ 1280.0f, 112.0f };
 	floor_.pos.y = -303.0f;
 
-	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.LoadSettingDirectory("backGroundParticle");
 	backGroundParticle_.ParticleStart();
 
 	for (auto& i : backGround_) {
@@ -94,6 +94,8 @@ void TitleScene::Initialize() {
 	bgm_ = audioManager_->LoadWav("./Resources/Audio/BGM/BGM/title.wav", true);
 	decideSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_kettei.wav", false);
 	bgm_->Start(0.15f);
+
+	smoke_.LoadSettingDirectory("smoke");
 }
 
 void TitleScene::Finalize() {
@@ -109,7 +111,13 @@ void TitleScene::Update() {
 
 	player_.scale = playerScaleEaseing_.Get(playerScale_.first, playerScale_.second);
 	player_.pos = playerPosEaseing_.Get(playerPos_.first, playerPos_.second);
-	
+	if (player_.pos.y <= playerPos_.first.y) {
+		smoke_.ParticleStart();
+		smoke_.emitterPos_ = player_.pos;
+		smoke_.emitterPos_.y -= 40.0f;
+	}
+
+
 	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
 		isPlayerAnimationCoolTime_ = false;
 	}
@@ -138,6 +146,7 @@ void TitleScene::Update() {
 	playerScaleEaseing_.Update();
 	playerPosEaseing_.Update();
 	backGroundParticle_.Update();
+	smoke_.Update();
 
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
@@ -168,4 +177,6 @@ void TitleScene::Draw() {
 	titleTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 
 	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
+
+	smoke_.Draw(camera_.GetViewOthographics());
 }

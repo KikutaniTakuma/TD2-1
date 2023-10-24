@@ -75,7 +75,7 @@ void GameScene::Initialize() {
 
 	startTime_ = std::chrono::steady_clock::now();
 
-	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.LoadSettingDirectory("backGroundParticle");
 	backGroundParticle_.ParticleStart();
 
 	pause_.Initialize();

@@ -169,7 +169,7 @@ void StageSelect::Initialize() {
 		isClearTex_.pos.y + 10.0f
 	};
 
-	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.LoadSettingDirectory("backGroundParticle");
 	backGroundParticle_.ParticleStart();
 
 	bgm_ = audioManager_->LoadWav("./Resources/Audio/BGM/BGM/stageSelect.wav", true);

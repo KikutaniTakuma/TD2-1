@@ -411,7 +411,7 @@ void Particle::ThreadLoadTexture(const std::string& fileName) {
 }
 
 
-void Particle::LopadSettingDirectory(const std::string& directoryName) {
+void Particle::LoadSettingDirectory(const std::string& directoryName) {
 	const std::filesystem::path kDirectoryPath = "./Resources/Datas/Particles/" + directoryName + "/";
 	dataDirectoryName = kDirectoryPath.string();
 
@@ -941,7 +941,7 @@ void Particle::Debug(const std::string& guiName) {
 					if (id == IDOK) {
 						settings.clear();
 						datas.clear();
-						LopadSettingDirectory(entry.path().stem().string());
+						LoadSettingDirectory(entry.path().stem().string());
 						MessageBoxA(
 							WinApp::GetInstance()->GetHwnd(),
 							"Load success", "Particle",
