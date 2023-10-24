@@ -822,14 +822,6 @@ void GameScene::Update() {
 
 	layer_->Update(camera2D_.get());
 
-#ifdef _DEBUG
-
-	if (input_->GetKey()->Pushed(DIK_RETURN)) {
-		sceneManager_->SceneChange(new ResultScene{});
-	}
-
-#endif // _DEBUG
-
 }
 
 void GameScene::Draw() {
