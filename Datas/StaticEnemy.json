@@ -10,6 +10,6 @@
         "kLayerReboundCoefficient": 0.30000001192092896,
         "kLeaveTime": 1.0,
         "kMoveSpeed": 50.0,
-        "kReboundCoefficient": 0.5
+        "kReboundCoefficient": 0.800000011920929
     }
 }
