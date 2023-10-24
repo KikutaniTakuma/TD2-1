@@ -272,7 +272,7 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 
 void Enemy::CollisionPlayer(Player* player) {
 
-	if (player->GetStatus() != Player::Status::kFalling && (status_ == Status::kLeave || status_ == Status::kNormal)) {
+	if (player->GetStatus() != Player::Status::kFalling && player->GetStatus() != Player::Status::kLanding && (status_ == Status::kLeave || status_ == Status::kNormal)) {
 		if (tex_->Collision(*player->GetTex())) {
 
 			if (isCollisionType_) {

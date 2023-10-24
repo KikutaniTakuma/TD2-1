@@ -46,11 +46,11 @@ ShockWave::ShockWave(const Vector3& pos, float highest, float layerY) {
 		tex->pos = pos;
 		if (i % 2 == 1) {
 			tex->LoadTexture("./Resources/ShockWave/player_wave_gyaku.png");
-			tex->pos.x -= tex->scale.x;
+			tex->pos.x -= tex->scale.x / 4;
 		}
 		else {
 			tex->LoadTexture("./Resources/ShockWave/player_wave.png");
-			tex->pos.x += tex->scale.x;
+			tex->pos.x += tex->scale.x / 4;
 		}
 		tex->uvSize.x = 1.0f / 7;
 		tex->uvPibotSpd_ = 1.0f / 7;
