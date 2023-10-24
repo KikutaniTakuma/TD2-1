@@ -259,4 +259,8 @@ private:
 
 	class Audio* jumpSE_;
 	class Audio* fallSE_;
+
+	class Audio* damageSE_;
+	class Audio* batinSE_;
+	class Audio* humuSE_;
 };

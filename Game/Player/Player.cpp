@@ -103,6 +103,10 @@ void Player::Initialize() {
 
 	jumpSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/jamp1.wav", false);
 	fallSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/otiru.wav", false);
+
+	damageSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/damage.wav", false);
+	batinSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/batin.wav", false);
+	humuSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/player_humu.wav", false);
 }
 
 void Player::Update(const float& y, const Camera* camera) {
@@ -242,7 +246,7 @@ void Player::NormalUpdate(const float& y) {
 			statusRequest_ = Status::kHipDrop;
 
 			// 音を出す
-			fallSE_->Start(0.4f);
+			fallSE_->Start(0.3f);
 		}
 
 		easeCount_ += deletaTime;
@@ -256,6 +260,14 @@ void Player::NormalUpdate(const float& y) {
 
 	// ジャンプ入力
 	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetGamepad()->Pushed(Gamepad::Button::A)))) {
+		if (!isStep_) {
+			// 音を出す
+			jumpSE_->Start(0.4f);
+		}
+		else {
+			humuSE_->Start(0.4f);
+		}
+
 		isFly_ = true;
 		isStep_ = false;
 		// 初速を与える
@@ -266,9 +278,6 @@ void Player::NormalUpdate(const float& y) {
 		scaleEnd_ = { scale_.x * 0.8f,scale_.y * 1.2f };
 		easeCount_ = 0.0f;
 		easeTime_ = 0.3f;
-
-		// 音を出す
-		jumpSE_->Start(0.4f);
 	}
 
 	if (isFallingGravity_) {
@@ -394,14 +403,17 @@ void Player::LandingInitialize(const float& y) {
 	if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMiddle))) {
 		scaleEnd_ = { scale_.x * 10.0f,scale_.y * 0.3f };
 		easeTime_ = 0.7f;
+		batinSE_->Start(0.4f);
 	}
 	else if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kSmall))) {
 		scaleEnd_ = { scale_.x * 5.0f,scale_.y * 0.5f };
 		easeTime_ = 0.5f;
+		batinSE_->Start(0.2f);
 	}
 	else {
 		scaleEnd_ = { scale_.x * 2.0f,scale_.y * 0.8f };
 		easeTime_ = 0.3f;
+		batinSE_->Start(0.1f);
 	}
 
 	easeCount_ = 0.0f;
@@ -597,7 +609,7 @@ void Player::CollisionScaffolding(const Texture2D* tex)
 
 void Player::KnockBack(const Vector3& pos, const Vector3& scale)
 {
-
+	damageSE_->Start(0.1f);
 	Vector3 vector = tex_->pos - pos;
 	vector.y = 0.0f;
 
@@ -639,7 +651,7 @@ void Player::KnockBack(const Vector3& pos, const Vector3& scale)
 
 void Player::Steped(const Vector3& pos)
 {
-	
+	damageSE_->Start(0.1f);
 	float speed = velocity_.Length() * kReboundCoefficient_;
 
 	Vector3 vector = pos - tex_->pos;

@@ -7,6 +7,7 @@
 #include <numbers>
 #include <cmath>
 #include <algorithm>
+#include "AudioManager/AudioManager.h"
 
 std::unique_ptr<GlobalVariables> Enemy::globalVariables_ = std::make_unique<GlobalVariables>();
 
@@ -113,6 +114,9 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 
 	enemyStepOnParticle_.LoadSettingDirectory("smoke");
 	enemyDeathParticle_.LoadSettingDirectory("enemy-kill");
+
+	//otitaSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/enemy_otita.wav", false);
+	explorsionSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/bakuhatu2.wav", false);
 }
 
 void Enemy::SetGlobalVariable() {
@@ -696,6 +700,7 @@ void Enemy::FallingUpdate(const float& y) {
 		else {
 			
 			isCollisionLayer_ = true;
+			//otitaSE_->Start(0.3f);
 
 			fallingSpeed_ = kFallingSpeed_;
 			velocity_.y = std::fabsf(velocity_.y) * kLayerReboundCoefficient_;
@@ -793,6 +798,7 @@ void Enemy::DeathInitialize(Layer* layer) {
 	layer->AddDamage(1);
 	enemyDeathParticle_.ParticleStart();
 	enemyDeathParticle_.emitterPos_ = tex_->pos;
+	explorsionSE_->Start(0.2f);
 }
 
 void Enemy::DeathUpdate() {

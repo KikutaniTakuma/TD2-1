@@ -288,5 +288,8 @@ private:
 
 	// 敵をぶち殺したときのエフェクト
 	Particle enemyStepOnParticle_;
+
+	//class Audio* otitaSE_;
+	class Audio* explorsionSE_;
 	Particle enemyDeathParticle_;
 };
