@@ -59,6 +59,10 @@ GameScene::GameScene() :
 
 void GameScene::Initialize() {
 
+	textureManager_->LoadTexture("./Resources/ShockWave/player_wave.png");
+
+	textureManager_->LoadTexture("./Resources/ShockWave/player_wave_gyaku.png");
+
 	shockWaves_.clear();
 
 	layer_->Initialize(kLayerNums_[stage_], kLayerHitPoints_[stage_]);
@@ -616,6 +620,21 @@ void GameScene::ApplyGlobalVariable() {
 
 void GameScene::CreatShockWave(const Vector3& pos, float highest, float y) {
 	shockWaves_.push_back(std::make_unique<ShockWave>(pos, highest, y));
+
+	if (highest >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMiddle))) {
+		isShack_ = true;
+		shackTime_ = 0.7f;
+		shackMax_ = 30.0f;
+		shackCount_ = 0.0f;
+		shackPos_ = { 0.0f,0.0f,0.0f };
+	}
+	else if (highest >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kSmall))) {
+		isShack_ = true;
+		shackTime_ = 0.4f;
+		shackMax_ = 18.0f;
+		shackCount_ = 0.0f;
+		shackPos_ = { 0.0f,0.0f,0.0f };
+	}
 }
 
 void GameScene::EnemyGeneration() {
@@ -757,16 +776,42 @@ void GameScene::Collision() {
 	}
 }
 
+void GameScene::ShackUpdate()
+{
+	if (isShack_) {
+
+		shackCount_ += FrameInfo::GetInstance()->GetDelta();
+
+		float length = shackMax_ * (1.0f - shackCount_ / shackTime_);
+
+		shackPos_.x = UtilsLib::Random(-length / 2.0f, length / 2.0f);
+		shackPos_.y = UtilsLib::Random(-length / 2.0f, length / 2.0f);
+
+		if (shackCount_ >= shackTime_) {
+			shackCount_ = shackTime_;
+			isShack_ = false;
+			shackPos_ = { 0.0f,0.0f,0.0f };
+		}
+	}
+
+}
+
 void GameScene::Update() {
 	auto nowTime = std::chrono::steady_clock::now();
 
 	if (!pause_.isActive_) {
 
-		if (cameraLocalPos_.y <= player_->GetTex()->pos.y) {
+		if (cameraLocalPos_.y + layer_->GetHighestPosY() <= player_->GetTex()->pos.y) {
 			camera2D_->pos.y = player_->GetTex()->pos.y;
 		}
 		else {
-			camera2D_->pos.y = cameraLocalPos_.y;
+			camera2D_->pos.y = cameraLocalPos_.y + layer_->GetHighestPosY();
+		}
+		if (isShack_) {
+			camera2D_->pos += shackPos_;
+		}
+		else {
+			camera2D_->pos.x = 0.0f;
 		}
 
 		camera2D_->Update();
@@ -831,6 +876,8 @@ void GameScene::Update() {
 		DeleteShockWave();
 
 		Collision();
+
+		ShackUpdate();
 
 		layer_->Update(camera2D_.get());
 

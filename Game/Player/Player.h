@@ -4,7 +4,7 @@
 #include "Drawers/Texture2D/Texture2D.h"
 #include "Drawers/Model/Model.h"
 #include "Input/Input.h"
-
+#include "Utils/Easeing/Easeing.h"
 #include "GlobalVariables/GlobalVariables.h"
 
 class GameScene;
@@ -99,7 +99,7 @@ public:
 
 	void CollisionScaffolding(const Texture2D* tex);
 
-	void KnockBack(const Vector3& pos);
+	void KnockBack(const Vector3& pos, const Vector3& scale);
 
 	void Steped(const Vector3& pos);
 
@@ -176,6 +176,14 @@ private:
 	void MemoHighest();
 	
 private:
+	Vector2 scale_ = { 50.0f,50.0f };
+	Easeing easeScale_;
+	float easeTime_;
+	float easeCount_;
+	bool isEaseReturn_;
+
+	Vector2 scaleStart_;
+	Vector2 scaleEnd_;
 
 	float rotateAddAngle_;
 

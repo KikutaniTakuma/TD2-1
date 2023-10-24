@@ -27,7 +27,7 @@ Player::Player() {
 
 	tex_->pos = {};
 
-	tex_->scale *= 50.0f;
+	tex_->scale = scale_;
 
 	// ジャンプ時の初速
 	kJampInitialVelocity_ = 10.0f;
@@ -171,13 +171,16 @@ void Player::Update(const float& y, const Camera* camera) {
 		break;
 	}
 
-	if (tex_->pos.x - tex_->scale.x < -640) {
-		tex_->pos.x -= tex_->pos.x - tex_->scale.x + 640;
-		velocity_.x *= -1;
-	}
-	else if (tex_->pos.x + tex_->scale.x > 640) {
-		tex_->pos.x -= tex_->pos.x + tex_->scale.x - 640;
-		velocity_.x *= -1;
+
+	if (status_ != Status::kLanding) {
+		if (tex_->pos.x - tex_->scale.x < -640) {
+			tex_->pos.x -= tex_->pos.x - tex_->scale.x + 640;
+			velocity_.x *= -1;
+		}
+		else if (tex_->pos.x + tex_->scale.x > 640) {
+			tex_->pos.x -= tex_->pos.x + tex_->scale.x - 640;
+			velocity_.x *= -1;
+		}
 	}
 
 	float ratio = static_cast<float>(Engine::GetInstance()->clientHeight) /
@@ -195,6 +198,7 @@ void Player::Update(const float& y, const Camera* camera) {
 	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
 	tex_->Update();
 
+	easeScale_.Update();
 	isCollisionLayer_.Update();
 	isCollisionEnemy_.Update();
 
@@ -240,18 +244,28 @@ void Player::NormalUpdate(const float& y) {
 			// 音を出す
 			fallSE_->Start(0.4f);
 		}
-		/*else {
-			velocity_.y += kGravity_ * deletaTime;
-		}*/
+
+		easeCount_ += deletaTime;
+
+		if (easeCount_ > easeTime_) {
+			easeCount_ = easeTime_;
+		}
+
+		tex_->scale = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_);
 	}
 
 	// ジャンプ入力
-	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) ||
-		input_->GetKey()->Pushed(DIK_UP) || input_->GetGamepad()->Pushed(Gamepad::Button::A)))) {
+	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetGamepad()->Pushed(Gamepad::Button::A)))) {
 		isFly_ = true;
 		isStep_ = false;
 		// 初速を与える
 		velocity_.y = kJampInitialVelocity_;
+
+		//easeScale_.Start(false, 0.3f, Easeing::InSine);
+		scaleStart_ = scale_;
+		scaleEnd_ = { scale_.x * 0.8f,scale_.y * 1.2f };
+		easeCount_ = 0.0f;
+		easeTime_ = 0.3f;
 
 		// 音を出す
 		jumpSE_->Start(0.4f);
@@ -356,7 +370,7 @@ void Player::OnScaffoldingUpdate()
 		statusRequest_ = Status::kNormal;
 	}
 
-	velocity_.y += kGravity_;
+	velocity_.y += kGravity_ * deletaTime;
 
 	// 横の移動距離
 	velocity_.x = move.x * kMoveSpeed_;
@@ -369,21 +383,54 @@ void Player::OnScaffoldingUpdate()
 
 void Player::LandingInitialize(const float& y) {
 
-	velocity_ = {};
+	velocity_ = { 0.0f,0.0f,0.0f };
 
 	Collision(y);
 
 	play_->CreatShockWave(tex_->pos, highest_, y);
 
-	/*if (highest_ > ShockWave::kHighCriteria_[static_cast<uint16_t>(ShockWave::Size::kSmall)] - y) {
-		play_->CreatShockWave(tex_->pos, highest_, y);
-	}*/
+	scaleStart_ = tex_->scale;
+
+	if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMiddle))) {
+		scaleEnd_ = { scale_.x * 10.0f,scale_.y * 0.3f };
+		easeTime_ = 0.7f;
+	}
+	else if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kSmall))) {
+		scaleEnd_ = { scale_.x * 5.0f,scale_.y * 0.5f };
+		easeTime_ = 0.5f;
+	}
+	else {
+		scaleEnd_ = { scale_.x * 2.0f,scale_.y * 0.8f };
+		easeTime_ = 0.3f;
+	}
+
+	easeCount_ = 0.0f;
+	isEaseReturn_ = false;
+
 }
 
 void Player::LandingUpdate(const float& y) {
 
+	velocity_.y += kFallingGravity_;
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 	Collision(y);
-	statusRequest_ = Status::kNormal;
+
+	easeCount_ += FrameInfo::GetInstance()->GetDelta();
+
+	if (easeCount_ >= easeTime_ / 2 && !isEaseReturn_) {
+		isEaseReturn_ = true;
+		easeCount_ -= easeTime_ / 2;
+		scaleStart_ = tex_->scale;
+		scaleEnd_ = scale_;
+	}
+
+	tex_->scale = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_ * 2.0f);
+
+	if (easeCount_ >= easeTime_ / 2 && isEaseReturn_) {
+		statusRequest_ = Status::kNormal;
+		tex_->scale = scale_;
+		isEaseReturn_ = false;
+	}
 
 }
 
@@ -391,6 +438,14 @@ void Player::FallingInitialize(const float& y) {
 
 	Collision(y);
 	//velocity_ = {};
+
+	scaleStart_ = tex_->scale;
+
+	scaleEnd_ = scale_;
+
+	easeCount_ = 0.0f;
+	easeTime_ = 0.5f;
+	isEaseReturn_ = false;
 
 }
 
@@ -404,6 +459,14 @@ void Player::FallingUpdate(const float& y) {
 	else {
 		velocity_.y += kGravity_;
 	}
+
+	easeCount_ += deletaTime;
+
+	if (easeCount_ > easeTime_) {
+		easeCount_ = easeTime_;
+	}
+
+	tex_->scale = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_);
 
 	tex_->pos += velocity_ * deletaTime;
 
@@ -532,9 +595,11 @@ void Player::CollisionScaffolding(const Texture2D* tex)
 	}
 }
 
-void Player::KnockBack(const Vector3& pos)
+void Player::KnockBack(const Vector3& pos, const Vector3& scale)
 {
+
 	Vector3 vector = tex_->pos - pos;
+	vector.y = 0.0f;
 
 	Vector3 normal = vector.Normalize();
 
@@ -542,6 +607,10 @@ void Player::KnockBack(const Vector3& pos)
 
 	if (vector.x < 0) {
 		theta *= -1;
+		tex_->pos.x = pos.x - scale.x / 2 - tex_->scale.x / 2;
+	}
+	else {
+		tex_->pos.x = pos.x + scale.x / 2 + tex_->scale.x / 2;
 	}
 
 	float speed = 200.0f;
@@ -565,6 +634,7 @@ void Player::KnockBack(const Vector3& pos)
 	rotateTimeCount_ = 0.0f;
 
 	statusRequest_ = Status::kKnockBack;
+
 }
 
 void Player::Steped(const Vector3& pos)

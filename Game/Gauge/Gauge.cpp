@@ -35,14 +35,15 @@ void Gauge::SetGlobalVariable()
 	ApplyGlobalVariable();
 }
 
-void Gauge::ApplyGlobalVariable()
+void Gauge::ApplyGlobalVariable(const float& y)
 {
 	textures_[static_cast<int>(TextureNames::kMostBack)]->pos = globalVariables_->GetVector3Value(groupName_, "kPos");
+	textures_[static_cast<int>(TextureNames::kMostBack)]->pos.y += y;
 	textures_[static_cast<int>(TextureNames::kMostBack)]->scale = globalVariables_->GetVector2Value(groupName_, "kAllScale");
 	textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale = globalVariables_->GetVector2Value(groupName_, "kGaugeScale");
 
 	textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos = textures_[static_cast<int>(TextureNames::kMostBack)]->pos;
-
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos.y = textures_[static_cast<int>(TextureNames::kMostBack)]->pos.y;
 }
 
 void Gauge::DamageUpdate(const int& damage)
@@ -97,11 +98,11 @@ void Gauge::Initialize(const int& num, const int& Max)
 
 }
 
-void Gauge::Update(const int& num, const int& Max, const int& damage)
+void Gauge::Update(const int& num, const int& Max, const int& damage, const float& y)
 {
 	globalVariables_->Update();
 
-	ApplyGlobalVariable();
+	ApplyGlobalVariable(y);
 
 	num_ = num;
 	kMax_ = Max;

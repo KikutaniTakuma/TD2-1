@@ -11,7 +11,7 @@ Vector2 ShockWave::kSize_[static_cast<uint16_t>(Size::kEnd)] = {};
 
 float ShockWave::kHighCriteria_[static_cast<uint16_t>(Size::kEnd)] = {};
 
-int ShockWave::kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)] = {};
+float ShockWave::kDeleteFrame_[static_cast<uint16_t>(Size::kEnd)] = {};
 
 const std::string ShockWave::typeNames_[static_cast<uint16_t>(Size::kEnd)] = {
 	"Small",
@@ -39,28 +39,22 @@ ShockWave::ShockWave(const Vector3& pos, float highest, float layerY) {
 		type_ = Size::kMajor;
 	}
 
-	/*if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kSmall)] - layerY && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)] - layerY) {
-		type_ = Size::kSmall;
-	}
-	else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMiddle)] - layerY && highest < kHighCriteria_[static_cast<uint16_t>(Size::kMajor)] - layerY) {
-		type_ = Size::kMiddle;
-	}
-	else if (highest >= kHighCriteria_[static_cast<uint16_t>(Size::kMajor)] - layerY) {
-		type_ = Size::kMajor;
-	}
-	else {
-		type_ = Size::kSmall;
-	}*/
-
 	int i = 0;
 
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
-		tex->LoadTexture("./Resources/ShockWave/player_syogekiha.png");
 		tex->scale = kSize_[static_cast<uint16_t>(type_)];
 		tex->pos = pos;
 		if (i % 2 == 1) {
-			tex->rotate.z = std::numbers::pi_v<float>;
+			tex->LoadTexture("./Resources/ShockWave/player_wave_gyaku.png");
+			tex->pos.x -= tex->scale.x / 4;
 		}
+		else {
+			tex->LoadTexture("./Resources/ShockWave/player_wave.png");
+			tex->pos.x += tex->scale.x / 4;
+		}
+		tex->uvSize.x = 1.0f / 7;
+		tex->uvPibotSpd_ = 1.0f / 7;
+		tex->AnimationStart(0.0f);
 		tex->Update();
 		i++;
 	}
@@ -149,7 +143,7 @@ void ShockWave::ApplyGlobalVariable() {
 
 		item = "kDeleteFrame";
 		item = item + typeNames_[i];
-		kDeleteFrame_[i] = globalVariables_->GetIntValue(groupName_, item);
+		kDeleteFrame_[i] = globalVariables_->GetFloatValue(groupName_, item);
 	}
 
 	/*kSpeed_ = globalVariables_->GetFloatValue(groupName_, "kSpeed");
@@ -170,9 +164,9 @@ void ShockWave::Update() {
 
 	//ApplyGlobalVariable();
 
-	deleteCount_++;
+	deleteCount_ += FrameInfo::GetInstance()->GetDelta();
 
-	if (deleteCount_ == kDeleteFrame_[static_cast<int>(type_)]) {
+	if (deleteCount_ >= kDeleteFrame_[static_cast<uint16_t>(type_)]) {
 		textures_.clear();
 		isDelete_ = true;
 	}
@@ -181,15 +175,16 @@ void ShockWave::Update() {
 	int i = 0;
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		if (i == 0) {
-			tex->pos.x += kSpeed_[static_cast<int>(type_)] * FrameInfo::GetInstance()->GetDelta();
+			tex->pos.x += kSpeed_[static_cast<uint16_t>(type_)] * FrameInfo::GetInstance()->GetDelta();
 		}
 		else {
-			tex->pos.x -= kSpeed_[static_cast<int>(type_)] * FrameInfo::GetInstance()->GetDelta();
+			tex->pos.x -= kSpeed_[static_cast<uint16_t>(type_)] * FrameInfo::GetInstance()->GetDelta();
 		}
 		i++;
 	}
 
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
+		tex->Animation(size_t(kDeleteFrame_[static_cast<uint16_t>(type_)]) / 7 * 1000 , false, 0.0f, 6.0f);
 		tex->Update();
 	}
 }

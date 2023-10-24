@@ -104,6 +104,11 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 		break;
 	}
 
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate.y = UtilsLib::Random(0.0f, std::numbers::pi_v<float>);
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->scale.x *= 2.0f;
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->scale.z *= 2.0f;
+	randRotate_ = UtilsLib::Random(std::numbers::pi_v<float> * 3.0f, std::numbers::pi_v<float> * 4.0f);
+
 	tex_->Update();
 
 	enemyStepOnParticle_.LoadSettingDirectory("smoke");
@@ -269,7 +274,7 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 
 void Enemy::CollisionPlayer(Player* player) {
 
-	if (player->GetStatus() != Player::Status::kFalling && (status_ == Status::kLeave || status_ == Status::kNormal)) {
+	if (player->GetStatus() != Player::Status::kFalling && player->GetStatus() != Player::Status::kLanding && (status_ == Status::kLeave || status_ == Status::kNormal)) {
 		if (tex_->Collision(*player->GetTex())) {
 
 			if (isCollisionType_) {
@@ -306,9 +311,9 @@ void Enemy::CollisionPlayer(Player* player) {
 				}
 				else {
 
-					if (type_ == Type::kWalk) {
+					if (type_ == Type::kWalk || (type_ == Type::kFly && player->GetVelocity().y <= 0.0f)) {
 						moveVector_ *= -1;
-						player->KnockBack(tex_->pos);
+						player->KnockBack(tex_->pos, tex_->scale);
 					}
 					else if (type_ == Type::kFly) {
 						if (status_ == Status::kNormal) {
@@ -352,9 +357,10 @@ void Enemy::CollisionPlayer(Player* player) {
 				}
 				else {
 
-					if (type_ == Type::kWalk) {
+					if (type_ == Type::kWalk || (type_ == Type::kFly && player->GetVelocity().y <= 0.0f)) {
 						moveVector_ *= -1;
-						player->KnockBack(tex_->pos);
+
+						player->KnockBack(tex_->pos, tex_->scale);
 					}
 					else if (type_ == Type::kFly) {
 						if (status_ == Status::kNormal) {
@@ -646,6 +652,8 @@ void Enemy::NormalUpdate(const float y, Layer* layer) {
 			moveVector_ *= -1;
 		}
 	}
+
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate.y += randRotate_ * FrameInfo::GetInstance()->GetDelta();
 
 }
 

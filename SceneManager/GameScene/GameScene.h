@@ -146,6 +146,8 @@ public:
 		preStage_ = stage_;
 	}
 
+	void ShackUpdate();
+
 private:
 
 	// グローバル変数
@@ -178,6 +180,13 @@ private:
 private:
 
 	std::unique_ptr<Camera> camera2D_;
+
+	Vector3 shackPos_;
+	Vector3 preShack_;
+	float shackMax_;
+	bool isShack_ = false;
+	float shackTime_;
+	float shackCount_;
 
 	Vector3 cameraLocalPos_;
 
