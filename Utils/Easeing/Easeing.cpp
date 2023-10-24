@@ -67,7 +67,7 @@ void Easeing::Debug([[maybe_unused]]const std::string& debugName) {
 #ifdef _DEBUG
 	ImGui::Begin(debugName.c_str());
 	ImGui::SliderInt("easeType", &easeType_, 0, 30);
-	ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, std::numeric_limits<float>::max());
+	ImGui::DragFloat("easeSpd(seconds)", &easeTime_, 0.01f, 0.0f, std::numeric_limits<float>::max());
 	ImGui::Checkbox("isLoop", isLoop_.Data());
 	if (ImGui::Button("Start")) {
 		isActive_ = true;
