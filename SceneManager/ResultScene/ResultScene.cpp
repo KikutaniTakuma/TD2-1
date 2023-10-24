@@ -146,17 +146,12 @@ void ResultScene::Initialize() {
 	player_.pos = { -357.0f, -33.7f,-400.0f };
 	player_.scale *= 170.0f;
 	playerScale_ = { Vector3{190.0f, 150.0f, 150.0f}, Vector3{ 150.0f,190.0f,190.0f  } };
-	playerScaleEase_.Start(
-		true,
-		0.75f,
-		Easeing::GetFunction(24)
-	);
 
 	playerScaleGetStar_.first = player_.scale;
 	playerScaleGetStar_.second = playerScale_.second;
 
 	playerScaleGetStar2_.first = playerScale_.second;
-	playerScaleGetStar2_.second = player_.scale;
+	playerScaleGetStar2_.second = playerScale_.first;
 
 	playerRotateSpecial_.first = 2.962f;
 	playerRotateSpecial_.second = 2.962f + (std::numbers::pi_v<float> *2.0f);
@@ -315,6 +310,11 @@ void ResultScene::SetClearTime(std::chrono::milliseconds clearTime) {
 	if (score_ <= 0) {
 		isCanSelect_ = true;
 		isUpdate_ = true;
+		playerScaleEase_.Start(
+			true,
+			0.75f,
+			Easeing::GetFunction(24)
+		);
 	}
 }
 
@@ -334,10 +334,9 @@ void ResultScene::Update() {
 		isStick_ = false;
 	}
 
-	if (0 < score_ &&
-		!isUpdate_ && 
+
+	if (!isUpdate_ &&
 		updateStartTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_)) {
-		isUpdate_ = true;
 
 		stars_[currentStar_].Start();
 		startTime_ = nowTime;
@@ -350,8 +349,13 @@ void ResultScene::Update() {
 			0.4f,
 			Easeing::GetFunction(23)
 		);
+		isUpdate_ = true;
 	}
 	if(isUpdate_){
+		if (score_ <= 0 && !bgm_->IsStart()) {
+			bgm_->Start(0.15f);
+		}
+
 		for (size_t i = 0; i < backGround_.size(); i++) {
 			backGround_[i].Update();
 		}
@@ -381,7 +385,7 @@ void ResultScene::Update() {
 
 				playerScaleGetStarEase_.Start(
 					false,
-					0.6f,
+					0.9f,
 					Easeing::GetFunction(23)
 				);
 
@@ -391,7 +395,7 @@ void ResultScene::Update() {
 				starSE_->Start(0.4f);
 				playerScaleGetStarEase_.Start(
 					false,
-					0.4f,
+					0.5f,
 					Easeing::GetFunction(23)
 				);
 			}
@@ -407,6 +411,13 @@ void ResultScene::Update() {
 				stars_[i].NormalStart();
 			}
 			isCanSelect_ = true;
+
+			
+			playerScaleEase_.Start(
+				true,
+				0.75f,
+				Easeing::GetFunction(24)
+			);
 
 			bgm_->Start(0.15f);
 		}
@@ -489,8 +500,8 @@ void ResultScene::Update() {
 	if (playerScaleGetStarEase_.ActiveExit()) {
 		playerScaleGetStarEase2_.Start(
 			false,
-			0.8f,
-			Easeing::GetFunction(26)
+			0.375f,
+			Easeing::GetFunction(23)
 		);
 	}
 
@@ -523,7 +534,7 @@ void ResultScene::Update() {
 			player_.scale = playerScaleGetStarEase_.Get(playerScaleGetStar_.first, playerScaleGetStar_.second);
 		}
 		else if (playerScaleGetStarEase2_.ActiveEnter() || playerScaleGetStarEase2_.ActiveStay()) {
-			player_.scale = playerScaleGetStarEase_.Get(playerScaleGetStar2_.first, playerScaleGetStar2_.second);
+			player_.scale = playerScaleGetStarEase2_.Get(playerScaleGetStar2_.first, playerScaleGetStar2_.second);
 		}
 	}
 
@@ -564,6 +575,38 @@ void ResultScene::Update() {
 			sceneManager_->SceneChange(stageSelect);
 		}
 	}
+
+#ifdef _DEBUG
+	if (input_->GetKey()->Pushed(DIK_1)) {
+		auto scene = new ResultScene{};
+		scene->SetClearTime(std::chrono::milliseconds{ 21 * 1000 });
+		scene->SetStageNumber(stageNumber_);
+
+		sceneManager_->SceneChange(scene);
+	}
+	else if (input_->GetKey()->Pushed(DIK_2)) {
+		auto scene = new ResultScene{};
+		scene->SetClearTime(std::chrono::milliseconds{ 31 * 1000 });
+		scene->SetStageNumber(stageNumber_);
+
+		sceneManager_->SceneChange(scene);
+	}
+	else if (input_->GetKey()->Pushed(DIK_3)) {
+		auto scene = new ResultScene{};
+		scene->SetClearTime(std::chrono::milliseconds{ 61 * 1000 });
+		scene->SetStageNumber(stageNumber_);
+
+		sceneManager_->SceneChange(scene);
+	}
+	else if (input_->GetKey()->Pushed(DIK_4)) {
+		auto scene = new ResultScene{};
+		scene->SetClearTime(std::chrono::milliseconds{ 121 * 1000 });
+		scene->SetStageNumber(stageNumber_);
+
+		sceneManager_->SceneChange(scene);
+	}
+#endif // _DEBUG
+
 }
 
 void ResultScene::Draw() {
