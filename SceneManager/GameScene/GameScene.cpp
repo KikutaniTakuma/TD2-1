@@ -20,6 +20,8 @@ GameScene::GameScene() :
 
 	camera2D_ = std::make_unique<Camera>();
 
+	cameraLocalPos_ = { 0.0f,200.0f,0.0f };
+
 	player_ = std::make_unique<Player>();
 	player_->SetGameScene(this);
 
@@ -52,7 +54,7 @@ GameScene::GameScene() :
 
 	layer_ = std::make_unique<Layer>(kLayerNums_[stage_], kLayerHitPoints_[stage_]);
 
-
+	playTime_ = std::chrono::milliseconds{ 0 };
 }
 
 void GameScene::Initialize() {
@@ -72,10 +74,18 @@ void GameScene::Initialize() {
 	ScaffoldingGeneration();
 
 	startTime_ = std::chrono::steady_clock::now();
+
+	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
+	backGroundParticle_.ParticleStart();
+
+	pause_.Initialize();
+
+	bgm_ = audioManager_->LoadWav("./Resources/Audio/BGM/BGM/game.wav", true);
+	bgm_->Start(0.1f);
 }
 
 void GameScene::Finalize() {
-
+	bgm_->Stop();
 }
 
 void GameScene::InitializeGlobalVariable() {
@@ -147,6 +157,9 @@ void GameScene::InitializeGlobalVariable() {
 			if (enemyPoses_.size() <= stageNum) {
 				enemyPoses_.push_back(std::vector<Vector3>());
 				enemyType_.push_back(std::vector<int>());
+				enemyIsHealer_.push_back(std::vector<int>());
+				enemyMoveVector_.push_back(std::vector<int>());
+				enemyMoveRadius_.push_back(std::vector<float>());
 			}
 
 			if (scaffoldingPoses_.size() <= stageNum) {
@@ -160,6 +173,9 @@ void GameScene::InitializeGlobalVariable() {
 				if (enemyPoses_[stageNum].size() <= enemyNum) {
 					enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
 					enemyType_[stageNum].push_back(0);
+					enemyIsHealer_[stageNum].push_back(0);
+					enemyMoveVector_[stageNum].push_back(0);
+					enemyMoveRadius_[stageNum].push_back(0.0f);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -172,6 +188,18 @@ void GameScene::InitializeGlobalVariable() {
 				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kType)];
 
 				enemyType_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveVector)];
+
+				enemyMoveVector_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kIsHealer)];
+
+				enemyIsHealer_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveRadius)];
+
+				enemyMoveRadius_[stageNum][enemyNum] = globalVariables_->GetFloatValue(g, item);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -275,6 +303,9 @@ void GameScene::SetGlobalVariable() {
 			if (enemyPoses_.size() <= stageNum) {
 				enemyPoses_.push_back(std::vector<Vector3>());
 				enemyType_.push_back(std::vector<int>());
+				enemyIsHealer_.push_back(std::vector<int>());
+				enemyMoveVector_.push_back(std::vector<int>());
+				enemyMoveRadius_.push_back(std::vector<float>());
 			}
 
 			if (scaffoldingPoses_.size() <= stageNum) {
@@ -287,6 +318,9 @@ void GameScene::SetGlobalVariable() {
 				if (enemyPoses_[stageNum].size() <= enemyNum) {
 					enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
 					enemyType_[stageNum].push_back(0);
+					enemyMoveVector_[stageNum].push_back(0);
+					enemyIsHealer_[stageNum].push_back(0);
+					enemyMoveRadius_[stageNum].push_back(0.0f);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -298,6 +332,18 @@ void GameScene::SetGlobalVariable() {
 				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kType)];
 
 				globalVariables_->AddItem(g, item, enemyType_[stageNum][enemyNum]);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveVector)];
+
+				globalVariables_->AddItem(g, item, enemyMoveVector_[stageNum][enemyNum]);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kIsHealer)];
+
+				globalVariables_->AddItem(g, item, enemyIsHealer_[stageNum][enemyNum]);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveRadius)];
+
+				globalVariables_->AddItem(g, item, enemyMoveRadius_[stageNum][enemyNum]);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -332,7 +378,7 @@ void GameScene::ApplyGlobalVariable() {
 
 	kMaxStageNum_ = globalVariables_->GetIntValue("Game", "kMaxStageNum");
 
-	camera2D_->pos = globalVariables_->GetVector3Value("Game", "Camera2DPos");
+	cameraLocalPos_ = globalVariables_->GetVector3Value("Game", "Camera2DPos");
 
 	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
 
@@ -367,6 +413,9 @@ void GameScene::ApplyGlobalVariable() {
 		if (enemyPoses_.size() <= stageNum) {
 			enemyPoses_.push_back(std::vector<Vector3>());
 			enemyType_.push_back(std::vector<int>());
+			enemyMoveVector_.push_back(std::vector<int>());
+			enemyIsHealer_.push_back(std::vector<int>());
+			enemyMoveRadius_.push_back(std::vector<float>());
 		}
 
 		if (scaffoldingNums_.size() <= stageNum) {
@@ -443,6 +492,9 @@ void GameScene::ApplyGlobalVariable() {
 				if (enemyPoses_[stageNum].size() <= enemyNum) {
 					enemyPoses_[stageNum].push_back(Vector3{ -200.0f + 100.0f * enemyNum, 300.0f,0.0f });
 					enemyType_[stageNum].push_back(0);
+					enemyMoveVector_[stageNum].push_back(0);
+					enemyIsHealer_[stageNum].push_back(0);
+					enemyMoveRadius_[stageNum].push_back(0.0f);
 				}
 
 				std::string enemy = std::to_string(enemyNum);
@@ -474,6 +526,48 @@ void GameScene::ApplyGlobalVariable() {
 				}
 
 				enemyType_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveVector)];
+
+				if (preMaxStageNum_ < kMaxStageNum_) {
+					globalVariables_->AddItem(g, item, enemyMoveVector_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_.size() > preEnemyNums_.size()) {
+					globalVariables_->AddItem(g, item, enemyMoveVector_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+					globalVariables_->AddItem(g, item, enemyMoveVector_[stageNum][enemyNum]);
+				}
+
+				enemyMoveVector_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kIsHealer)];
+
+				if (preMaxStageNum_ < kMaxStageNum_) {
+					globalVariables_->AddItem(g, item, enemyIsHealer_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_.size() > preEnemyNums_.size()) {
+					globalVariables_->AddItem(g, item, enemyIsHealer_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+					globalVariables_->AddItem(g, item, enemyIsHealer_[stageNum][enemyNum]);
+				}
+
+				enemyIsHealer_[stageNum][enemyNum] = globalVariables_->GetIntValue(g, item);
+
+				item = enemyGruoopName_ + enemy + enemyParameter[static_cast<uint16_t>(EnemyParameter::kMoveRadius)];
+
+				if (preMaxStageNum_ < kMaxStageNum_) {
+					globalVariables_->AddItem(g, item, enemyMoveRadius_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_.size() > preEnemyNums_.size()) {
+					globalVariables_->AddItem(g, item, enemyMoveRadius_[stageNum][enemyNum]);
+				}
+				else if (enemyNums_[stageNum] > preEnemyNums_[stageNum]) {
+					globalVariables_->AddItem(g, item, enemyMoveRadius_[stageNum][enemyNum]);
+				}
+
+				enemyMoveRadius_[stageNum][enemyNum] = globalVariables_->GetFloatValue(g, item);
 			}
 
 			for (int scaffoldingNum = 0; scaffoldingNum < scaffoldingNums_[stageNum][layerNum]; scaffoldingNum++) {
@@ -533,7 +627,8 @@ void GameScene::EnemyGeneration() {
 		for (int num = 0; num < enemyNums_[stage_][layer_->GetNowLayer()]; num++) {
 			if (num >= size) {
 
-				enemies_.push_back(std::make_unique<Enemy>(enemyType_[stage_][num], enemyPoses_[stage_][num], layer_->GetHighestPosY()));
+				enemies_.push_back(std::make_unique<Enemy>(enemyType_[stage_][num], enemyPoses_[stage_][num], layer_->GetHighestPosY(),
+					enemyMoveVector_[stage_][num],enemyIsHealer_[stage_][num],enemyMoveRadius_[stage_][num]));
 
 			}
 		}
@@ -553,7 +648,8 @@ void GameScene::SetEnemyParametar() {
 		if (enemyNums_[stage_][layer_->GetNowLayer()] == i) {
 			break;
 		}
-		enemy->SetParametar(enemyType_[stage_][i], enemyPoses_[stage_][i], layer_->GetHighestPosY());
+		enemy->SetParametar(enemyType_[stage_][i], enemyPoses_[stage_][i], layer_->GetHighestPosY(),
+			enemyMoveVector_[stage_][i], enemyIsHealer_[stage_][i], enemyMoveRadius_[stage_][i]);
 		i++;
 	}
 }
@@ -578,7 +674,7 @@ void GameScene::SetScaffoldingParametar() {
 		if (scaffoldingNums_[stage_][layer_->GetNowLayer()] == i) {
 			break;
 		}
-		scaffolding->SetParametar(scaffoldingPoses_[stage_][i], scaffoldingScales_[stage_][i]);
+		scaffolding->SetParametar(scaffoldingPoses_[stage_][i], scaffoldingScales_[stage_][i], camera2D_.get());
 		i++;
 	}
 }
@@ -606,9 +702,6 @@ void GameScene::DeleteShockWave() {
 
 void GameScene::Collision() {
 
-	const Texture2D* playerTex = player_->GetTex();
-	const Vector3& playerVelocity = player_->GetVelocity();
-
 	int i = 0;
 
 	for (std::unique_ptr<Enemy>& enemy : enemies_) {
@@ -620,25 +713,12 @@ void GameScene::Collision() {
 
 		const Texture2D* enemyTex = enemy->GetTex();
 
-		// �G�l�~�[���ʏ펞�̎��A�v���C���[���ʏ펞�q�b�v�h���b�v���̎��̂�
-		if (enemy->GetStatus() == Enemy::Status::kNormal &&
-			(player_->GetStatus() == Player::Status::kNormal || player_->GetStatus() == Player::Status::kHipDrop)) {
+		player_->FallingCollision(enemy.get());
 
-			if (playerTex->Collision(*enemyTex)) {
+		enemy->CollisionPlayer(player_.get());
 
-				// �G�����Ǒ��x��0�ȉ��Ńv���C���[������ł锻��ɂ��Ă���
-				if (playerVelocity.y < 0.0f) {
-					// �G�𓥂񂾎�
-					enemy->StatusRequest(Enemy::Status::kFalling);
-					player_->EnemyStep(true);
-				}
-				else {
-					// �G�ɓ��܂ꂽ��
-					player_->EnemyStep(false);
-				}
-			}
-		}
-		else if (enemy->GetStatus() == Enemy::Status::kFaint && shockWaves_.size() != 0) {
+
+		if (shockWaves_.size() != 0 && enemy->GetStatus() != Enemy::Status::kDeath && enemy->GetStatus() != Enemy::Status::kGeneration) {
 			for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
 				const std::list<std::unique_ptr<Texture2D>>& shockWaveTextures = shockWave->GetTextures();
 
@@ -648,6 +728,19 @@ void GameScene::Collision() {
 						enemy->StatusRequest(Enemy::Status::kDeath);
 					}
 				}
+			}
+		}
+
+		int j = 0;
+
+		for (std::unique_ptr<Enemy>& enemy2 : enemies_) {
+			if (enemyNums_[stage_][layer_->GetNowLayer()] == j) {
+				break;
+			}
+			j++;
+
+			if (i != j) {
+				enemy->CollisionEnemy(enemy2.get());
 			}
 		}
 	}
@@ -665,87 +758,113 @@ void GameScene::Collision() {
 }
 
 void GameScene::Update() {
+	auto nowTime = std::chrono::steady_clock::now();
 
-#ifdef _DEBUG
+	if (!pause_.isActive_) {
 
-	preStage_ = stage_;
-	preMaxStageNum_ = kMaxStageNum_;
-	preEnemyNums_ = enemyNums_;
-	preScaffoldingNums_ = scaffoldingNums_;
-	preLayerNums_ = kLayerNums_;
-
-	ImGui::Begin("PlayScene");
-	ImGui::SliderInt("NowStage 0 = 1stage", &stage_, 0, kMaxStageNum_ - 1);
-	ImGui::End();
-
-	globalVariables_->Update();
-
-	//SetGlobalVariable();
-	Enemy::GlobalVariablesUpdate();
-	ShockWave::GlobalVariablesUpdate();
-	ShockWave::ApplyGlobalVariable();
-	Layer::GlobalVariablesUpdate();
-
-#endif // _DEBUG
-
-	ApplyGlobalVariable();
-
-	if (kMaxStageNum_ <= 0) {
-		kMaxStageNum_ = 1;
-	}
-
-	EnemyGeneration();
-	ScaffoldingGeneration();
-
-#ifdef _DEBUG
-
-	SetEnemyParametar();
-	SetScaffoldingParametar();
-	CreateLayer();
-	SetLayerParametar();
-
-#endif // _DEBUG
-
-	background_->Update();
-
-	player_->Update(layer_->GetHighestPosY(), camera2D_.get());
-
-	int i = 0;
-
-	for (std::unique_ptr<Enemy>& enemy : enemies_) {
-		if (enemyNums_[stage_][layer_->GetNowLayer()] == i) {
-			break;
+		if (cameraLocalPos_.y <= player_->GetTex()->pos.y) {
+			camera2D_->pos.y = player_->GetTex()->pos.y;
 		}
-		enemy->Update(layer_.get(), layer_->GetHighestPosY(), camera2D_.get());
-		i++;
-	}
-	for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
-		shockWave->Update();
-	}
+		else {
+			camera2D_->pos.y = cameraLocalPos_.y;
+		}
 
-	DeleteShockWave();
-
-	Collision();
-
-	layer_->Update(camera2D_.get());
-
-	camera2D_->Update();
+		camera2D_->Update();
 
 #ifdef _DEBUG
 
-	if (layer_->GetClearFlag().OnEnter()) {
-		auto nowTime = std::chrono::steady_clock::now();
-		std::chrono::milliseconds playTime = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
+		preStage_ = stage_;
+		preMaxStageNum_ = kMaxStageNum_;
+		preEnemyNums_ = enemyNums_;
+		preScaffoldingNums_ = scaffoldingNums_;
+		preLayerNums_ = kLayerNums_;
 
-		auto result = new ResultScene{};
-		assert(result);
-		result->SetClearTime(playTime);
-		result->SetStageNumber(stage_ + 1);
-		sceneManager_->SceneChange(result);
-	}
+		ImGui::Begin("PlayScene");
+		ImGui::SliderInt("NowStage 0 = 1stage", &stage_, 0, kMaxStageNum_ - 1);
+		ImGui::End();
+
+		globalVariables_->Update();
+
+		//SetGlobalVariable();
+		Enemy::GlobalVariablesUpdate();
+		ShockWave::GlobalVariablesUpdate();
+		ShockWave::ApplyGlobalVariable();
+		Layer::GlobalVariablesUpdate();
 
 #endif // _DEBUG
 
+		ApplyGlobalVariable();
+
+		if (kMaxStageNum_ <= 0) {
+			kMaxStageNum_ = 1;
+		}
+
+		EnemyGeneration();
+		ScaffoldingGeneration();
+
+#ifdef _DEBUG
+
+		SetEnemyParametar();
+		SetScaffoldingParametar();
+		CreateLayer();
+		SetLayerParametar();
+
+#endif // _DEBUG
+
+		background_->Update();
+
+		player_->Update(layer_->GetHighestPosY(), camera2D_.get());
+
+		int i = 0;
+
+		for (std::unique_ptr<Enemy>& enemy : enemies_) {
+			if (enemyNums_[stage_][layer_->GetNowLayer()] == i) {
+				break;
+			}
+			enemy->Update(layer_.get(), layer_->GetHighestPosY(), camera2D_.get());
+			i++;
+		}
+		for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
+			shockWave->Update();
+		}
+
+		DeleteShockWave();
+
+		Collision();
+
+		layer_->Update(camera2D_.get());
+
+		if (layer_->GetClearFlag().OnEnter()) {
+			bgm_->Stop();
+			playTime_ += std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
+
+			auto result = new ResultScene{};
+			assert(result);
+			result->SetClearTime(playTime_);
+			result->SetStageNumber(stage_ + 1);
+			sceneManager_->SceneChange(result);
+		}
+	}
+
+	pause_.ActiveUpdate();
+	if (input_->GetKey()->Pushed(DIK_TAB) ||
+		input_->GetGamepad()->Pushed(Gamepad::Button::START)
+		) 
+	{
+		pause_.isActive_ = !pause_.isActive_;
+		if (pause_.isActive_) {
+			bgm_->SetAudio(0.025f);
+			playTime_ += std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
+		}
+		else {
+			bgm_->SetAudio(0.1f);
+			startTime_ = nowTime;
+		}
+	}
+
+	backGroundParticle_.Update();
+
+	bgm_->Debug("bgm_");
 }
 
 void GameScene::Draw() {
@@ -753,11 +872,14 @@ void GameScene::Draw() {
 
 	background_->Draw2D(camera2D_->GetViewOthographics());
 
-	layer_->Draw2DFar(camera2D_->GetViewOthographics());
+	backGroundParticle_.Draw(camera2D_->GetViewOthographics());
+
+	//layer_->Draw2DFar(camera2D_->GetViewOthographics());
 
 	player_->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
 
 	layer_->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
+	layer_->ParticleDraw(camera2D_->GetViewOthographics());
 
 	int i = 0;
 
@@ -766,6 +888,7 @@ void GameScene::Draw() {
 			break;
 		}
 		enemy->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
+		enemy->DrawParticle(camera2D_->GetViewOthographics());
 
 		//enemy->Draw2D(camera2D_->GetViewOthographics());
 		i++;
@@ -776,16 +899,17 @@ void GameScene::Draw() {
 		if (scaffoldingNums_[stage_][layer_->GetNowLayer()] == i) {
 			break;
 		}
-		scaffolding->Draw2D(camera2D_->GetViewOthographics());
+		scaffolding->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
+		//scaffolding->Draw2D(camera2D_->GetViewOthographics());
 		i++;
 	}
 	for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
 		shockWave->Draw2D(camera2D_->GetViewOthographics());
 	}
 
-	//layer_->Draw2DNear(camera2D_->GetViewOthographics());
+	layer_->Draw2DNear(camera2D_->GetViewOthographics());
 
 	//player_->Draw2D(camera2D_->GetViewOthographics());
 
-
+	pause_.Draw();
 }

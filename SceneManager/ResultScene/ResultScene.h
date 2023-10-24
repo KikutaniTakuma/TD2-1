@@ -170,6 +170,14 @@ private:
 	// 背景パーティクル
 	Particle backGroundParticle_;
 
+
+	// BGM
+	Audio* bgm_;
+	Audio* choiceSE_;
+	Audio* decideSE_;
+	Audio* starSE_;
+	Audio* specialStarSE_;
+
 	///
 	/// =============================================
 	/// 

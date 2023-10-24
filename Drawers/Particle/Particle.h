@@ -294,6 +294,15 @@ public:
 	/// <param name="index">particleのインデックス</param>
 	void Resize(uint32_t index);
 
+	const UtilsLib::Flg& GetIsParticleStart() const {
+		if (settings.empty()) {
+			static UtilsLib::Flg result{false};
+			return result;
+		}
+
+		return settings.front().isValid;
+	}
+
 public:
 	Vector2 uvPibot;
 	Vector2 uvSize;

@@ -272,6 +272,13 @@ void ResultScene::Initialize() {
 
 	backGroundParticle_.LopadSettingDirectory("backGroundParticle");
 	backGroundParticle_.ParticleStart();
+
+
+	bgm_ = audioManager_->LoadWav("./Resources/Audio/BGM/BGM/result.wav", true);
+	choiceSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_sentaku.wav", false);
+	decideSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_kettei.wav", false);
+	starSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/star1.wav", false);
+	specialStarSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/star2.wav", false);
 }
 
 void ResultScene::SetClearTime(std::chrono::milliseconds clearTime) {
@@ -296,7 +303,7 @@ void ResultScene::SetStageNumber(int32_t stageNumber) {
 }
 
 void ResultScene::Finalize() {
-
+	bgm_->Stop();
 }
 
 void ResultScene::Update() {
@@ -310,6 +317,8 @@ void ResultScene::Update() {
 		stars_[currentStar_].Start();
 		startTime_ = nowTime;
 		currentStar_++;
+
+		starSE_->Start(0.4f);
 	}
 	if(isUpdate_){
 		for (size_t i = 0; i < backGround_.size(); i++) {
@@ -330,6 +339,13 @@ void ResultScene::Update() {
 		if (currentStar_ < score_ && currentStar_ < stars_.size()&&
 			starEffectDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_))
 		{
+			if (currentStar_ == static_cast<int32_t>(stars_.size() - 1)) {
+				specialStarSE_->Start(0.4f);
+			}
+			else {
+				starSE_->Start(0.4f);
+			}
+
 			stars_[currentStar_].Start();
 			startTime_ = nowTime;
 			currentStar_++;
@@ -340,6 +356,8 @@ void ResultScene::Update() {
 				stars_[i].NormalStart();
 			}
 			isCanSelect_ = true;
+
+			bgm_->Start(0.15f);
 		}
 
 		for (size_t i = 0; i < stars_.size(); i++) {
@@ -357,6 +375,7 @@ void ResultScene::Update() {
 				input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f
 				)
 			{
+				choiceSE_->Start(0.25f);
 				nowChoose_--;
 			}
 			else if (
@@ -366,6 +385,7 @@ void ResultScene::Update() {
 				input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f
 				)
 			{
+				choiceSE_->Start(0.25f);
 				nowChoose_++;
 			}
 			nowChoose_ = std::clamp(nowChoose_, 0, 1);
@@ -431,14 +451,16 @@ void ResultScene::Update() {
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
 		) {
+		bgm_->Stop();
+		decideSE_->Start(0.2f);
 		if (nowChoose_ == 0) {
+
 			auto gameScene = new GameScene;
 			assert(gameScene);
 			gameScene->SetStageNumber(stageNumber_);
 
 			sceneManager_->SceneChange(gameScene);
 		}
-		// ここはタイトルになる予定
 		else {
 			auto stageSelect = new StageSelect;
 			assert(stageSelect);

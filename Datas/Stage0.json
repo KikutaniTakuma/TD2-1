@@ -1,42 +1,90 @@
 {
     "Stage0": {
+        "Enemy0IsHealer": 0,
+        "Enemy0MoveRadius": 0.0,
+        "Enemy0MoveVector": 0,
         "Enemy0Pos": [
-            -200.0,
-            100.0,
+            -125.0,
+            125.0,
             0.0
         ],
         "Enemy0Type": 0,
+        "Enemy1IsHealer": 0,
+        "Enemy1MoveRadius": 0.0,
+        "Enemy1MoveVector": 0,
         "Enemy1Pos": [
-            -100.0,
-            200.0,
+            100.0,
+            125.0,
             0.0
         ],
         "Enemy1Type": 0,
+        "Enemy2IsHealer": 0,
+        "Enemy2MoveRadius": 0.0,
+        "Enemy2MoveVector": 0,
         "Enemy2Pos": [
-            0.0,
-            300.0,
+            -275.0,
+            250.0,
             0.0
         ],
         "Enemy2Type": 0,
+        "Enemy3IsHealer": 0,
+        "Enemy3MoveRadius": 1.0,
+        "Enemy3MoveVector": 0,
         "Enemy3Pos": [
-            100.0,
-            300.0,
+            0.0,
+            250.0,
             0.0
         ],
-        "Enemy3Type": 1,
-        "Layer0EnemyNum": 3,
-        "Layer0HP": 1,
-        "Layer0ScaffoldingNum": 1,
-        "Layer1EnemyNum": 4,
+        "Enemy3Type": 0,
+        "Enemy4IsHealer": 0,
+        "Enemy4MoveRadius": 0.0,
+        "Enemy4MoveVector": 0,
+        "Enemy4Pos": [
+            275.0,
+            250.0,
+            0.0
+        ],
+        "Enemy4Type": 0,
+        "Enemy5IsHealer": 0,
+        "Enemy5MoveRadius": 0.0,
+        "Enemy5MoveVector": 0,
+        "Enemy5Pos": [
+            125.0,
+            450.0,
+            0.0
+        ],
+        "Enemy5Type": 0,
+        "Enemy6IsHealer": 0,
+        "Enemy6MoveRadius": 0.0,
+        "Enemy6MoveVector": 0,
+        "Enemy6Pos": [
+            -125.0,
+            450.0,
+            0.0
+        ],
+        "Enemy6Type": 0,
+        "Layer0EnemyNum": 5,
+        "Layer0HP": 4,
+        "Layer0ScaffoldingNum": 0,
+        "Layer1EnemyNum": 7,
         "Layer1HP": 1,
-        "Layer1ScaffoldingNum": 1,
-        "LayerNum": 2,
+        "Layer1ScaffoldingNum": 0,
+        "LayerNum": 1,
         "Scaffolding0Pos": [
-            -300.0,
+            -450.0,
             100.0,
             0.0
         ],
         "Scaffolding0Scale": [
+            75.0,
+            10.0
+        ],
+        "Scaffolding1Pos": [
+            450.0,
+            100.0,
+            0.0
+        ],
+        "Scaffolding1Scale": [
             100.0,
             10.0
         ]

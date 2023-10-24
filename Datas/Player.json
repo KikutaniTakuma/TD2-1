@@ -1,9 +1,11 @@
 {
-    "Player": {
-        "kFallingGravity": -30.0,
-        "kGravity": -9.800000190734863,
-        "kHipDropSpeed": -25.0,
-        "kJampInitialVelocity": 8.0,
-        "kMoveSpeed": 300.0
-    }
+  "Player": {
+    "kFallingGravity": -60.0,
+    "kGravity": -20.0,
+    "kHipDropSpeed": -60.0,
+    "kJampInitialVelocity": 10.7,
+    "kLayerReboundCoefficient": 0.6000000238418579,
+    "kMoveSpeed": 225.0,
+    "kReboundCoefficient": 0.8999999761581421
+  }
 }
