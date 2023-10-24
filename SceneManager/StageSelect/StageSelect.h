@@ -51,6 +51,9 @@ private:
 	Easeing rotateEase_;
 
 	Model player_;
+	std::array<std::pair<Vector2, Vector2>, 3> playerScaleEaseDuration_;
+	std::array<Easeing, 3> playerEase_;
+	int32_t currentPlayerEaseing_;
 
 
 	Texture2D bubble_;

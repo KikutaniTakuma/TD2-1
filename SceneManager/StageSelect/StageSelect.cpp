@@ -12,12 +12,15 @@ StageSelect::StageSelect():
 	currentStage_{},
 	maxStage_{},
 	stageNumberTex_{},
-	stageTenNumberTex_{}
+	stageTenNumberTex_{},
+	bgm_{nullptr},
+	choiceSE_{nullptr},
+	decideSE_{nullptr}
 {}
 
 void StageSelect::Initialize() {
 	camera_.farClip = 3000.0f;
-	camera_.pos.z = -500.0f;
+	camera_.pos.z = -2000.0f;
 	currentStage_ = 1;
 	maxStage_ = static_cast<decltype(maxStage_)>(sceneManager_->isClearStage_.size());
 
@@ -30,6 +33,34 @@ void StageSelect::Initialize() {
 	moon_.pos.y = -360.0f;
 	moon_.rotate.z = std::numbers::pi_v<float> / 10.0f * static_cast<float>(maxStage_ - currentStage_);
 
+	player_.LoadObj("./Resources/Player/player.obj");
+	player_.light.ligDirection = { 0.0f, 0.0f, 1.0f };
+	player_.light.ligColor = Vector3::identity;
+	player_.light.ptRange = std::numeric_limits<float>::max();
+	player_.pos.y = -63.0f;
+	player_.pos.z = -800.0f;
+	player_.rotate.y = std::numbers::pi_v<float>;
+	player_.rotate.x = 0.19f;
+	player_.scale *= 40.0f;
+
+	playerScaleEaseDuration_ = {
+		std::pair<Vector2, Vector2>{
+		Vector2{player_.scale.x * 1.0f, player_.scale.y * 1.0f},
+		Vector2{player_.scale.x * 1.25f, player_.scale.y * 0.75f}
+		},
+		std::pair<Vector2, Vector2>{
+		Vector2{player_.scale.x * 1.25f, player_.scale.y * 0.75f},
+		Vector2{player_.scale.x * 0.75f, player_.scale.y * 1.25f}
+		},
+		std::pair<Vector2, Vector2>{
+		Vector2{player_.scale.x * 0.75f, player_.scale.y * 1.25f},
+		Vector2{player_.scale.x * 1.0f, player_.scale.y * 1.0f}
+		}
+	};
+
+	currentPlayerEaseing_ = 0;
+
+	
 	bubble_.LoadTexture("./Resources/StageSelect/hukidasi_stageSelect.png");
 	bubble_.isSameTexSize = true;
 	bubble_.texScalar = 0.48f;
@@ -141,6 +172,13 @@ void StageSelect::Update() {
 		moonRotateY_.first = moon_.rotate.z;
 
 		choiceSE_->Start(0.25f);
+
+		currentPlayerEaseing_ = 0;
+		playerEase_[currentPlayerEaseing_].Start(
+			false,
+			0.1f,
+			Easeing::GetFunction(4)
+		);
 	}
 
 	else if (input_->GetKey()->Pushed(DIK_LEFT) ||
@@ -154,6 +192,13 @@ void StageSelect::Update() {
 		moonRotateY_.first = moon_.rotate.z;
 
 		choiceSE_->Start(0.25f);
+
+		currentPlayerEaseing_ = 0;
+		playerEase_[currentPlayerEaseing_].Start(
+			false,
+			0.05f,
+			Easeing::GetFunction(4)
+		);
 	}
 	if (maxStage_ < currentStage_) {
 		currentStage_ = 1;
@@ -180,6 +225,13 @@ void StageSelect::Update() {
 		i.Update();
 	}
 	
+	player_.Debug("player_");
+	for (size_t i = 0; i < playerEase_.size();i++) {
+		playerEase_[i].Debug("playerEase_" + std::to_string(i));
+	}
+	player_.scale = playerEase_[currentPlayerEaseing_].Get(playerScaleEaseDuration_[currentPlayerEaseing_].first, playerScaleEaseDuration_[currentPlayerEaseing_].second);
+	player_.Update();
+
 	moon_.Update();
 	
 	bubble_.pos.y = bubbleEase_.Get(bubbleY_.first, bubbleY_.second);
@@ -205,6 +257,31 @@ void StageSelect::Update() {
 	rotateEase_.Update();
 	bubbleEase_.Update();
 	arrowEase_.Update();
+	for (auto& i : playerEase_) {
+		i.Update();
+	}
+
+	if (playerEase_[currentPlayerEaseing_].ActiveExit()) {
+		currentPlayerEaseing_++;
+		if (static_cast<int32_t>(playerEase_.size()) <= currentPlayerEaseing_) {
+			currentPlayerEaseing_ = 0;
+		}
+		else if(currentPlayerEaseing_ == 1){
+			playerEase_[currentPlayerEaseing_].Start(
+				false,
+				0.05f,
+				Easeing::GetFunction(23)
+			);
+		}
+		else if (currentPlayerEaseing_ == 2) {
+			playerEase_[currentPlayerEaseing_].Start(
+				false,
+				0.5f,
+				Easeing::GetFunction(26)
+			);
+		}
+	}
+
 
 	backGroundParticle_.Update();
 
@@ -245,4 +322,6 @@ void StageSelect::Draw() {
 	}
 
 	moon_.Draw(camera_.GetViewOthographics(), camera_.pos);
+
+	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
 }
