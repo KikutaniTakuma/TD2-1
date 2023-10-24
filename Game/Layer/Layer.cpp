@@ -207,7 +207,7 @@ void Layer::Update(const Camera* camera) {
 
 	ApplyGlobalVariable();
 
-	gauge_->Update(hitPoints_[nowLayer_], kMaxHitPoints_[nowLayer_], damage_);
+	gauge_->Update(hitPoints_[nowLayer_], kMaxHitPoints_[nowLayer_], damage_, GetHighestPosY());
 
 	hitPoints_[nowLayer_] -= damage_;
 

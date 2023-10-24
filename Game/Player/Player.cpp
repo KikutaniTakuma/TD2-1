@@ -167,13 +167,16 @@ void Player::Update(const float& y, const Camera* camera) {
 		break;
 	}
 
-	if (tex_->pos.x - tex_->scale.x < -640) {
-		tex_->pos.x -= tex_->pos.x - tex_->scale.x + 640;
-		velocity_.x *= -1;
-	}
-	else if (tex_->pos.x + tex_->scale.x > 640) {
-		tex_->pos.x -= tex_->pos.x + tex_->scale.x - 640;
-		velocity_.x *= -1;
+
+	if (status_ != Status::kLanding) {
+		if (tex_->pos.x - tex_->scale.x < -640) {
+			tex_->pos.x -= tex_->pos.x - tex_->scale.x + 640;
+			velocity_.x *= -1;
+		}
+		else if (tex_->pos.x + tex_->scale.x > 640) {
+			tex_->pos.x -= tex_->pos.x + tex_->scale.x - 640;
+			velocity_.x *= -1;
+		}
 	}
 
 	float ratio = static_cast<float>(Engine::GetInstance()->clientHeight) /
@@ -242,8 +245,7 @@ void Player::NormalUpdate(const float& y) {
 	}
 
 	// ジャンプ入力
-	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetKey()->Pushed(DIK_W) ||
-		input_->GetKey()->Pushed(DIK_UP) || input_->GetGamepad()->Pushed(Gamepad::Button::A)))) {
+	if (isStep_ || (!isFly_ && (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetGamepad()->Pushed(Gamepad::Button::A)))) {
 		isFly_ = true;
 		isStep_ = false;
 		// 初速を与える
@@ -368,7 +370,7 @@ void Player::OnScaffoldingUpdate()
 
 void Player::LandingInitialize(const float& y) {
 
-	velocity_ = {};
+	velocity_ = { 0.0f,0.0f,0.0f };
 
 	Collision(y);
 
@@ -376,11 +378,11 @@ void Player::LandingInitialize(const float& y) {
 
 	scaleStart_ = tex_->scale;
 
-	if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMajor))) {
+	if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMiddle))) {
 		scaleEnd_ = { scale_.x * 10.0f,scale_.y * 0.3f };
 		easeTime_ = 0.7f;
 	}
-	else if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMiddle))) {
+	else if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kSmall))) {
 		scaleEnd_ = { scale_.x * 5.0f,scale_.y * 0.5f };
 		easeTime_ = 0.5f;
 	}

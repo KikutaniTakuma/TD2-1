@@ -27,7 +27,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(const int& num, const int& Max, const int& damage);
+	void Update(const int& num, const int& Max, const int& damage, const float& y);
 
 	/// <summary>
 	/// 3DモデルのDraw仮
@@ -51,7 +51,7 @@ private:
 	/// <summary>
 	/// jsonファイルからの呼び出し
 	/// </summary>
-	void ApplyGlobalVariable();
+	void ApplyGlobalVariable(const float& y = 0.0f);
 
 	void DamageUpdate(const int& damage);
 
