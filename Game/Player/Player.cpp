@@ -26,7 +26,7 @@ Player::Player() {
 
 	tex_->pos = {};
 
-	tex_->scale *= 50.0f;
+	tex_->scale = scale_;
 
 	// ジャンプ時の初速
 	kJampInitialVelocity_ = 10.0f;
@@ -191,6 +191,7 @@ void Player::Update(const float& y, const Camera* camera) {
 	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
 	tex_->Update();
 
+	easeScale_.Update();
 	isCollisionLayer_.Update();
 	isCollisionEnemy_.Update();
 }
@@ -230,9 +231,14 @@ void Player::NormalUpdate(const float& y) {
 		if (input_->GetKey()->Pushed(DIK_SPACE) || input_->GetGamepad()->Pushed(Gamepad::Button::A)) {
 			statusRequest_ = Status::kHipDrop;
 		}
-		/*else {
-			velocity_.y += kGravity_ * deletaTime;
-		}*/
+
+		easeCount_ += deletaTime;
+
+		if (easeCount_ > easeTime_) {
+			easeCount_ = easeTime_;
+		}
+
+		tex_->scale = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_);
 	}
 
 	// ジャンプ入力
@@ -242,6 +248,12 @@ void Player::NormalUpdate(const float& y) {
 		isStep_ = false;
 		// 初速を与える
 		velocity_.y = kJampInitialVelocity_;
+
+		//easeScale_.Start(false, 0.3f, Easeing::InSine);
+		scaleStart_ = scale_;
+		scaleEnd_ = { scale_.x * 0.8f,scale_.y * 1.2f };
+		easeCount_ = 0.0f;
+		easeTime_ = 0.3f;
 	}
 
 	if (isFallingGravity_) {
@@ -343,7 +355,7 @@ void Player::OnScaffoldingUpdate()
 		statusRequest_ = Status::kNormal;
 	}
 
-	velocity_.y += kGravity_;
+	velocity_.y += kGravity_ * deletaTime;
 
 	// 横の移動距離
 	velocity_.x = move.x * kMoveSpeed_;
@@ -361,6 +373,11 @@ void Player::LandingInitialize(const float& y) {
 	Collision(y);
 
 	play_->CreatShockWave(tex_->pos, highest_, y);
+
+	/*scaleStart_ = tex_->scale;
+	scaleEnd_ = { scale_.x * 0.6f,scale_.y * 1.4f };
+	easeCount_ = 0.0f;
+	easeTime_ = 0.5f;*/
 
 	/*if (highest_ > ShockWave::kHighCriteria_[static_cast<uint16_t>(ShockWave::Size::kSmall)] - y) {
 		play_->CreatShockWave(tex_->pos, highest_, y);

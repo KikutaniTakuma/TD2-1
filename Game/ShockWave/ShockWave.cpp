@@ -183,7 +183,7 @@ void ShockWave::Update() {
 	}
 
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
-		tex->Animation(size_t(kDeleteFrame_[static_cast<uint16_t>(type_)]) * 2000, false, 0.0f, 6.0f);
+		tex->Animation(size_t(kDeleteFrame_[static_cast<uint16_t>(type_)]), false, 0.0f, 6.0f);
 		tex->Update();
 	}
 }
