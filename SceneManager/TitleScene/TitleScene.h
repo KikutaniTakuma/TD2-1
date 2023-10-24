@@ -43,6 +43,17 @@ private:
 	Easeing playerScaleEaseing_;
 	Easeing playerPosEaseing_;
 
+	// プレイヤーアニメーション
+	std::vector<Texture*> playerAnimationTex_;
+	std::chrono::milliseconds playerAnimationDuration_;
+	std::chrono::steady_clock::time_point playerAnimationStartTime_;
+	int32_t currentPlayerAnimation_;
+	bool isPlayerAnimationTurnBack_;
+	std::chrono::milliseconds playerAnimationCoolTime_;
+	std::pair<int32_t, int32_t> playerAnimationCoolTimeDuration_;
+	std::chrono::steady_clock::time_point playerAnimationCoolStartTime_;
+	bool isPlayerAnimationCoolTime_;
+
 	// タイトル
 	Texture2D titleTex_;
 
