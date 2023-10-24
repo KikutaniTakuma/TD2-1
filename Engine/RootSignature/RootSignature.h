@@ -2,6 +2,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
+#include <vector>
 
 class RootSignature {
 public:
@@ -29,8 +30,8 @@ public:
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-	D3D12_ROOT_PARAMETER* rootParamater;
-	size_t rootParamaterSize;
+	std::vector<std::pair<D3D12_ROOT_PARAMETER, std::vector<D3D12_DESCRIPTOR_RANGE>>> rootParamater;
+	
 	bool isTexture;
 };
 
