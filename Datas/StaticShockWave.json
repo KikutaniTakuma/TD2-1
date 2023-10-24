@@ -1,22 +1,22 @@
 {
     "StaticShockWave": {
-        "kDeleteFrameMajor": 300,
-        "kDeleteFrameMiddle": 25,
-        "kDeleteFrameSmall": 15,
+        "kDeleteFrameMajor": 0.5,
+        "kDeleteFrameMiddle": 0.20000000298023224,
+        "kDeleteFrameSmall": 1.0,
         "kHighCriteriaMajor": 800.0,
         "kHighCriteriaMiddle": 600.0,
         "kHighCriteriaSmall": 300.0,
         "kSizeMajor": [
             80.0,
-            80.0
+            1000.0
         ],
         "kSizeMiddle": [
             60.0,
-            60.0
+            500.0
         ],
         "kSizeSmall": [
-            40.0,
-            40.0
+            100.0,
+            100.0
         ],
         "kSpeedMajor": 900.0,
         "kSpeedMiddle": 600.0,

@@ -99,7 +99,7 @@ public:
 
 	void CollisionScaffolding(const Texture2D* tex);
 
-	void KnockBack(const Vector3& pos);
+	void KnockBack(const Vector3& pos, const Vector3& scale);
 
 	void Steped(const Vector3& pos);
 

@@ -519,9 +519,11 @@ void Player::CollisionScaffolding(const Texture2D* tex)
 	}
 }
 
-void Player::KnockBack(const Vector3& pos)
+void Player::KnockBack(const Vector3& pos, const Vector3& scale)
 {
+
 	Vector3 vector = tex_->pos - pos;
+	vector.y = 0.0f;
 
 	Vector3 normal = vector.Normalize();
 
@@ -529,6 +531,10 @@ void Player::KnockBack(const Vector3& pos)
 
 	if (vector.x < 0) {
 		theta *= -1;
+		tex_->pos.x = pos.x - scale.x / 2 - tex_->scale.x / 2;
+	}
+	else {
+		tex_->pos.x = pos.x + scale.x / 2 + tex_->scale.x / 2;
 	}
 
 	float speed = 200.0f;
@@ -552,6 +558,7 @@ void Player::KnockBack(const Vector3& pos)
 	rotateTimeCount_ = 0.0f;
 
 	statusRequest_ = Status::kKnockBack;
+
 }
 
 void Player::Steped(const Vector3& pos)

@@ -251,6 +251,8 @@ private:
 
 	float moveRadius_;
 
+	float randRotate_;
+
 	float normalFallingSpeed_;
 
 	bool isHealer_;
