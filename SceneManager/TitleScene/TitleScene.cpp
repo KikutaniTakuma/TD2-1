@@ -127,6 +127,19 @@ void TitleScene::Initialize() {
 	startHud_.pos = Vector2{ -315.0f, -291.0f };
 
 	hudAlphaEase_.Start(true, 1.0f, Easeing::InOutQuad);
+
+	keyEscHud_.LoadTexture("./Resources/HUD/keys_UI_esc.png");
+	keyEscHud_.uvSize.x = 0.5f;
+	keyEscHud_.scale = Vector2{ 115.0f, 113.0f };
+	keyEscHud_.pos = Vector2{ -555.0f,291.0f };
+	padStartHud_.LoadTexture("./Resources/HUD/controler_UI_pose.png");
+	padStartHud_.uvSize.x = 0.5f;
+	padStartHud_.scale = Vector2{ 70.0f, 70.0f };
+	padStartHud_.pos = Vector2{ -555.0f,291.0f };
+	backToHud_.LoadTexture("./Resources/HUD/title_UI_owaru.png");
+	backToHud_.isSameTexSize = true;
+	backToHud_.texScalar = 0.25f;
+	backToHud_.pos = Vector2{ -549.0f, 232.0f };
 }
 
 void TitleScene::Finalize() {
@@ -199,6 +212,23 @@ void TitleScene::Update() {
 
 	hudAlphaEase_.Update();
 
+	if (input_->GetGamepad()->GetButton(Gamepad::Button::START)) {
+		padStartHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		padStartHud_.uvPibot.x = 0.0f;
+	}
+	if (input_->GetKey()->GetKey(DIK_ESCAPE)) {
+		keyEscHud_.uvPibot.x = 0.5f;
+	}
+	else {
+		keyEscHud_.uvPibot.x = 0.0f;
+	}
+	padStartHud_.Update();
+	keyEscHud_.Update();
+
+	backToHud_.Update();
+
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
 		) {
@@ -233,9 +263,12 @@ void TitleScene::Draw() {
 
 	if (sceneManager_->GetIsPad()) {
 		aButtonHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		padStartHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	}
 	else {
 		spaceHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		keyEscHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	}
+	backToHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	startHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 }
