@@ -101,9 +101,13 @@ private:
 	Audio* bgm_;
 	Audio* choiceSE_;
 	Audio* decideSE_;
+	Audio* backSE_;
 
 	// Hud
 	Texture2D aButtonHud_;
 	Texture2D spaceHud_;
 	Easeing hudAlphaEase_;
+	Texture2D keyEscHud_;
+	Texture2D padStartHud_;
+	Texture2D backToHud_;
 };
