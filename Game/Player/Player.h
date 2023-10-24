@@ -266,6 +266,7 @@ private:
 
 	// プレイヤーアニメーション
 	std::vector<Texture*> playerAnimationTex_;
+	Texture* nockBackFaceTexture_;
 	std::chrono::milliseconds playerAnimationDuration_;
 	std::chrono::steady_clock::time_point playerAnimationStartTime_;
 	int32_t currentPlayerAnimation_;

@@ -51,6 +51,7 @@ Player::Player() {
 	playerAnimationTex_.push_back(textureManager->LoadTexture("./Resources/Player/player_face3.png"));
 	playerAnimationTex_.push_back(textureManager->LoadTexture("./Resources/Player/player_face4.png"));
 	playerAnimationTex_.push_back(textureManager->LoadTexture("./Resources/Player/player_face5.png"));
+	nockBackFaceTexture_ = textureManager->LoadTexture("./Resources/Player/player_face_happy.png");
 
 	playerAnimationDuration_ = std::chrono::milliseconds{ 33 };
 	currentPlayerAnimation_ = 0;
@@ -228,28 +229,32 @@ void Player::Update(const float& y, const Camera* camera) {
 	isCollisionLayer_.Update();
 	isCollisionEnemy_.Update();
 
-	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
-		isPlayerAnimationCoolTime_ = false;
-	}
-
-	if (!isPlayerAnimationCoolTime_ && playerAnimationDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationStartTime_)) {
-		isPlayerAnimationTurnBack_ ? --currentPlayerAnimation_ : ++currentPlayerAnimation_;
-		if (currentPlayerAnimation_ >= static_cast<int32_t>(playerAnimationTex_.size()) - 1) {
-			isPlayerAnimationTurnBack_ = true;
-			playerAnimationCoolTime_ = std::chrono::milliseconds{
-				UtilsLib::Random(playerAnimationCoolTimeDuration_.first, playerAnimationCoolTimeDuration_.second)
-			};
+	if (status_ != Status::kKnockBack) {
+		if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
+			isPlayerAnimationCoolTime_ = false;
 		}
-		else if (currentPlayerAnimation_ <= 0) {
-			isPlayerAnimationTurnBack_ = false;
-			isPlayerAnimationCoolTime_ = true;
-			playerAnimationCoolStartTime_ = nowTime;
-		}
-		currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(playerAnimationTex_.size()) - 1);
-		models_[0]->ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]);
-		playerAnimationStartTime_ = nowTime;
-	}
 
+		if (!isPlayerAnimationCoolTime_ && playerAnimationDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationStartTime_)) {
+			isPlayerAnimationTurnBack_ ? --currentPlayerAnimation_ : ++currentPlayerAnimation_;
+			if (currentPlayerAnimation_ >= static_cast<int32_t>(playerAnimationTex_.size()) - 1) {
+				isPlayerAnimationTurnBack_ = true;
+				playerAnimationCoolTime_ = std::chrono::milliseconds{
+					UtilsLib::Random(playerAnimationCoolTimeDuration_.first, playerAnimationCoolTimeDuration_.second)
+				};
+			}
+			else if (currentPlayerAnimation_ <= 0) {
+				isPlayerAnimationTurnBack_ = false;
+				isPlayerAnimationCoolTime_ = true;
+				playerAnimationCoolStartTime_ = nowTime;
+			}
+			currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(playerAnimationTex_.size()) - 1);
+			models_[0]->ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]);
+			playerAnimationStartTime_ = nowTime;
+		}
+	}
+	else {
+		models_[0]->ChangeTexture("face", nockBackFaceTexture_);
+	}
 	jumpSE_->Debug("jumpSE_");
 	fallSE_->Debug("fallSE_");
 }
