@@ -46,7 +46,7 @@ void TitleScene::Initialize() {
 	player_.light.ligColor = Vector3::identity;
 	player_.light.ptRange = std::numeric_limits<float>::max();
 	player_.scale *= 50.0f;
-	player_.pos.y = -205.0f;
+	player_.pos.y = -160.5f;
 	player_.rotate.y = std::numbers::pi_v<float>;
 	playerScale_.first = Vector3{ player_.scale.x + 20.0f, player_.scale.y - 10.0f, player_.scale.z };
 	playerScale_.second = Vector3{ player_.scale.x-20.0f, player_.scale.y+10.0f,player_.scale.z };
@@ -81,8 +81,8 @@ void TitleScene::Initialize() {
 	titleTex_.isSameTexSize = true;
 	titleTex_.pos = Vector2{ 19.0f, 116.0f };
 	floor_.LoadTexture("./Resources/layer/layer1.png");
-	floor_.scale = Vector2{ 1280.0f, 112.0f };
-	floor_.pos.y = -303.0f;
+	floor_.scale = Vector2{ 1280.0f, 151.0f };
+	floor_.pos.y = -286.0f;
 
 	backGroundParticle_.LoadSettingDirectory("backGroundParticle");
 	backGroundParticle_.ParticleStart();
@@ -116,13 +116,13 @@ void TitleScene::Update() {
 		i.Update();
 	}
 
-	player_.scale = playerScaleEaseing_.Get(playerScale_.first, playerScale_.second);
+	/*player_.scale = playerScaleEaseing_.Get(playerScale_.first, playerScale_.second);
 	player_.pos = playerPosEaseing_.Get(playerPos_.first, playerPos_.second);
 	if (player_.pos.y <= playerPos_.first.y) {
 		smoke_.ParticleStart();
 		smoke_.emitterPos_ = player_.pos;
 		smoke_.emitterPos_.y -= 40.0f;
-	}
+	}*/
 
 
 	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
@@ -147,8 +147,11 @@ void TitleScene::Update() {
 		playerAnimationStartTime_ = nowTime;
 	}
 	
+	player_.Debug("player_");
 	player_.Update();
+	titleTex_.Debug("titleTex_");
 	titleTex_.Update();
+	floor_.Debug("floor_");
 	floor_.Update();
 	playerScaleEaseing_.Update();
 	playerPosEaseing_.Update();
