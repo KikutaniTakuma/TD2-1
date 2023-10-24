@@ -252,6 +252,11 @@ void Model::ChangeTexture(const std::string& useMtlName, const std::string& texN
 	assert(data[useMtlName].tex->GetFileName() == texName);
 }
 
+void Model::ChangeTexture(const std::string& useMtlName, Texture* tex) {
+	assert(tex != nullptr);
+	data[useMtlName].tex = tex;
+}
+
 void Model::Update() {
 	*dirLig = light;
 }

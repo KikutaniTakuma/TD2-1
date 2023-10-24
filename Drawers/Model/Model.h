@@ -90,6 +90,7 @@ public:
 	}
 	
 	void ChangeTexture(const std::string& useMtlName, const std::string& texName);
+	void ChangeTexture(const std::string& useMtlName, Texture* tex);
 
 public:
 	Vector3 pos;

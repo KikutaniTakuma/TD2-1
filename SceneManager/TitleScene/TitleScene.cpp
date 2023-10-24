@@ -143,7 +143,7 @@ void TitleScene::Update() {
 			playerAnimationCoolStartTime_ = nowTime;
 		}
 		currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(playerAnimationTex_.size()) - 1);
-		player_.ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]->GetFileName());
+		player_.ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]);
 		playerAnimationStartTime_ = nowTime;
 	}
 	
