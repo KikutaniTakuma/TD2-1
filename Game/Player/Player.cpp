@@ -229,7 +229,10 @@ void Player::Update(const float& y, const Camera* camera) {
 	isCollisionLayer_.Update();
 	isCollisionEnemy_.Update();
 
-	if (status_ != Status::kKnockBack) {
+	if(status_  == Status::kFalling || status_ == Status::kKnockBack){
+		models_[0]->ChangeTexture("face", nockBackFaceTexture_);
+	}
+	else {
 		if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
 			isPlayerAnimationCoolTime_ = false;
 		}
@@ -251,9 +254,6 @@ void Player::Update(const float& y, const Camera* camera) {
 			models_[0]->ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]);
 			playerAnimationStartTime_ = nowTime;
 		}
-	}
-	else {
-		models_[0]->ChangeTexture("face", nockBackFaceTexture_);
 	}
 	jumpSE_->Debug("jumpSE_");
 	fallSE_->Debug("fallSE_");
