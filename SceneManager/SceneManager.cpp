@@ -116,8 +116,10 @@ void SceneManager::Game() {
 		Engine::FrameEnd();
 
 		// Escapeが押されたら終了
-		if (input_->GetKey()->Pushed(DIK_ESCAPE) || input_->GetGamepad()->Pushed(Gamepad::Button::BACK)) {
-			break;
+		if (scene_->GetID() == BaseScene::ID::Title) {
+			if (input_->GetKey()->Pushed(DIK_ESCAPE) || input_->GetGamepad()->Pushed(Gamepad::Button::START)) {
+				break;
+			}
 		}
 	}
 }
