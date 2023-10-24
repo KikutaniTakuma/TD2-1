@@ -107,6 +107,7 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 	tex_->Update();
 
 	enemyStepOnParticle_.LoadSettingDirectory("smoke");
+	enemyDeathParticle_.LoadSettingDirectory("enemy-kill");
 }
 
 void Enemy::SetGlobalVariable() {
@@ -449,6 +450,7 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 
 	enemyStepOnParticle_.emitterPos_ = tex_->pos;
 	enemyStepOnParticle_.Update();
+	enemyDeathParticle_.Update();
 }
 
 void Enemy::Collision(const float& y) {
@@ -781,6 +783,8 @@ void Enemy::LeaveUpdate(const float& y) {
 
 void Enemy::DeathInitialize(Layer* layer) {
 	layer->AddDamage(1);
+	enemyDeathParticle_.ParticleStart();
+	enemyDeathParticle_.emitterPos_ = tex_->pos;
 }
 
 void Enemy::DeathUpdate() {
@@ -822,6 +826,7 @@ void Enemy::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 
 void Enemy::DrawParticle(const Mat4x4& viewProjection) {
 	enemyStepOnParticle_.Draw(viewProjection);
+	enemyDeathParticle_.Draw(viewProjection);
 }
 
 void Enemy::Draw2D(const Mat4x4& viewProjection) {

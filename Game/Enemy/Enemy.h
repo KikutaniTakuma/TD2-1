@@ -286,4 +286,5 @@ private:
 
 	// 敵をぶち殺したときのエフェクト
 	Particle enemyStepOnParticle_;
+	Particle enemyDeathParticle_;
 };
