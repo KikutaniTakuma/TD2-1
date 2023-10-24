@@ -113,6 +113,36 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 
 	enemyStepOnParticle_.LoadSettingDirectory("smoke");
 	enemyDeathParticle_.LoadSettingDirectory("enemy-kill");
+	auto textureManager_ = TextureManager::GetInstance();
+	normalAnimationTex_.reserve(5);
+	normalAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Norml/enemy_face1.png"));
+	normalAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Norml/enemy_face2.png"));
+	normalAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Norml/enemy_face3.png"));
+	normalAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Norml/enemy_face4.png"));
+	normalAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Norml/enemy_face5.png"));
+	
+
+	stanAnimationTex_.reserve(5);
+	stanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/NormalStan/enemy_stan_face1.png"));
+	stanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/NormalStan/enemy_stan_face2.png"));
+	stanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/NormalStan/enemy_stan_face3.png"));
+	stanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/NormalStan/enemy_stan_face4.png"));
+	stanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/NormalStan/enemy_stan_face5.png"));
+	
+
+	healAnimationTex_.reserve(5);
+	healAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Heal/enemy_naosu_face1.png"));
+	healAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Heal/enemy_naosu_face2.png"));
+	healAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Heal/enemy_naosu_face3.png"));
+	healAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Heal/enemy_naosu_face4.png"));
+	healAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/Heal/enemy_naosu_face5.png"));
+
+	 healStanAnimationTex_.reserve(5);
+	 healStanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/HealStan/enemy_naosu_stan_face1.png"));
+	 healStanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/HealStan/enemy_naosu_stan_face2.png"));
+	 healStanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/HealStan/enemy_naosu_stan_face3.png"));
+	 healStanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/HealStan/enemy_naosu_stan_face4.png"));
+	 healStanAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Enemy/Faces/HealStan/enemy_naosu_stan_face5.png"));
 }
 
 void Enemy::SetGlobalVariable() {
@@ -381,7 +411,7 @@ void Enemy::CollisionPlayer(Player* player) {
 //}
 
 void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
-
+	auto nowTime = std::chrono::steady_clock::now();
 	ApplyGlobalVariable();
 
 	if (statusRequest_) {
@@ -457,6 +487,86 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 	enemyStepOnParticle_.emitterPos_ = tex_->pos;
 	enemyStepOnParticle_.Update();
 	enemyDeathParticle_.Update();
+
+	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
+		isPlayerAnimationCoolTime_ = false;
+	}
+
+	if (!isPlayerAnimationCoolTime_ && playerAnimationDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationStartTime_)) {
+		isPlayerAnimationTurnBack_ ? --currentPlayerAnimation_ : ++currentPlayerAnimation_;
+		
+		if (!isHealer_ && status_ == Status::kFaint) {
+			if (currentPlayerAnimation_ >= static_cast<int32_t>(normalAnimationTex_.size()) - 1) {
+				isPlayerAnimationTurnBack_ = true;
+				playerAnimationCoolTime_ = std::chrono::milliseconds{
+					UtilsLib::Random(playerAnimationCoolTimeDuration_.first, playerAnimationCoolTimeDuration_.second)
+				};
+			}
+			else if (currentPlayerAnimation_ <= 0) {
+				isPlayerAnimationTurnBack_ = false;
+				isPlayerAnimationCoolTime_ = true;
+				playerAnimationCoolStartTime_ = nowTime;
+			}
+		}
+		else if (!isHealer_ && status_ != Status::kFaint)
+		{
+			if (currentPlayerAnimation_ >= static_cast<int32_t>(stanAnimationTex_.size()) - 1) {
+				isPlayerAnimationTurnBack_ = true;
+				playerAnimationCoolTime_ = std::chrono::milliseconds{
+					UtilsLib::Random(playerAnimationCoolTimeDuration_.first, playerAnimationCoolTimeDuration_.second)
+				};
+			}
+			else if (currentPlayerAnimation_ <= 0) {
+				isPlayerAnimationTurnBack_ = false;
+				isPlayerAnimationCoolTime_ = true;
+				playerAnimationCoolStartTime_ = nowTime;
+			}
+		}
+		else if (isHealer_ && status_ == Status::kFaint) {
+			if (currentPlayerAnimation_ >= static_cast<int32_t>(healAnimationTex_.size()) - 1) {
+				isPlayerAnimationTurnBack_ = true;
+				playerAnimationCoolTime_ = std::chrono::milliseconds{
+					UtilsLib::Random(playerAnimationCoolTimeDuration_.first, playerAnimationCoolTimeDuration_.second)
+				};
+			}
+			else if (currentPlayerAnimation_ <= 0) {
+				isPlayerAnimationTurnBack_ = false;
+				isPlayerAnimationCoolTime_ = true;
+				playerAnimationCoolStartTime_ = nowTime;
+			}
+		}
+		else if (isHealer_ && status_ != Status::kFaint)
+		{
+			if (currentPlayerAnimation_ >= static_cast<int32_t>(healStanAnimationTex_.size()) - 1) {
+				isPlayerAnimationTurnBack_ = true;
+				playerAnimationCoolTime_ = std::chrono::milliseconds{
+					UtilsLib::Random(playerAnimationCoolTimeDuration_.first, playerAnimationCoolTimeDuration_.second)
+				};
+			}
+			else if (currentPlayerAnimation_ <= 0) {
+				isPlayerAnimationTurnBack_ = false;
+				isPlayerAnimationCoolTime_ = true;
+				playerAnimationCoolStartTime_ = nowTime;
+			}
+		}
+		currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(normalAnimationTex_.size()) - 1);
+		if (!isHealer_ && status_ == Status::kFaint) {
+			models_[0]->ChangeTexture("face", normalAnimationTex_[currentPlayerAnimation_]);
+		}
+		else if (!isHealer_ && status_ != Status::kFaint)
+		{
+			models_[0]->ChangeTexture("face", stanAnimationTex_[currentPlayerAnimation_]);
+		}
+		else if (isHealer_ && status_ == Status::kFaint) {
+			models_[0]->ChangeTexture("face", healAnimationTex_[currentPlayerAnimation_]);
+		}
+		else if (isHealer_ && status_ != Status::kFaint)
+		{
+			models_[0]->ChangeTexture("face", healStanAnimationTex_[currentPlayerAnimation_]);
+		}
+
+		playerAnimationStartTime_ = nowTime;
+	}
 }
 
 void Enemy::Collision(const float& y) {

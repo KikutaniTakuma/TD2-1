@@ -23,6 +23,6 @@ Begin CompilerShader, path:./Resources/Shaders/PostShader/Post.VS.hlsl, profile:
 Compile Succeeded, path:./Resources/Shaders/PostShader/Post.VS.hlsl, profile:vs_6_0
 Begin CompilerShader, path:./Resources/Shaders/PostShader/PostHeightBlur.PS.hlsl, profile:ps_6_0
 Compile Succeeded, path:./Resources/Shaders/PostShader/PostHeightBlur.PS.hlsl, profile:ps_6_0
-Average Fps : 28.29
+Average Fps : 34.96
 Max Fps : 60.00
-Min Fps : 3.37
+Min Fps : 0.44
