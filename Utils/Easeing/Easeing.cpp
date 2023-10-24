@@ -30,7 +30,8 @@ void Easeing::Update() {
 				spdT_ *= -1.0f;
 			}
 			else {
-				Stop();
+				isActive_ = false;
+				isLoop_ = false;
 			}
 		}
 	}
