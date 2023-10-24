@@ -329,65 +329,65 @@ void Particle::Resize(uint32_t index) {
 }
 
 Particle::~Particle() {
-#ifdef _DEBUG
-
-
-	for (auto i = 0llu; i < settings.size(); i++) {
-		const auto groupName = ("setting" + std::to_string(i));
-
-		datas[groupName]["Emitter_Pos"] = settings[i].emitter.pos;
-		datas[groupName]["Emitter_Size"] = settings[i].emitter.size;
-		datas[groupName]["Emitter_Type"] = static_cast<uint32_t>(settings[i].emitter.type);
-		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
-		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
-		datas[groupName]["Emitter_RotateFirst"] = settings[i].emitter.rotate.first;
-		datas[groupName]["Emitter_RotateSecond"] = settings[i].emitter.rotate.second;
-		datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
-		datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
-
-		// 大きさ
-		datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
-		datas[groupName]["Particle_size1"] = settings[i].size.first;
-		datas[groupName]["Particle_size2"] = settings[i].size.second;
-		datas[groupName]["Particle_sizeSecond1"] = settings[i].sizeSecond.first;
-		datas[groupName]["Particle_sizeSecond2"] = settings[i].sizeSecond.second;
-		datas[groupName]["Particle_sizeEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
-
-		// 速度
-		datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
-		datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
-		datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
-		datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
-		datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].moveEaseType);
-		datas[groupName]["Particle_moveRotateFirst"] = settings[i].moveRotate.first;
-		datas[groupName]["Particle_moveRotateSecond"] = settings[i].moveRotate.second;
-		
-		// 回転
-		datas[groupName]["Particle_rotate1"] = settings[i].rotate.first;
-		datas[groupName]["Particle_rotate2"] = settings[i].rotate.second;
-		datas[groupName]["Particle_rotateSecond1"] = settings[i].rotateSecond.first;
-		datas[groupName]["Particle_rotateSecond2"] = settings[i].rotateSecond.second;
-		datas[groupName]["Particle_rotateEase"] = static_cast<uint32_t>(settings[i].rotateEaseType);
-
-		datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
-		datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
-		datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
-		datas[groupName]["Particle_freqSecond"] = settings[i].freq.second;
-		datas[groupName]["Particle_deathFirst"] = settings[i].death.first;
-		datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
-		datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
-		datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
-		datas[groupName]["Particle_colorEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
-		BackUpSettingFile("setting" + std::to_string(i));
-	}
-
-	std::ofstream file{ dataDirectoryName + "BackUp/" + "delete_otherSetting.txt" };
-
-	if (!file.fail() && isLoad) {
-		file << static_cast<bool>(isLoop_) << std::endl
-			<< tex->GetFileName();
-	}
-#endif // _DEBUG
+//#ifdef _DEBUG
+//
+//
+//	for (auto i = 0llu; i < settings.size(); i++) {
+//		const auto groupName = ("setting" + std::to_string(i));
+//
+//		datas[groupName]["Emitter_Pos"] = settings[i].emitter.pos;
+//		datas[groupName]["Emitter_Size"] = settings[i].emitter.size;
+//		datas[groupName]["Emitter_Type"] = static_cast<uint32_t>(settings[i].emitter.type);
+//		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
+//		datas[groupName]["Emitter_CircleSize"] = settings[i].emitter.circleSize;
+//		datas[groupName]["Emitter_RotateFirst"] = settings[i].emitter.rotate.first;
+//		datas[groupName]["Emitter_RotateSecond"] = settings[i].emitter.rotate.second;
+//		datas[groupName]["Emitter_ParticleMaxNum"] = settings[i].emitter.particleMaxNum;
+//		datas[groupName]["Emitter_vaildTime"] = static_cast<uint32_t>(settings[i].emitter.validTime.count());
+//
+//		// 大きさ
+//		datas[groupName]["Particle_isSameHW"] = static_cast<uint32_t>(settings[i].isSameHW);
+//		datas[groupName]["Particle_size1"] = settings[i].size.first;
+//		datas[groupName]["Particle_size2"] = settings[i].size.second;
+//		datas[groupName]["Particle_sizeSecond1"] = settings[i].sizeSecond.first;
+//		datas[groupName]["Particle_sizeSecond2"] = settings[i].sizeSecond.second;
+//		datas[groupName]["Particle_sizeEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
+//
+//		// 速度
+//		datas[groupName]["Particle_velocity1"] = settings[i].velocity.first;
+//		datas[groupName]["Particle_velocity2"] = settings[i].velocity.second;
+//		datas[groupName]["Particle_velocitySecond1"] = settings[i].velocitySecond.first;
+//		datas[groupName]["Particle_velocitySecond2"] = settings[i].velocitySecond.second;
+//		datas[groupName]["Particle_ease"] = static_cast<uint32_t>(settings[i].moveEaseType);
+//		datas[groupName]["Particle_moveRotateFirst"] = settings[i].moveRotate.first;
+//		datas[groupName]["Particle_moveRotateSecond"] = settings[i].moveRotate.second;
+//		
+//		// 回転
+//		datas[groupName]["Particle_rotate1"] = settings[i].rotate.first;
+//		datas[groupName]["Particle_rotate2"] = settings[i].rotate.second;
+//		datas[groupName]["Particle_rotateSecond1"] = settings[i].rotateSecond.first;
+//		datas[groupName]["Particle_rotateSecond2"] = settings[i].rotateSecond.second;
+//		datas[groupName]["Particle_rotateEase"] = static_cast<uint32_t>(settings[i].rotateEaseType);
+//
+//		datas[groupName]["Particle_particleNumFirst"] = settings[i].particleNum.first;
+//		datas[groupName]["Particle_particleNumSecond"] = settings[i].particleNum.second;
+//		datas[groupName]["Particle_freqFirst"] = settings[i].freq.first;
+//		datas[groupName]["Particle_freqSecond"] = settings[i].freq.second;
+//		datas[groupName]["Particle_deathFirst"] = settings[i].death.first;
+//		datas[groupName]["Particle_deathSecond"] = settings[i].death.second;
+//		datas[groupName]["Particle_colorFirst"] = settings[i].color.first;
+//		datas[groupName]["Particle_colorSecond"] = settings[i].color.second;
+//		datas[groupName]["Particle_colorEase"] = static_cast<uint32_t>(settings[i].colorEaseType);
+//		BackUpSettingFile("setting" + std::to_string(i));
+//	}
+//
+//	std::ofstream file{ dataDirectoryName + "BackUp/" + "delete_otherSetting.txt" };
+//
+//	if (!file.fail() && isLoad) {
+//		file << static_cast<bool>(isLoop_) << std::endl
+//			<< tex->GetFileName();
+//	}
+//#endif // _DEBUG
 
 	if (vertexResource) {
 		vertexResource->Release();
