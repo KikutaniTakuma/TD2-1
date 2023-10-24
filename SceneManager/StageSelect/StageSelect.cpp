@@ -60,6 +60,28 @@ void StageSelect::Initialize() {
 
 	currentPlayerEaseing_ = 0;
 
+	playerNormalMove_ = { player_.pos.y - 5.0f,player_.pos.y + 5.0f };
+
+	playerAnimationTex_.reserve(5);
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face.png"));
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face2.png"));
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face3.png"));
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face4.png"));
+	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face5.png"));
+
+	playerAnimationDuration_ = std::chrono::milliseconds{ 33 };
+	currentPlayerAnimation_ = 0;
+	isPlayerAnimationTurnBack_ = false;
+	playerAnimationStartTime_ = std::chrono::steady_clock::now();
+
+	playerAnimationCoolTime_ = std::chrono::milliseconds{ 1600 };
+	playerAnimationCoolTimeDuration_ = { 
+		800, 
+		1600 
+	};
+	isPlayerAnimationCoolTime_ = true;
+	playerAnimationCoolStartTime_ = playerAnimationStartTime_;
+
 	
 	bubble_.LoadTexture("./Resources/StageSelect/hukidasi_stageSelect.png");
 	bubble_.isSameTexSize = true;
@@ -161,6 +183,8 @@ void StageSelect::Finalize() {
 }
 
 void StageSelect::Update() {
+	auto nowTime = std::chrono::steady_clock::now();
+
 	if (input_->GetKey()->Pushed(DIK_RIGHT) ||
 		input_->GetKey()->Pushed(DIK_D) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::RIGHT) ||
@@ -225,11 +249,30 @@ void StageSelect::Update() {
 		i.Update();
 	}
 	
-	player_.Debug("player_");
-	for (size_t i = 0; i < playerEase_.size();i++) {
-		playerEase_[i].Debug("playerEase_" + std::to_string(i));
-	}
 	player_.scale = playerEase_[currentPlayerEaseing_].Get(playerScaleEaseDuration_[currentPlayerEaseing_].first, playerScaleEaseDuration_[currentPlayerEaseing_].second);
+	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
+		isPlayerAnimationCoolTime_ = false;
+	}
+
+	if (!isPlayerAnimationCoolTime_ && playerAnimationDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationStartTime_)) {
+		isPlayerAnimationTurnBack_ ? --currentPlayerAnimation_ : ++currentPlayerAnimation_;
+		if (currentPlayerAnimation_ >= static_cast<int32_t>(playerAnimationTex_.size()) - 1) {
+			isPlayerAnimationTurnBack_ = true;
+			playerAnimationCoolTime_ = std::chrono::milliseconds{
+				UtilsLib::Random(playerAnimationCoolTimeDuration_.first, playerAnimationCoolTimeDuration_.second)
+			};
+		}
+		else if (currentPlayerAnimation_ <= 0) {
+			isPlayerAnimationTurnBack_ = false;
+			isPlayerAnimationCoolTime_ = true;
+			playerAnimationCoolStartTime_ = nowTime;
+		}
+		currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(playerAnimationTex_.size()) - 1);
+		player_.ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]->GetFileName());
+		playerAnimationStartTime_ = nowTime;
+	}
+	player_.pos.y = bubbleEase_.Get(playerNormalMove_.first, playerNormalMove_.second);
+
 	player_.Update();
 
 	moon_.Update();
