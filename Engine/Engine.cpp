@@ -865,7 +865,6 @@ Engine::~Engine() {
 	for (auto& i : fontHeap) {
 		i.second->Release();
 	}
-	dsvHeap->Release();
 	depthStencilResource->Release();
 	CloseHandle(fenceEvent);
 	rtvDescriptorHeap->Release();
