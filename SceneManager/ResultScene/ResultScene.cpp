@@ -420,32 +420,37 @@ void ResultScene::Update() {
 		}
 
 		if (isCanSelect_) {
-			if (input_->GetKey()->Pushed(DIK_W)||
-				input_->GetKey()->Pushed(DIK_UP)||
-				input_->GetGamepad()->Pushed(Gamepad::Button::UP)||
-				(
-					input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f && !isStick_)
-				) 
-			{
-				isStick_ = true;
-				if (nowChoose_ == 1) {
-					choiceSE_->Start(0.25f);
+			if (stageNumber_ < static_cast<int32_t>(sceneManager_->isClearStage_.size())) {
+				if (input_->GetKey()->Pushed(DIK_W) ||
+					input_->GetKey()->Pushed(DIK_UP) ||
+					input_->GetGamepad()->Pushed(Gamepad::Button::UP) ||
+					(
+						input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) > 0.3f && !isStick_)
+					)
+				{
+					isStick_ = true;
+					if (nowChoose_ == 1) {
+						choiceSE_->Start(0.25f);
+					}
+					nowChoose_--;
 				}
-				nowChoose_--;
+				else if (
+					input_->GetKey()->Pushed(DIK_S) ||
+					input_->GetKey()->Pushed(DIK_DOWN) ||
+					input_->GetGamepad()->Pushed(Gamepad::Button::DOWN) ||
+					(
+						input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f && !isStick_)
+					)
+				{
+					isStick_ = true;
+					if (nowChoose_ == 0) {
+						choiceSE_->Start(0.25f);
+					}
+					nowChoose_++;
+				}
 			}
-			else if (
-				input_->GetKey()->Pushed(DIK_S) ||
-				input_->GetKey()->Pushed(DIK_DOWN) || 
-				input_->GetGamepad()->Pushed(Gamepad::Button::DOWN) ||
-				(
-					input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_Y) < -0.3f && !isStick_)
-				)
-			{
-				isStick_ = true;
-				if (nowChoose_ == 0) {
-					choiceSE_->Start(0.25f);
-				}
-				nowChoose_++;
+			else {
+				nowChoose_ = 1;
 			}
 			nowChoose_ = std::clamp(nowChoose_, 0, 1);
 
@@ -555,7 +560,7 @@ void ResultScene::Update() {
 		else {
 			auto stageSelect = new StageSelect;
 			assert(stageSelect);
-
+			stageSelect->SetStartStage(stageNumber_ );
 			sceneManager_->SceneChange(stageSelect);
 		}
 	}
@@ -599,8 +604,10 @@ void ResultScene::Draw() {
 	timerUI_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 
 	if (isCanSelect_) {
-		nextStageMassage_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 		stageSelectMassage_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		if (stageNumber_ < static_cast<int32_t>(sceneManager_->isClearStage_.size())) {
+			nextStageMassage_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		}
 		arrow_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	}
 

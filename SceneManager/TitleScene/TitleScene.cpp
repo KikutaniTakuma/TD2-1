@@ -238,7 +238,7 @@ void TitleScene::Update() {
 
 		auto nextScene = new StageSelect{};
 		assert(nextScene);
-
+		nextScene->SetStartStage(1);
 		sceneManager_->SceneChange(nextScene);
 	}
 }

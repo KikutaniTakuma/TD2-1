@@ -117,7 +117,16 @@ void Pause::Update() {
 	arrow_.pos.x = arrowEase_.Get(arrowPosX_.first, arrowPosX_.second);
 	arrow_.Update();
 
-	if (input_->GetKey()->Pushed(DIK_SPACE)|| 
+	/*for (size_t i = 0; i < audios_.size();i++) {
+		audios_[i]->Debug("se" + std::to_string(i));
+	}*/
+
+	arrowEase_.Update();
+}
+
+void Pause::SceneChange(int32_t nowStage) {
+	nowStage = std::clamp(nowStage, 1, static_cast<int32_t>(sceneManager_->isClearStage_.size()));
+	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
 		) {
 		if (currentChoose_ == 0) {
@@ -125,20 +134,20 @@ void Pause::Update() {
 			audios_[1]->Start(0.2f);
 		}
 		else if (currentChoose_ == 1) {
-			sceneManager_->SceneChange(new StageSelect{});
+			auto nextScene = new StageSelect{};
+			assert(nextScene);
+			nextScene->SetStartStage(nowStage);
+			sceneManager_->SceneChange(nextScene);
+
 			audios_[0]->Start(0.125f);
 		}
 		else if (currentChoose_ == 2) {
-			sceneManager_->SceneChange(new TitleScene{});
+			auto nextScene = new StageSelect{};
+			assert(nextScene);
+			sceneManager_->SceneChange(nextScene);
 			audios_[0]->Start(0.125f);
 		}
 	}
-
-	/*for (size_t i = 0; i < audios_.size();i++) {
-		audios_[i]->Debug("se" + std::to_string(i));
-	}*/
-
-	arrowEase_.Update();
 }
 
 void Pause::Draw() {

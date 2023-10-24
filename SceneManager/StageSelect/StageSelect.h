@@ -39,6 +39,10 @@ public:
 	/// 描画
 	/// </summary>
 	void Draw() override;
+
+public:
+	void SetStartStage(int32_t startStageNumber);
+
 	
 private:
 	// 背景

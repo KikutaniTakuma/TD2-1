@@ -24,6 +24,9 @@ public:
 private:
 	void Update() override;
 
+public:
+	void SceneChange(int32_t nowStage);
+
 private:
 	// 背景を少し暗くする
 	Texture2D backGround_;

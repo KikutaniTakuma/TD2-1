@@ -999,6 +999,7 @@ void GameScene::Update() {
 
 
 	pause_.ActiveUpdate();
+	pause_.SceneChange(stage_ + 1);
 	if (input_->GetKey()->Pushed(DIK_TAB) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::START)
 		) 

@@ -10,7 +10,7 @@ StageSelect::StageSelect():
 	moonRotateY_{},
 	rotateEase_{},
 	bubble_{},
-	currentStage_{},
+	currentStage_{1},
 	maxStage_{},
 	stageNumberTex_{},
 	stageTenNumberTex_{},
@@ -28,7 +28,7 @@ StageSelect::StageSelect():
 void StageSelect::Initialize() {
 	camera_.farClip = 3000.0f;
 	camera_.pos.z = -2000.0f;
-	currentStage_ = 1;
+	currentStage_ = std::clamp(currentStage_, 1, static_cast<int32_t>(sceneManager_->isClearStage_.size()));
 	maxStage_ = static_cast<decltype(maxStage_)>(sceneManager_->isClearStage_.size());
 
 	moon_.LoadObj("./Resources/StageSelect/moon/moon.obj");
@@ -463,4 +463,8 @@ void StageSelect::Draw() {
 	}
 
 	backToHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+}
+
+void StageSelect::SetStartStage(int32_t startStageNumber) {
+	currentStage_ = startStageNumber;
 }
