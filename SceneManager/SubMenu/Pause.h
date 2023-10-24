@@ -51,4 +51,6 @@ private:
 	class AudioManager* audioManager_;
 
 	std::array<class Audio*, 4> audios_;
+
+	bool isStick_;
 };
