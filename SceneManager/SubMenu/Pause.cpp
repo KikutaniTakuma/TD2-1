@@ -125,27 +125,29 @@ void Pause::Update() {
 }
 
 void Pause::SceneChange(int32_t nowStage) {
-	nowStage = std::clamp(nowStage, 1, static_cast<int32_t>(sceneManager_->isClearStage_.size()));
-	if (input_->GetKey()->Pushed(DIK_SPACE) ||
-		input_->GetGamepad()->Pushed(Gamepad::Button::A)
-		) {
-		if (currentChoose_ == 0) {
-			isActive_ = false;
-			audios_[1]->Start(0.2f);
-		}
-		else if (currentChoose_ == 1) {
-			auto nextScene = new StageSelect{};
-			assert(nextScene);
-			nextScene->SetStartStage(nowStage);
-			sceneManager_->SceneChange(nextScene);
+	if (isActive_) {
+		nowStage = std::clamp(nowStage, 1, static_cast<int32_t>(sceneManager_->isClearStage_.size()));
+		if (input_->GetKey()->Pushed(DIK_SPACE) ||
+			input_->GetGamepad()->Pushed(Gamepad::Button::A)
+			) {
+			if (currentChoose_ == 0) {
+				isActive_ = false;
+				audios_[1]->Start(0.2f);
+			}
+			else if (currentChoose_ == 1) {
+				auto nextScene = new StageSelect{};
+				assert(nextScene);
+				nextScene->SetStartStage(nowStage);
+				sceneManager_->SceneChange(nextScene);
 
-			audios_[0]->Start(0.125f);
-		}
-		else if (currentChoose_ == 2) {
-			auto nextScene = new StageSelect{};
-			assert(nextScene);
-			sceneManager_->SceneChange(nextScene);
-			audios_[0]->Start(0.125f);
+				audios_[0]->Start(0.125f);
+			}
+			else if (currentChoose_ == 2) {
+				auto nextScene = new StageSelect{};
+				assert(nextScene);
+				sceneManager_->SceneChange(nextScene);
+				audios_[0]->Start(0.125f);
+			}
 		}
 	}
 }
