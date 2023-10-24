@@ -6,7 +6,7 @@ Background::Background() {
 
 	for (int i = 0; i < kTexNum_; i++) {
 		textures_.push_back(std::make_unique<Texture2D>());
-		textures_[i]->scale = { 1300,1000 };
+		textures_[i]->scale = { 1600,1000 };
 	}
 
 	textures_[0]->LoadTexture("./Resources/Background/backGra_3.png");
