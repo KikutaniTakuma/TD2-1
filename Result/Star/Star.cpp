@@ -8,9 +8,9 @@ Star::Star() :
 	rotateEase_{},
 	isStart_{false},
 	isEnd_{false},
-	scaleEaseTime_{1.4f},
+	scaleEaseTime_{1.0f},
 	rotateEaseTime_{1.0f},
-	specialScaleEaseTime_{ 1.0f }
+	specialScaleEaseTime_{ 1.4f }
 {
 	scale_ = Vector2::zero;
 		
@@ -69,11 +69,11 @@ void Star::Update() {
 		// 星3つの演出
 		if (isSpecial_) {
 			rotateEase_.Start(false, rotateEaseTime_, Easeing::InOutCirc);
-			ease_.Start(false, scaleEaseTime_, Easeing::OutBack);
+			ease_.Start(false, specialScaleEaseTime_, Easeing::OutBack);
 		}
 		// 通常の演出
 		else {
-			ease_.Start(false, specialScaleEaseTime_, Easeing::OutElastic);
+			ease_.Start(false, scaleEaseTime_, Easeing::OutElastic);
 		}
 	}
 

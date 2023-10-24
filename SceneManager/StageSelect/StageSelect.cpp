@@ -15,7 +15,13 @@ StageSelect::StageSelect():
 	stageTenNumberTex_{},
 	bgm_{nullptr},
 	choiceSE_{nullptr},
-	decideSE_{nullptr}
+	decideSE_{nullptr},
+	currentPlayerAnimation_(),
+	currentPlayerEaseing_(),
+	isPlayerAnimationCoolTime_(),
+	isPlayerAnimationTurnBack_(),
+	playerAnimationCoolTime_(),
+	playerAnimationCoolTimeDuration_()
 {}
 
 void StageSelect::Initialize() {

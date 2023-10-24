@@ -329,6 +329,9 @@ void Particle::Resize(uint32_t index) {
 }
 
 Particle::~Particle() {
+#ifdef _DEBUG
+
+
 	for (auto i = 0llu; i < settings.size(); i++) {
 		const auto groupName = ("setting" + std::to_string(i));
 
@@ -383,8 +386,8 @@ Particle::~Particle() {
 	if (!file.fail() && isLoad) {
 		file << static_cast<bool>(isLoop_) << std::endl
 			<< tex->GetFileName();
-		file.close();
 	}
+#endif // _DEBUG
 
 	if (vertexResource) {
 		vertexResource->Release();

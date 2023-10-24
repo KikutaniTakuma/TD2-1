@@ -125,12 +125,27 @@ private:
 	Model player_;
 	std::pair<Vector3, Vector3> playerScale_;
 	Easeing playerScaleEase_;
+
+	// 星獲得時のアニメーション
+	std::pair<Vector3, Vector3> playerScaleGetStar_;
+	std::pair<Vector3, Vector3> playerScaleGetStar2_;
+	Easeing playerScaleGetStarEase_;
+	Easeing playerScaleGetStarEase2_;
+
+	// 星3つの時のモデルアニメーション
+	std::pair<float, float> playerRotateSpecial_;
+	Easeing playerSpecialEase_;
+
+	Texture* speciaclPlayerTex_;
+
+	// プレイヤーアニメーション
 	std::vector<Texture*> playerAnimationTex_;
 	std::chrono::milliseconds playerAnimationDuration_;
 	std::chrono::steady_clock::time_point playerAnimationStartTime_;
 	int32_t currentPlayerAnimation_;
 	bool isPlayerAnimationTurnBack_;
 	std::chrono::milliseconds playerAnimationCoolTime_;
+	std::pair<int32_t, int32_t> playerAnimationCoolTimeDuration_;
 	std::chrono::steady_clock::time_point playerAnimationCoolStartTime_;
 	bool isPlayerAnimationCoolTime_;
 

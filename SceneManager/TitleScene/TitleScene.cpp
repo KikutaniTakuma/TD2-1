@@ -5,7 +5,14 @@
 
 TitleScene::TitleScene():
 	BaseScene{BaseScene::ID::Title},
-	backGround_{}
+	backGround_{},
+	bgm_(nullptr),
+	currentPlayerAnimation_(),
+	decideSE_(nullptr),
+	isPlayerAnimationCoolTime_(),
+	isPlayerAnimationTurnBack_(),
+	playerAnimationCoolStartTime_(),
+	playerAnimationDuration_()
 {
 	camera_.farClip = 3000.0f;
 	camera_.pos.z = -1000.0f;

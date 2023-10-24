@@ -3,6 +3,7 @@
 #include "externals/imgui/imgui.h"
 #include "SceneManager/GameScene/GameScene.h"
 #include "SceneManager/StageSelect/StageSelect.h"
+#include <numbers>
 
 ResultScene::ResultScene():
 	BaseScene(BaseScene::ID::Result),
@@ -31,7 +32,12 @@ ResultScene::ResultScene():
 	arrow_(),
 	nowChoose_(),
 	isCanSelect_(false),
-	stageNumber_()
+	stageNumber_(),
+	bgm_(),
+	choiceSE_(),
+	decideSE_(),
+	starSE_(),
+	specialStarSE_()
 {
 	clearTimeBasis_ = {
 		std::chrono::milliseconds{30000},  // 30秒
@@ -146,19 +152,33 @@ void ResultScene::Initialize() {
 		Easeing::GetFunction(24)
 	);
 
+	playerScaleGetStar_.first = player_.scale;
+	playerScaleGetStar_.second = playerScale_.second;
+
+	playerScaleGetStar2_.first = playerScale_.second;
+	playerScaleGetStar2_.second = player_.scale;
+
+	playerRotateSpecial_.first = 2.962f;
+	playerRotateSpecial_.second = 2.962f + (std::numbers::pi_v<float> *2.0f);
+
 	playerAnimationTex_.reserve(5);
 	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face.png"));
 	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face2.png"));
 	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face3.png"));
 	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face4.png"));
 	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face5.png"));
+	speciaclPlayerTex_ = textureManager_->LoadTexture("./Resources/Player/player_face_happy.png");
 
-	playerAnimationDuration_ = std::chrono::milliseconds{ 66 };
+	playerAnimationDuration_ = std::chrono::milliseconds{ 33 };
 	currentPlayerAnimation_ = 0;
 	isPlayerAnimationTurnBack_ = false;
 	playerAnimationStartTime_ = std::chrono::steady_clock::now();
 
 	playerAnimationCoolTime_ = std::chrono::milliseconds{ 800 };
+	playerAnimationCoolTimeDuration_ = {
+		800,
+		1600
+	};
 	isPlayerAnimationCoolTime_ = true;
 	playerAnimationCoolStartTime_ = playerAnimationStartTime_;
 
@@ -319,6 +339,12 @@ void ResultScene::Update() {
 		currentStar_++;
 
 		starSE_->Start(0.4f);
+
+		playerScaleGetStarEase_.Start(
+			false,
+			0.4f,
+			Easeing::GetFunction(23)
+		);
 	}
 	if(isUpdate_){
 		for (size_t i = 0; i < backGround_.size(); i++) {
@@ -341,10 +367,30 @@ void ResultScene::Update() {
 		{
 			if (currentStar_ == static_cast<int32_t>(stars_.size() - 1)) {
 				specialStarSE_->Start(0.4f);
+
+				playerSpecialEase_.Start(
+					false,
+					1.4f,
+					Easeing::OutExpo
+				);
+
+				playerScaleGetStarEase_.Start(
+					false,
+					0.6f,
+					Easeing::GetFunction(23)
+				);
+
+				player_.ChangeTexture("face", speciaclPlayerTex_->GetFileName());
 			}
 			else {
 				starSE_->Start(0.4f);
+				playerScaleGetStarEase_.Start(
+					false,
+					0.4f,
+					Easeing::GetFunction(23)
+				);
 			}
+
 
 			stars_[currentStar_].Start();
 			startTime_ = nowTime;
@@ -422,24 +468,52 @@ void ResultScene::Update() {
 	stageTenNumberTex_.Update();
 
 	//playerScaleEase_.Debug("playerScaleEase_");
-	player_.scale = playerScaleEase_.Get(playerScale_.first, playerScale_.second);
-	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
-		isPlayerAnimationCoolTime_ = false;
+	if (playerScaleGetStarEase_.ActiveExit()) {
+		playerScaleGetStarEase2_.Start(
+			false,
+			0.8f,
+			Easeing::GetFunction(26)
+		);
 	}
-	
-	if (!isPlayerAnimationCoolTime_ && playerAnimationDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationStartTime_)) {
-		isPlayerAnimationTurnBack_ ? --currentPlayerAnimation_ : ++currentPlayerAnimation_;
-		if (currentPlayerAnimation_ >= static_cast<int32_t>(playerAnimationTex_.size())-1) {
-			isPlayerAnimationTurnBack_ = true;
+
+	if (isCanSelect_) {
+		player_.scale = playerScaleEase_.Get(playerScale_.first, playerScale_.second);
+		if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
+			isPlayerAnimationCoolTime_ = false;
 		}
-		else if (currentPlayerAnimation_ <= 0) {
-			isPlayerAnimationTurnBack_ = false;
-			isPlayerAnimationCoolTime_ = true;
-			playerAnimationCoolStartTime_ = nowTime;
+
+		if (!isPlayerAnimationCoolTime_ && playerAnimationDuration_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationStartTime_)) {
+			isPlayerAnimationTurnBack_ ? --currentPlayerAnimation_ : ++currentPlayerAnimation_;
+			if (currentPlayerAnimation_ >= static_cast<int32_t>(playerAnimationTex_.size()) - 1) {
+				isPlayerAnimationTurnBack_ = true;
+				playerAnimationCoolTime_ = std::chrono::milliseconds{
+					UtilsLib::Random(playerAnimationCoolTimeDuration_.first, playerAnimationCoolTimeDuration_.second)
+				};
+			}
+			else if (currentPlayerAnimation_ <= 0) {
+				isPlayerAnimationTurnBack_ = false;
+				isPlayerAnimationCoolTime_ = true;
+				playerAnimationCoolStartTime_ = nowTime;
+			}
+			currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(playerAnimationTex_.size()) - 1);
+			player_.ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]->GetFileName());
+			playerAnimationStartTime_ = nowTime;
 		}
-		currentPlayerAnimation_ = std::clamp(currentPlayerAnimation_, 0, static_cast<int32_t>(playerAnimationTex_.size())-1);
-		player_.ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]->GetFileName());
-		playerAnimationStartTime_ = nowTime;
+	}
+	else {
+		if (playerScaleGetStarEase_.ActiveEnter() || playerScaleGetStarEase_.ActiveStay()){
+			player_.scale = playerScaleGetStarEase_.Get(playerScaleGetStar_.first, playerScaleGetStar_.second);
+		}
+		else if (playerScaleGetStarEase2_.ActiveEnter() || playerScaleGetStarEase2_.ActiveStay()) {
+			player_.scale = playerScaleGetStarEase_.Get(playerScaleGetStar2_.first, playerScaleGetStar2_.second);
+		}
+	}
+
+	if (playerSpecialEase_.ActiveEnter() || playerSpecialEase_.ActiveStay()) {
+		player_.rotate.y = playerSpecialEase_.Get(playerRotateSpecial_.first, playerRotateSpecial_.second);
+	}
+	else if(playerSpecialEase_.ActiveExit()){
+		player_.rotate.y = playerRotateSpecial_.first;
 	}
 
 	player_.Update();
@@ -447,6 +521,10 @@ void ResultScene::Update() {
 
 	timer_.Update();
 	timerUI_.Update();
+
+	playerScaleGetStarEase_.Update();
+	playerScaleGetStarEase2_.Update();
+	playerSpecialEase_.Update();
 
 	if (input_->GetKey()->Pushed(DIK_SPACE) ||
 		input_->GetGamepad()->Pushed(Gamepad::Button::A)
