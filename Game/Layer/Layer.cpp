@@ -260,13 +260,13 @@ void Layer::Update(const Camera* camera) {
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.y * 10;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->Update();
 
-		if (kMaxHitPoints_[i] / 3.0f < hitPoints_[i] && hitPoints_[i] < kMaxHitPoints_[i] / 3.0f * 2.0f) {
+		if (kMaxHitPoints_[i] / 3.0f <= hitPoints_[i] && hitPoints_[i] < kMaxHitPoints_[i] / 3.0f * 2.0f) {
 			tex_[i]->LoadTexture("./Resources/Layer/layer_front1.png");
 		}
 		else if (hitPoints_[i] < kMaxHitPoints_[i] / 3.0f) {
 			tex_[i]->LoadTexture("./Resources/Layer/layer_front2.png");
 		}
-		else {
+		else if(hitPoints_[i] >= kMaxHitPoints_[i] / 3.0f * 2.0f){
 			tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
 		}
 
