@@ -65,6 +65,10 @@ void GameScene::Initialize() {
 
 	shockWaves_.clear();
 
+	if (stage_ >= kMaxStageNum_) {
+		stage_ = kMaxStageNum_ - 1;
+	}
+
 	layer_->Initialize(kLayerNums_[stage_], kLayerHitPoints_[stage_]);
 
 	player_->Initialize();
