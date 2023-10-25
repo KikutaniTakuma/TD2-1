@@ -29,7 +29,7 @@ ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
 	SRVHeap(),
 	heapSize(numDescriptor),
 #ifdef _DEBUG
-	currentHadleIndex(1),
+	currentHandleIndex(1),
 #else
 	currentHadleIndex(0),
 #endif // _DEBUG
@@ -49,6 +49,16 @@ ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
 		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
 		heapHandles.push_back(hadleTmp);
 	}
+
+	isUseHandle_.resize(numDescriptor);
+	for (size_t i = 0; i < isUseHandle_.size(); i++) {
+		isUseHandle_[i] = false;
+	}
+
+#ifdef _DEBUG
+	isUseHandle_[0] = true;
+#endif // _DEBUG
+
 
 	//isUse.resize(numDescriptor);
 }
@@ -88,45 +98,87 @@ void ShaderResourceHeap::Reset() {
 uint32_t ShaderResourceHeap::CreateTxtureView(Texture* tex) {
 	assert(tex != nullptr);
 	if (tex == nullptr || !*tex) {
-		return currentHadleIndex;
+		return currentHandleIndex;
 	}
-	assert(currentHadleIndex < heapSize);
-	if (currentHadleIndex >= heapSize /*|| isUse[currentHadleIndex]*/) {
+	assert(currentHandleIndex < heapSize);
+	if (currentHandleIndex >= heapSize /*|| isUse[currentHadleIndex]*/) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreateTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		return std::numeric_limits<uint32_t>::max();
 	}
 
-	tex->CreateSRVView(heapHandles[currentHadleIndex].first);
+	isUseHandle_[currentHandleIndex] = true;
+	tex->CreateSRVView(heapHandles[currentHandleIndex].first);
 
 	//isUse[currentHadleIndex] = true;
 
-	currentHadleIndex++;
+	currentHandleIndex++;
 
-	return currentHadleIndex - 1u;
+	return currentHandleIndex - 1u;
 }
 void ShaderResourceHeap::CreateTxtureView(Texture* tex, uint32_t heapIndex) {
 	assert(tex != nullptr);
 	assert(heapIndex < heapSize);
-	if (currentHadleIndex >= heapSize/* || isUse[heapIndex]*/) {
+	if (currentHandleIndex >= heapSize/* || isUse[heapIndex]*/) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreatTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		return;
 	}
+	isUseHandle_[heapIndex] = true;
 	tex->CreateSRVView(heapHandles[heapIndex].first);
 
 	//isUse[heapIndex] = true;
 }
 
 uint32_t ShaderResourceHeap::CreatePerarenderView(RenderTarget& renderTarget) {
-	assert(currentHadleIndex < heapSize);
-	if (currentHadleIndex >= heapSize/* || isUse[currentHadleIndex]*/) {
+	assert(currentHandleIndex < heapSize);
+	if (currentHandleIndex >= heapSize/* || isUse[currentHadleIndex]*/) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreatePerarenderView failed\nOver HeapSize", "ShaderResourceHeap");
 		return std::numeric_limits<uint32_t>::max();
 	}
 
-	renderTarget.CreateView(heapHandles[currentHadleIndex].first, heapHandles[currentHadleIndex].second);
-	currentHadleIndex++;
+	isUseHandle_[currentHandleIndex] = true;
+	renderTarget.CreateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
+	currentHandleIndex++;
 
 	//isUse[currentHadleIndex] = true;
 
-	return currentHadleIndex - 1u;
+	return currentHandleIndex - 1u;
+}
+
+void ShaderResourceHeap::BookingHeapPos(UINT nextCreateViewNum) {
+	bool isLoop = false;
+	while (isLoop) {
+		auto heapHandleItr = std::find(isUseHandle_.begin(), isUseHandle_.end(), false);
+		if (heapHandleItr == isUseHandle_.end()) {
+			ErrorCheck::GetInstance()->ErrorTextBox("SetReleasedIndexPos failed : all view used", "ShaderResourceHeap");
+			return;
+		}
+
+
+		size_t startIndex = std::distance(isUseHandle_.begin(), heapHandleItr);
+		size_t index = startIndex;
+
+		for (UINT i = 0u; i < nextCreateViewNum; i++) {
+			if (isUseHandle_[index]) {
+				isLoop = true;
+				for (UINT j = i; j < nextCreateViewNum; j++) {
+					index++;
+				}
+				startIndex = index;
+				break;
+			}
+			else {
+				index++;
+			}
+		}
+
+		if (!isLoop) {
+			currentHandleIndex = static_cast<UINT>(startIndex);
+			return;
+		}
+	}
+}
+
+
+void ShaderResourceHeap::ReleaseView(UINT viewHandle) {
+	isUseHandle_[viewHandle] = false;
 }

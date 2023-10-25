@@ -172,7 +172,7 @@ void RenderTarget::UseThisRenderTargetShaderResource() {
 	mainComList->SetGraphicsRootDescriptorTable(0, srvHeapHandle);
 }
 
-void RenderTarget::CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU) {
+void RenderTarget::CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU, UINT descHeapHandleUINT) {
 	Engine::GetDevice()->CreateShaderResourceView(
 		resource.Get(),
 		&srvDesc,
@@ -180,4 +180,5 @@ void RenderTarget::CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_
 	);
 
 	srvHeapHandle = descHeapHandleGPU;
+	srvHeapHandleUint = descHeapHandleUINT;
 }

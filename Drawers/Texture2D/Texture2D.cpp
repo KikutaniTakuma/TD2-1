@@ -52,6 +52,7 @@ Texture2D::Texture2D() :
 	}
 
 	auto srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap->BookingHeapPos(2u);
 	srvHeap->CreateConstBufferView(wvpMat);
 	srvHeap->CreateConstBufferView(colorBuf);
 }
@@ -134,6 +135,10 @@ Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
 }
 
 Texture2D::~Texture2D() {
+	auto descriptorHeap = ShaderResourceHeap::GetInstance();
+	descriptorHeap->ReleaseView(wvpMat.GetViewHandleUINT());
+	descriptorHeap->ReleaseView(colorBuf.GetViewHandleUINT());
+
 	if (vertexResource) {
 		vertexResource->Release();
 		vertexResource.Reset();

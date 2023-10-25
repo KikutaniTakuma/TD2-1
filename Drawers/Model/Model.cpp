@@ -130,6 +130,7 @@ Model::Model() :
 	*colorBuf = UintToVector4(color);
 
 	auto descriptorHeap = ShaderResourceHeap::GetInstance();
+	descriptorHeap->BookingHeapPos(3u);
 	descriptorHeap->CreateConstBufferView(wvpData);
 	descriptorHeap->CreateConstBufferView(dirLig);
 	descriptorHeap->CreateConstBufferView(colorBuf);
@@ -294,7 +295,7 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 			pipeline->Use();
 			i.second.tex->Use(0);
 
-			descriptorHeap->Use(wvpData.GetDescIndex(), 1);
+			descriptorHeap->Use(wvpData.GetViewHandleUINT(), 1);
 
 			commandlist->IASetVertexBuffers(0, 1, &i.second.resource.second);
 			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
@@ -318,6 +319,11 @@ void Model::Debug(const std::string& guiName) {
 }
 
 Model::~Model() {
+	auto descriptorHeap = ShaderResourceHeap::GetInstance();
+	descriptorHeap->ReleaseView(wvpData.GetViewHandleUINT());
+	descriptorHeap->ReleaseView(dirLig.GetViewHandleUINT());
+	descriptorHeap->ReleaseView(colorBuf.GetViewHandleUINT());
+
 	for (auto& i : data) {
 		if (i.second.resource.first) {
 			i.second.resource.first->Release();

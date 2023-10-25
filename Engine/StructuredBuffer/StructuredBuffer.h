@@ -144,7 +144,7 @@ public:
 		return descriptorHandle_;
 	}
 
-	UINT GetDescIndex() const noexcept {
+	UINT GetViewHandleUINT() const noexcept {
 		return dsecIndex_;
 	}
 
