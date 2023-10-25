@@ -13,11 +13,29 @@
         "Enemy10MoveRadius": 0.0,
         "Enemy10MoveVector": 0,
         "Enemy10Pos": [
-            300.0,
+            350.0,
             450.0,
             0.0
         ],
         "Enemy10Type": 0,
+        "Enemy11IsHealer": 1,
+        "Enemy11MoveRadius": 60.0,
+        "Enemy11MoveVector": 1,
+        "Enemy11Pos": [
+            -400.0,
+            0.0,
+            0.0
+        ],
+        "Enemy11Type": 1,
+        "Enemy12IsHealer": 1,
+        "Enemy12MoveRadius": 60.0,
+        "Enemy12MoveVector": 1,
+        "Enemy12Pos": [
+            400.0,
+            0.0,
+            0.0
+        ],
+        "Enemy12Type": 1,
         "Enemy1IsHealer": 0,
         "Enemy1MoveRadius": 0.0,
         "Enemy1MoveVector": 0,
@@ -67,7 +85,7 @@
         "Enemy6MoveRadius": 0.0,
         "Enemy6MoveVector": 0,
         "Enemy6Pos": [
-            -100.0,
+            -150.0,
             350.0,
             0.0
         ],
@@ -76,7 +94,7 @@
         "Enemy7MoveRadius": 0.0,
         "Enemy7MoveVector": 0,
         "Enemy7Pos": [
-            100.0,
+            150.0,
             350.0,
             0.0
         ],
@@ -85,7 +103,7 @@
         "Enemy8MoveRadius": 0.0,
         "Enemy8MoveVector": 0,
         "Enemy8Pos": [
-            -300.0,
+            -350.0,
             450.0,
             0.0
         ],
@@ -95,11 +113,11 @@
         "Enemy9MoveVector": 0,
         "Enemy9Pos": [
             0.0,
-            450.0,
+            500.0,
             0.0
         ],
         "Enemy9Type": 0,
-        "Layer0EnemyNum": 11,
+        "Layer0EnemyNum": 13,
         "Layer0HP": 8,
         "Layer0ScaffoldingNum": 0,
         "LayerNum": 1,
