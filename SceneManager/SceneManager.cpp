@@ -76,6 +76,8 @@ void SceneManager::Initialize(BaseScene* firstScene) {
 	Layer::GlobalVariablesLoad();
 	ShockWave::SetGlobalVariable();
 
+	frameInfo_->SetFpsLimit(60.0);
+
 	assert(firstScene != nullptr);
 	scene_.reset(firstScene);
 	scene_->SceneInitialize(this);
