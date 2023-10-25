@@ -113,7 +113,7 @@
         "Enemy20MoveVector": 0,
         "Enemy20Pos": [
             0.0,
-            1000.0,
+            2000.0,
             0.0
         ],
         "Enemy20Type": 0,
