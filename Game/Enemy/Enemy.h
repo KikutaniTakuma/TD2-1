@@ -83,7 +83,12 @@ public:
 	/// 状態のリクエスト
 	/// </summary>
 	/// <param name="status">したい状態</param>
-	void StatusRequest(Status status) { statusRequest_ = status; }
+	void StatusRequest(Status status) {
+		if (statusRequest_.has_value() && statusRequest_.value() == Status::kDeath) {
+			return;
+		}
+		statusRequest_ = status; 
+	}
 
 	/// <summary>
 	/// 今の状態の確認。あたり判定のフラグに使用。
