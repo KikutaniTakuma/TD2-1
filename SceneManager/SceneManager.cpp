@@ -4,6 +4,9 @@
 #include "Game/Enemy/Enemy.h"
 #include "Game/ShockWave/ShockWave.h"
 #include "Game/Layer/Layer.h"
+#include <filesystem>
+#include <fstream>
+#include <format>
 
 BaseScene::BaseScene(BaseScene::ID sceneID):
 	sceneManager_(nullptr),
@@ -36,6 +39,24 @@ SceneManager* const SceneManager::GetInstace() {
 }
 
 void SceneManager::Initialize(BaseScene* firstScene) {
+	static const std::filesystem::path fileName_ = "./ExecutionLog/PlayLog.txt";
+	if (!std::filesystem::exists(fileName_.parent_path())) {
+		std::filesystem::create_directories(fileName_.parent_path());
+	}
+
+	std::ofstream playLogFile;
+	playLogFile.open(fileName_, std::ios::app);
+	if (!playLogFile.fail()) {
+		auto now = std::chrono::system_clock::now();
+		auto nowSec = std::chrono::floor<std::chrono::seconds>(now);
+		std::chrono::zoned_time zt{ "Asia/Tokyo", nowSec };
+
+		playLogFile << std::endl
+			<< "play start : " << std::format("{:%Y/%m/%d %H:%M:%S}", zt) << std::endl;
+	}
+
+
+
 	fade_ = std::make_unique<Fade>();
 	fadeCamera_.Update();
 
@@ -172,5 +193,39 @@ void SceneManager::Game() {
 				break;
 			}
 		}
+	}
+}
+
+
+void SceneManager::Finalize() {
+	static const std::filesystem::path fileName_ = "./ExecutionLog/PlayLog.txt";
+
+	if (!std::filesystem::exists(fileName_.parent_path())) {
+		std::filesystem::create_directories(fileName_.parent_path());
+	}
+
+	std::ofstream playLogFile;
+	playLogFile.open(fileName_, std::ios::app);
+	if (!playLogFile.fail()) {
+		auto now = std::chrono::system_clock::now();
+		auto nowSec = std::chrono::floor<std::chrono::seconds>(now);
+		std::chrono::zoned_time zt{ "Asia/Tokyo", nowSec };
+
+		for (size_t i = 0; i < clearData_.size();i++) {
+			playLogFile << "stage " << std::to_string(i + 1) << " : clear count " << clearCountData_[i] << std::endl;
+			std::chrono::milliseconds averageClearTime{};
+			for (auto& time : clearData_[i]) {
+				averageClearTime += time;
+			}
+			if (!clearData_[i].empty()) {
+				averageClearTime /= clearData_[i].size();
+			}
+			std::chrono::seconds averageClearTimeSecond = std::chrono::duration_cast<std::chrono::seconds>(averageClearTime);
+
+			playLogFile << "           average " << averageClearTimeSecond << std::endl;
+		}
+
+		playLogFile
+			<< "play end : " << std::format("{:%Y/%m/%d %H:%M:%S}", zt) << std::endl;
 	}
 }

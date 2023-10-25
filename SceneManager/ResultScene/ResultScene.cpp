@@ -47,6 +47,8 @@ ResultScene::ResultScene():
 }
 
 void ResultScene::Initialize() {
+	sceneManager_->SetClearMilliSecond(stageNumber_ - 1, clearTime_);
+
 	camera_.farClip = 3000.0f;
 	camera_.pos.z = -1000.0f;
 

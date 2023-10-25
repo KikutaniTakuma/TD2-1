@@ -79,6 +79,7 @@ public:
 
 public:
 	void Initialize(BaseScene* firstScene);
+	void Finalize();
 
 	void SceneChange(BaseScene* next);
 
@@ -93,6 +94,11 @@ public:
 		return isPad_;
 	}
 
+	void SetClearMilliSecond(size_t stageNumber, const std::chrono::milliseconds& cleatTime) {
+		clearData_[stageNumber].push_back(cleatTime);
+		clearCountData_[stageNumber]++;
+	}
+
 private:
 	std::unique_ptr<BaseScene> scene_;
 	std::unique_ptr<BaseScene> next_;
@@ -105,6 +111,9 @@ private:
 	Input* input_ = nullptr;
 
 	bool isPad_ = false;
+
+	std::array<std::vector<std::chrono::milliseconds>, 10> clearData_;
+	std::array<uint32_t, 10> clearCountData_;
 
 public:
 	std::bitset<10> isClearStage_;
