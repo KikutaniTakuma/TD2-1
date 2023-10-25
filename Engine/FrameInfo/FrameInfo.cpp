@@ -95,11 +95,7 @@ void FrameInfo::End() {
 	end = std::chrono::steady_clock::now();
 	auto frameTime = std::chrono::duration_cast<std::chrono::microseconds>(end - frameStartTime_);
 
-#ifdef _DEBUG
-	deltaTime_ = 1.0 / fpsLimit_;
-#else
 	deltaTime_ = static_cast<double>(frameTime.count()) * unitAdjustment;
-#endif // _DEBUG
 	fps_ = 1.0f / deltaTime_;
 
 

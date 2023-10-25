@@ -47,7 +47,11 @@ public:
 	/// </summary>
 	/// <returns>デルタタイム</returns>
 	inline float GetDelta() const {
+#ifdef _DEBUG
+		return static_cast<float>(1.0 / fpsLimit_);
+#else
 		return static_cast<float>(deltaTime_);
+#endif
 	}
 
 	/// <summary>
