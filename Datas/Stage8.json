@@ -136,10 +136,10 @@
         ],
         "Enemy22Type": 0,
         "Enemy23IsHealer": 1,
-        "Enemy23MoveRadius": 400.0,
+        "Enemy23MoveRadius": 600.0,
         "Enemy23MoveVector": 1,
         "Enemy23Pos": [
-            0.0,
+            -200.0,
             100.0,
             0.0
         ],
