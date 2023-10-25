@@ -74,6 +74,22 @@ public:
 
 	void Debug();
 
+#ifdef _DEBUG
+	bool GetIsDebugStop() const {
+		return isDebugStopGame_;
+	}
+
+	bool GetIsOneFrameActive() const {
+		return isOneFrameActive_;
+	}
+
+	void SetIsOneFrameActive(bool isOneFramActive) {
+		if (isDebugStopGame_) {
+			isOneFrameActive_ = isOneFramActive;
+		}
+	}
+
+#endif // _DEBUG
 
 /// <summary>
 /// メンバ変数
@@ -94,4 +110,10 @@ private:
 
 	std::chrono::microseconds minTime;
 	std::chrono::microseconds minCheckTime;
+
+#ifdef _DEBUG
+	bool isDebugStopGame_;
+	bool isOneFrameActive_;
+#endif // _DEBUG
+
 };

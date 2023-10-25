@@ -136,8 +136,19 @@ void SceneManager::Game() {
 		// 入力処理
 		input_->InputStart();
 
+#ifdef _DEBUG		
+		if (frameInfo_->GetIsDebugStop() && frameInfo_->GetIsOneFrameActive()) {
+			this->Update();
+			frameInfo_->SetIsOneFrameActive(false);
+		}
+		else if(!frameInfo_->GetIsDebugStop()){
+			// 更新処理
+			this->Update();
+		}
+#else
 		// 更新処理
 		this->Update();
+#endif
 
 		// 描画処理
 		this->Draw();

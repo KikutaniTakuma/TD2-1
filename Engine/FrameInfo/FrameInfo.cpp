@@ -13,6 +13,10 @@
 #include <algorithm>
 
 FrameInfo::FrameInfo() :
+#ifdef _DEBUG
+	isDebugStopGame_(false),
+	isOneFrameActive_(false),
+#endif // _DEBUG
 	frameStartTime_(),
 	deltaTime_(0.0),
 	fps_(0.0),
@@ -127,6 +131,15 @@ void FrameInfo::Debug() {
 	ImGui::DragFloat("fps limit", &fpsLimit, 1.0f, 10.0f, 165.0f);
 	fpsLimit_ = static_cast<double>(fpsLimit);
 	SetFpsLimit(fpsLimit_);
+	if (ImGui::TreeNode("DEBUG")) {
+		ImGui::Checkbox("is Debug Stop", &isDebugStopGame_);
+		if (isDebugStopGame_) {
+			if (ImGui::Button("DEBUG frame next")) {
+				isOneFrameActive_ = true;
+			}
+		}
+		ImGui::TreePop();
+	}
 	ImGui::End();
 #endif // _DEBUG
 }
