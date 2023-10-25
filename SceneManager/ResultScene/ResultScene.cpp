@@ -557,24 +557,26 @@ void ResultScene::Update() {
 	playerScaleGetStarEase2_.Update();
 	playerSpecialEase_.Update();
 
-	if (input_->GetKey()->Pushed(DIK_SPACE) ||
-		input_->GetGamepad()->Pushed(Gamepad::Button::A)
-		) {
-		bgm_->Stop();
-		decideSE_->Start(0.2f);
-		if (nowChoose_ == 0) {
+	if (isCanSelect_) {
+		if (input_->GetKey()->Pushed(DIK_SPACE) ||
+			input_->GetGamepad()->Pushed(Gamepad::Button::A)
+			) {
+			bgm_->Stop();
+			decideSE_->Start(0.2f);
+			if (nowChoose_ == 0) {
 
-			auto gameScene = new GameScene;
-			assert(gameScene);
-			gameScene->SetStageNumber(stageNumber_);
+				auto gameScene = new GameScene;
+				assert(gameScene);
+				gameScene->SetStageNumber(stageNumber_);
 
-			sceneManager_->SceneChange(gameScene);
-		}
-		else {
-			auto stageSelect = new StageSelect;
-			assert(stageSelect);
-			stageSelect->SetStartStage(stageNumber_ );
-			sceneManager_->SceneChange(stageSelect);
+				sceneManager_->SceneChange(gameScene);
+			}
+			else {
+				auto stageSelect = new StageSelect;
+				assert(stageSelect);
+				stageSelect->SetStartStage(stageNumber_);
+				sceneManager_->SceneChange(stageSelect);
+			}
 		}
 	}
 
