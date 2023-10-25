@@ -72,7 +72,29 @@ public:
 
 	void SetFpsLimit(double fpsLimit);
 
+	/// <summary>
+	/// ゲームスピード取得
+	/// </summary>
+	/// <returns></returns>
+	inline float GetGameSpeedScale() const {
+		return static_cast<float>(gameSpeedSccale_);
+	}
+
+	void SetGameSpeedScale(float gameSpeedSccale);
+
+	/// <summary>
+	/// フレームの最初の時間を取得
+	/// </summary>
+	/// <returns>フレームの時間</returns>
+	std::chrono::steady_clock::time_point GetThisFrameTime() const {
+		return frameStartTime_;
+	}
+
+	/// <summary>
+	/// デバッグ関数
+	/// </summary>
 	void Debug();
+
 
 #ifdef _DEBUG
 	bool GetIsDebugStop() const {
@@ -88,7 +110,6 @@ public:
 			isOneFrameActive_ = isOneFramActive;
 		}
 	}
-
 #endif // _DEBUG
 
 /// <summary>
@@ -110,6 +131,8 @@ private:
 
 	std::chrono::microseconds minTime;
 	std::chrono::microseconds minCheckTime;
+
+	double gameSpeedSccale_;
 
 #ifdef _DEBUG
 	bool isDebugStopGame_;
