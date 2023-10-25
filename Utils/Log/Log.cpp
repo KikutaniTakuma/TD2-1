@@ -8,7 +8,7 @@
 
 namespace Log {
 	bool AddLog(const std::string& text) {
-		static const std::filesystem::path fileName = "./ExecutionLog/Log.txt";
+		static const std::filesystem::path fileName = "./ExecutionLog/ExecutionLog.txt";
 		static bool isOpned = false;
 
 		if (!std::filesystem::exists(fileName.parent_path())) {
