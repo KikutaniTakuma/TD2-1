@@ -461,9 +461,8 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 			LeaveInitialize();
 			break;
 		case Enemy::Status::kDeath:
-			DeathInitialize(layer);
-			break;
 		default:
+			DeathInitialize(layer);
 			break;
 		}
 
@@ -488,9 +487,8 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 		LeaveUpdate(y);
 		break;
 	case Enemy::Status::kDeath:
-		DeathUpdate();
-		break;
 	default:
+		DeathUpdate();
 		break;
 	}
 
