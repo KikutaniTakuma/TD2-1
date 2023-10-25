@@ -318,7 +318,9 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 			}
 		}
 		else if (status_ == Status::kFaint || status_ == Status::kLeave) {
-			statusRequest_ = Status::kFaint;
+			if (statusRequest_ == std::nullopt) {
+				statusRequest_ = Status::kFaint;
+			}
 		}
 		else if (type_ == Type::kWalk && status_ == Status::kNormal && enemy->GetType() == Type::kWalk && enemy->GetStatus() == Status::kNormal) {
 

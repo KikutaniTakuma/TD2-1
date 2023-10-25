@@ -104,7 +104,10 @@ void Player::EnemyStep(bool step) {
 	else {
 		isSteped_ = true;
 		isFly_ = false;
-		statusRequest_ = Status::kFalling;
+
+		if (statusRequest_ == std::nullopt) {
+			statusRequest_ = Status::kFalling;
+		}
 	}
 }
 
@@ -694,7 +697,9 @@ void Player::KnockBack(const Vector3& pos, const Vector3& scale)
 
 	rotateTimeCount_ = 0.0f;
 
-	statusRequest_ = Status::kKnockBack;
+	if (statusRequest_ == std::nullopt) {
+		statusRequest_ = Status::kKnockBack;
+	}
 
 }
 
