@@ -24,13 +24,18 @@ public:
 	// レンダーターゲットに設定したResourceをShaderResourceとして使う
 	void UseThisRenderTargetShaderResource();
 
-	void CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU);
+	void CreateView(D3D12_CPU_DESCRIPTOR_HANDLE descHeapHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHeapHandleGPU, UINT descHeapHandleUINT);
+
+	UINT GetViewHandleUINT() const {
+		return srvHeapHandleUint;
+	}
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> RTVHeap;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHeapHandle;
+	UINT srvHeapHandleUint;
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 

@@ -50,7 +50,7 @@ Line::Line() :
 	vertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vertexMap));
 
 	heap = ShaderResourceHeap::GetInstance();
-
+	heap->BookingHeapPos(1);
 	heap->CreateConstBufferView(wvpMat);
 }
 
@@ -79,7 +79,11 @@ Line& Line::operator=(Line&& right)noexcept {
 }
 
 Line::~Line() {
-	vertexBuffer->Release();
+	heap->ReleaseView(wvpMat.GetViewHandleUINT());
+	if (vertexBuffer) {
+		vertexBuffer->Release();
+		vertexBuffer.Reset();
+	}
 }
 
 void Line::Draw(const Mat4x4& viewProjection, uint32_t color) {
@@ -90,7 +94,7 @@ void Line::Draw(const Mat4x4& viewProjection, uint32_t color) {
 	*wvpMat = viewProjection;
 
 	pipline->Use();
-	heap->Use(wvpMat.GetDescIndex(), 0);
+	heap->Use(wvpMat.GetViewHandleUINT(), 0);
 	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &vertexView);
 	Engine::GetCommandList()->DrawInstanced(kVertexNum, 1, 0, 0);
 }

@@ -22,6 +22,8 @@ PeraRender::PeraRender(uint32_t width_, uint32_t height_):
 {}
 
 PeraRender::~PeraRender() {
+	static auto srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap->ReleaseView(render.GetViewHandleUINT());
 	if (peraVertexResource) {
 		peraVertexResource->Release();
 		peraVertexResource.Reset();
@@ -52,6 +54,7 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 	peraVertexResource->Unmap(0, nullptr);
 
 	static auto srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap->BookingHeapPos(1u);
 	srvHeap->CreatePerarenderView(render);
 }
 

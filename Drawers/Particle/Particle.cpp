@@ -122,6 +122,9 @@ Particle::Particle() :
 	srvHeap(nullptr)
 {
 	srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap->BookingHeapPos(2u);
+	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
+	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
 	for (uint32_t i = 0; i < wvpMat.Size(); i++) {
 		wvpMat[i] = MakeMatrixIndentity();
 	}
@@ -187,6 +190,10 @@ Particle::Particle(uint32_t indexNum) :
 	srvHeap(nullptr)
 {
 	srvHeap = ShaderResourceHeap::GetInstance();
+	srvHeap->BookingHeapPos(2u);
+	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
+	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
+
 	for (uint32_t i = 0; i < wvpMat.Size();i++) {
 		wvpMat[i] = MakeMatrixIndentity();
 	}
@@ -322,9 +329,9 @@ Particle& Particle::operator=(Particle&& right) noexcept {
 
 void Particle::Resize(uint32_t index) {
 	wvpMat.Resize(index);
-	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat, wvpMat.GetDescIndex());
+	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat, wvpMat.GetViewHandleUINT());
 	colorBuf.Resize(index);
-	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf, colorBuf.GetDescIndex());
+	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf, colorBuf.GetViewHandleUINT());
 	wtfs.resize(index);
 }
 
@@ -389,6 +396,9 @@ Particle::~Particle() {
 //	}
 //#endif // _DEBUG
 
+	srvHeap->ReleaseView(wvpMat.GetViewHandleUINT());
+	srvHeap->ReleaseView(colorBuf.GetViewHandleUINT());
+
 	if (vertexResource) {
 		vertexResource->Release();
 		vertexResource.Reset();
@@ -402,9 +412,6 @@ void Particle::LoadTexture(const std::string& fileName) {
 	if (tex && !isLoad) {
 		isLoad = true;
 	}
-	srvHeap->CreateTxtureView(tex);
-	srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
-	srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
 }
 
 void Particle::ThreadLoadTexture(const std::string& fileName) {
@@ -455,9 +462,6 @@ void Particle::LoadSettingDirectory(const std::string& directoryName) {
 		else {
 			tex = TextureManager::GetInstance()->GetWhiteTex();
 			isLoad = true;
-			srvHeap->CreateTxtureView(tex);
-			srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
-			srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
 		}
 		file.close();
 	}
@@ -714,9 +718,6 @@ void Particle::Update() {
 	assert(wtfs.size() == wvpMat.Size());
 
 	if (tex && tex->CanUse() && !isLoad) {
-		srvHeap->CreateTxtureView(tex);
-		srvHeap->CreateStructuredBufferView<Mat4x4>(wvpMat);
-		srvHeap->CreateStructuredBufferView<Vector4>(colorBuf);
 		isLoad = true;
 	}
 
@@ -913,7 +914,7 @@ void Particle::Draw(
 			// 各種描画コマンドを積む
 			graphicsPipelineState[blend]->Use();
 			tex->Use(0);
-			srvHeap->Use(wvpMat.GetDescIndex(), 1);
+			srvHeap->Use(wvpMat.GetViewHandleUINT(), 1);
 			commandlist->IASetVertexBuffers(0, 1, &vertexView);
 			commandlist->IASetIndexBuffer(&indexView);
 			commandlist->DrawIndexedInstanced(6, drawCount, 0, 0, 0);

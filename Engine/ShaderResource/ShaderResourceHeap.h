@@ -2,7 +2,6 @@
 #include <memory>
 #include <vector>
 #include <list>
-#include <queue>
 #include <wrl.h>
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
@@ -46,15 +45,17 @@ public:
 	/// <returns>作成した場所のハンドル</returns>
 	template<IsNotPtrCB T>
 	uint32_t CreateConstBufferView(ConstBuffer<T>& conBuf) {
-		assert(currentHadleIndex < heapSize);
-		if (currentHadleIndex >= heapSize) {
+		assert(currentHandleIndex < heapSize);
+		if (currentHandleIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		conBuf.CrerateView(heapHandles[currentHadleIndex].first, heapHandles[currentHadleIndex].second, currentHadleIndex);
-		currentHadleIndex++;
+		isUseHandle_[currentHandleIndex] = true;
 
-		return currentHadleIndex - 1u;
+		conBuf.CrerateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
+		currentHandleIndex++;
+
+		return currentHandleIndex - 1u;
 	}
 
 	/// <summary>
@@ -70,6 +71,8 @@ public:
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
+		isUseHandle_[heapIndex] = true;
+
 		conBuf.CrerateView(heapHandles[heapIndex].first, heapHandles[heapIndex].second, heapIndex);
 	}
 
@@ -81,15 +84,15 @@ public:
 	/// <returns>作成した場所のハンドル</returns>
 	template<IsNotPtrSB T>
 	uint32_t CreateStructuredBufferView(StructuredBuffer<T>& strcBuf) {
-		assert(currentHadleIndex < heapSize);
-		if (currentHadleIndex >= heapSize) {
+		assert(currentHandleIndex < heapSize);
+		if (currentHandleIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
+		isUseHandle_[currentHandleIndex] = true;
+		strcBuf.CrerateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
+		currentHandleIndex++;
 
-		strcBuf.CrerateView(heapHandles[currentHadleIndex].first, heapHandles[currentHadleIndex].second, currentHadleIndex);
-		currentHadleIndex++;
-
-		return currentHadleIndex - 1u;
+		return currentHandleIndex - 1u;
 	}
 
 	/// <summary>
@@ -104,7 +107,7 @@ public:
 		if (heapIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
-
+		isUseHandle_[heapIndex] = true;
 		strcBuf.CrerateView(heapHandles[heapIndex].first, heapHandles[heapIndex].second, heapIndex);
 	}
 
@@ -148,7 +151,9 @@ public:
 		return SRVHeap.GetAddressOf();
 	}
 
-	//void SetReleasedIndexPos(UINT nextCreateViewNum);
+public:
+	void BookingHeapPos(UINT nextCreateViewNum);
+	void ReleaseView(UINT viewHandle);
 
 private:
 	void Reset();
@@ -157,11 +162,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> SRVHeap;
 
 	UINT heapSize;
-	UINT currentHadleIndex;
-	/*std::queue<UINT> releaseHadleIndex;
-	
-	std::vector<bool> isUse;
-	std::list<int32_t> releaseView;*/
+	UINT currentHandleIndex;
+
+	std::vector<bool> isUseHandle_;
 
 	std::vector<std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>> heapHandles;
 };

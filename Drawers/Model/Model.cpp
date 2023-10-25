@@ -55,7 +55,7 @@ void Model::LoadShader(
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg) {
-		std::array<D3D12_DESCRIPTOR_RANGE,1> range={};
+		std::array<D3D12_DESCRIPTOR_RANGE, 1> range = {};
 		range[0].NumDescriptors = 1;
 		range[0].BaseShaderRegister = 0;
 		range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -131,7 +131,7 @@ Model::Model() :
 	*colorBuf = UintToVector4(color);
 }
 
-Model::Model(const std::string& fileName):
+Model::Model(const std::string& fileName) :
 	Model()
 {
 	this->LoadObj(fileName);
@@ -142,7 +142,7 @@ Model::Model(const Model& right) :
 {
 	*this = right;
 }
-Model::Model(Model&& right) noexcept:
+Model::Model(Model&& right) noexcept :
 	Model()
 {
 	*this = std::move(right);
