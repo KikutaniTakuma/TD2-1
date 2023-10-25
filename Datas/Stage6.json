@@ -23,7 +23,7 @@
         "Enemy11MoveVector": 0,
         "Enemy11Pos": [
             -250.0,
-            750.0,
+            800.0,
             0.0
         ],
         "Enemy11Type": 0,
@@ -32,7 +32,7 @@
         "Enemy12MoveVector": 0,
         "Enemy12Pos": [
             250.0,
-            750.0,
+            800.0,
             0.0
         ],
         "Enemy12Type": 0,
