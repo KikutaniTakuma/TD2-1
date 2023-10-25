@@ -50,7 +50,7 @@
         "Enemy14MoveVector": 0,
         "Enemy14Pos": [
             -275.0,
-            50.0,
+            0.0,
             0.0
         ],
         "Enemy14Type": 0,
@@ -59,7 +59,7 @@
         "Enemy15MoveVector": 0,
         "Enemy15Pos": [
             275.0,
-            50.0,
+            0.0,
             0.0
         ],
         "Enemy15Type": 0,
