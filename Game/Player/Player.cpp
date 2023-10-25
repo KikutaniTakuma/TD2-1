@@ -446,8 +446,6 @@ void Player::LandingInitialize(const float& y) {
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 
-	highest_ = 0.0f;
-
 	Collision(y);
 
 	play_->CreatShockWave(tex_->pos, highest_, y);
@@ -472,7 +470,6 @@ void Player::LandingInitialize(const float& y) {
 
 	easeCount_ = 0.0f;
 	isEaseReturn_ = false;
-
 }
 
 void Player::LandingUpdate(const float& y) {
@@ -496,6 +493,7 @@ void Player::LandingUpdate(const float& y) {
 		statusRequest_ = Status::kNormal;
 		tex_->scale = scale_;
 		isEaseReturn_ = false;
+		highest_ = 0.0f;
 	}
 
 }
