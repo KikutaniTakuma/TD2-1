@@ -55,28 +55,29 @@ void Model::LoadShader(
 
 void Model::CreateGraphicsPipeline() {
 	if (loadShaderFlg) {
-		std::array<D3D12_DESCRIPTOR_RANGE,1> range={};
+		std::array<D3D12_DESCRIPTOR_RANGE, 1> range = {};
 		range[0].NumDescriptors = 1;
 		range[0].BaseShaderRegister = 0;
 		range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 		range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 
-		std::array<D3D12_DESCRIPTOR_RANGE, 1> rangeCBV = {};
-		rangeCBV[0].NumDescriptors = 3;
-		rangeCBV[0].BaseShaderRegister = 0;
-		rangeCBV[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-		rangeCBV[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-
-		std::array<D3D12_ROOT_PARAMETER, 2> paramates = {};
+		std::array<D3D12_ROOT_PARAMETER, 4> paramates = {};
 		paramates[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 		paramates[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 		paramates[0].DescriptorTable.pDescriptorRanges = range.data();
 		paramates[0].DescriptorTable.NumDescriptorRanges = UINT(range.size());
 
 		paramates[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-		paramates[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		paramates[1].DescriptorTable.pDescriptorRanges = rangeCBV.data();
-		paramates[1].DescriptorTable.NumDescriptorRanges = UINT(rangeCBV.size());
+		paramates[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		paramates[1].Descriptor.ShaderRegister = 0;
+
+		paramates[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		paramates[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		paramates[2].Descriptor.ShaderRegister = 1;
+
+		paramates[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		paramates[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		paramates[3].Descriptor.ShaderRegister = 2;
 
 		PipelineManager::CreateRootSgnature(paramates.data(), paramates.size(), true);
 
@@ -128,15 +129,9 @@ Model::Model() :
 
 	colorBuf.shaderRegister = 2;
 	*colorBuf = UintToVector4(color);
-
-	auto descriptorHeap = ShaderResourceHeap::GetInstance();
-	descriptorHeap->BookingHeapPos(3u);
-	descriptorHeap->CreateConstBufferView(wvpData);
-	descriptorHeap->CreateConstBufferView(dirLig);
-	descriptorHeap->CreateConstBufferView(colorBuf);
 }
 
-Model::Model(const std::string& fileName):
+Model::Model(const std::string& fileName) :
 	Model()
 {
 	this->LoadObj(fileName);
@@ -147,7 +142,7 @@ Model::Model(const Model& right) :
 {
 	*this = right;
 }
-Model::Model(Model&& right) noexcept:
+Model::Model(Model&& right) noexcept :
 	Model()
 {
 	*this = std::move(right);
@@ -290,12 +285,14 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 		[[maybe_unused]] size_t indexVertex = 0;
 
-		auto descriptorHeap = ShaderResourceHeap::GetInstance();
 		for (auto& i : data) {
 			pipeline->Use();
 			i.second.tex->Use(0);
 
-			descriptorHeap->Use(wvpData.GetViewHandleUINT(), 1);
+
+			commandlist->SetGraphicsRootConstantBufferView(1, wvpData.GetGPUVtlAdrs());
+			commandlist->SetGraphicsRootConstantBufferView(2, dirLig.GetGPUVtlAdrs());
+			commandlist->SetGraphicsRootConstantBufferView(3, colorBuf.GetGPUVtlAdrs());
 
 			commandlist->IASetVertexBuffers(0, 1, &i.second.resource.second);
 			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);
@@ -319,11 +316,6 @@ void Model::Debug(const std::string& guiName) {
 }
 
 Model::~Model() {
-	auto descriptorHeap = ShaderResourceHeap::GetInstance();
-	descriptorHeap->ReleaseView(wvpData.GetViewHandleUINT());
-	descriptorHeap->ReleaseView(dirLig.GetViewHandleUINT());
-	descriptorHeap->ReleaseView(colorBuf.GetViewHandleUINT());
-
 	for (auto& i : data) {
 		if (i.second.resource.first) {
 			i.second.resource.first->Release();

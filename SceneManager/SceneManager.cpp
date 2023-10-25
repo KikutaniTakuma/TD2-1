@@ -198,6 +198,10 @@ void SceneManager::Game() {
 
 
 void SceneManager::Finalize() {
+	fade_.reset();
+	scene_.reset();
+	next_.reset();
+
 	static const std::filesystem::path fileName_ = "./ExecutionLog/PlayLog.txt";
 
 	if (!std::filesystem::exists(fileName_.parent_path())) {

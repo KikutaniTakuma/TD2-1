@@ -146,8 +146,8 @@ uint32_t ShaderResourceHeap::CreatePerarenderView(RenderTarget& renderTarget) {
 
 void ShaderResourceHeap::BookingHeapPos(UINT nextCreateViewNum) {
 	bool isLoop = false;
-	while (isLoop) {
-		auto heapHandleItr = std::find(isUseHandle_.begin(), isUseHandle_.end(), false);
+	auto heapHandleItr = std::find(isUseHandle_.begin(), isUseHandle_.end(), false);
+	do {
 		if (heapHandleItr == isUseHandle_.end()) {
 			ErrorCheck::GetInstance()->ErrorTextBox("SetReleasedIndexPos failed : all view used", "ShaderResourceHeap");
 			return;
@@ -157,10 +157,10 @@ void ShaderResourceHeap::BookingHeapPos(UINT nextCreateViewNum) {
 		size_t startIndex = std::distance(isUseHandle_.begin(), heapHandleItr);
 		size_t index = startIndex;
 
-		for (UINT i = 0u; i < nextCreateViewNum; i++) {
+		for (UINT i = 0u; i < nextCreateViewNum * 10; i++) {
 			if (isUseHandle_[index]) {
 				isLoop = true;
-				for (UINT j = i; j < nextCreateViewNum; j++) {
+				for (UINT j = i; j < nextCreateViewNum * 10; j++) {
 					index++;
 				}
 				startIndex = index;
@@ -171,11 +171,18 @@ void ShaderResourceHeap::BookingHeapPos(UINT nextCreateViewNum) {
 			}
 		}
 
+		if (startIndex != index) {
+			isLoop = false;
+		}
+
 		if (!isLoop) {
 			currentHandleIndex = static_cast<UINT>(startIndex);
 			return;
 		}
-	}
+
+		heapHandleItr = isUseHandle_.begin();
+		std::advance(heapHandleItr, index);
+	} while (isLoop);
 }
 
 
