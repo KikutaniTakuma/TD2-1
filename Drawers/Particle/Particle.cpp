@@ -692,16 +692,20 @@ void Particle::BackUpSettingFile(const std::string& groupName) {
 void Particle::ParticleStart() {
 	if (!settings.empty()) {
 		currentParticleIndex = 0;
-		settings[currentParticleIndex].isValid = true;
 		emitterPos_ = settings[currentParticleIndex].emitter.pos;
+		settings[currentSettingIndex].isValid = false;
+		settings[currentSettingIndex].isValid.Update();
+		settings[currentParticleIndex].isValid = true;
 	}
 }
 
 void Particle::ParticleStart(const Vector3& emitterPos) {
 	if (!settings.empty()) {
 		currentParticleIndex = 0;
-		settings[currentParticleIndex].isValid = true;
 		emitterPos_ = emitterPos;
+		settings[currentSettingIndex].isValid = false;
+		settings[currentSettingIndex].isValid.Update();
+		settings[currentParticleIndex].isValid = true;
 	}
 }
 
