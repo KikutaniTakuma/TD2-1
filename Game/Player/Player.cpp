@@ -265,7 +265,7 @@ void Player::Update(const float& y, const Camera* camera) {
 void Player::NormalInitialize(const float& y) {
 
 	//velocity_ = {};
-	highest_ = 0.0f;
+	//highest_ = 0.0f;
 	Collision(y);
 	
 	isStep_ = false;
@@ -446,6 +446,8 @@ void Player::LandingInitialize(const float& y) {
 
 	velocity_ = { 0.0f,0.0f,0.0f };
 
+	highest_ = 0.0f;
+
 	Collision(y);
 
 	play_->CreatShockWave(tex_->pos, highest_, y);
@@ -561,6 +563,7 @@ void Player::FallingUpdate(const float& y) {
 			isFly_ = false;
 			statusRequest_ = Status::kNormal;
 			models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
+			highest_ = 0.0f;
 		}
 		else {
 
