@@ -25,7 +25,8 @@ FrameInfo::FrameInfo() :
 	frameCount_(0),
 	fpsLimit_(0.0),
 	minTime(),
-	minCheckTime()
+	minCheckTime(),
+	gameSpeedSccale_(1.0)
 {
 	//画面情報構造体
 	DEVMODE mode{};
@@ -142,4 +143,9 @@ void FrameInfo::Debug() {
 	}
 	ImGui::End();
 #endif // _DEBUG
+}
+
+void FrameInfo::SetGameSpeedScale(float gameSpeedSccale) {
+	gameSpeedSccale = std::clamp(gameSpeedSccale, 0.0f, 10.0f);
+	gameSpeedSccale_ = static_cast<double>(gameSpeedSccale);
 }

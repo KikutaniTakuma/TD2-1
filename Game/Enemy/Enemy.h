@@ -307,4 +307,6 @@ private:
 	std::pair<int32_t, int32_t> playerAnimationCoolTimeDuration_;
 	std::chrono::steady_clock::time_point playerAnimationCoolStartTime_;
 	bool isPlayerAnimationCoolTime_;
+
+	Particle generationDeleteParticle_;
 };

@@ -167,6 +167,8 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 
 	//otitaSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/enemy_otita.wav", false);
 	explorsionSE_ = AudioManager::GetInstance()->LoadWav("./Resources/Audio/kouka/kouka/bakuhatu2.wav", false);
+
+	generationDeleteParticle_.LoadSettingDirectory("enemy-generation-delete");
 }
 
 void Enemy::SetGlobalVariable() {
@@ -512,6 +514,9 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 	enemyStepOnParticle_.Update();
 	enemyDeathParticle_.Update();
 
+	generationDeleteParticle_.emitterPos_ = tex_->pos;
+	generationDeleteParticle_.Update();
+
 	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
 		isPlayerAnimationCoolTime_ = false;
 	}
@@ -726,6 +731,7 @@ void Enemy::GenerationInitialize(const float y) {
 
 	InitializeFirstMove();
 	
+	generationDeleteParticle_.ParticleStart();
 }
 
 void Enemy::GenerationUpdate() {
@@ -903,6 +909,7 @@ void Enemy::FaintUpdate(const float& y) {
 
 void Enemy::LeaveInitialize() {
 	timeCount_ = 0;
+	generationDeleteParticle_.ParticleStart();
 }
 
 void Enemy::LeaveUpdate(const float& y) {
@@ -935,9 +942,7 @@ void Enemy::DeathUpdate() {
 	if (isHealer_) {
 		timeCount_ += FrameInfo::GetInstance()->GetDelta();
 
-		float t = timeCount_ / kHealerDeathTime_;
-
-		tex_->scale = Vector2(enemyScale_, enemyScale_) * (1.0f - t) + Vector2(0.0f, 0.0f) * t;
+		tex_->scale = Vector2::zero;
 
 		if (timeCount_ >= kHealerDeathTime_) {
 			statusRequest_ = Status::kGeneration;
@@ -948,9 +953,7 @@ void Enemy::DeathUpdate() {
 	else {
 		timeCount_ += FrameInfo::GetInstance()->GetDelta();
 
-		float t = timeCount_ / kDeathTime_;
-
-		tex_->scale = Vector2(enemyScale_, enemyScale_) * (1.0f - t) + Vector2(0.0f, 0.0f) * t;
+		tex_->scale = Vector2::zero;
 
 		if (timeCount_ >= kDeathTime_) {
 			statusRequest_ = Status::kGeneration;
@@ -970,6 +973,7 @@ void Enemy::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 void Enemy::DrawParticle(const Mat4x4& viewProjection) {
 	enemyStepOnParticle_.Draw(viewProjection);
 	enemyDeathParticle_.Draw(viewProjection);
+	generationDeleteParticle_.Draw(viewProjection);
 }
 
 void Enemy::Draw2D(const Mat4x4& viewProjection) {

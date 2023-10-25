@@ -22,7 +22,7 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 		tex_.push_back(std::make_unique<Texture2D>());
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
-		tex_[i]->LoadTexture("./Resources/white2x2.png");
+		tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
 		if (i % 3 == 0) {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
@@ -40,7 +40,7 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 			models_[i].push_back(std::make_unique<Model>());
 		}
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
-		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
@@ -85,7 +85,7 @@ void Layer::ApplyGlobalVariable() {
 			tex_.push_back(std::make_unique<Texture2D>());
 			tex_[i]->scale = kLayer2DScale_;
 			tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
-			tex_[i]->LoadTexture("./Resources/white2x2.png");
+			tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
 			if (i % 3 == 0) {
 				tex_[i]->color = 0xFFFFFFFF;
 			}
@@ -102,7 +102,7 @@ void Layer::ApplyGlobalVariable() {
 				models_[i].push_back(std::make_unique<Model>());
 			}
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
-			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();;
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
@@ -177,7 +177,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 		else {
 			tex_[i]->color = 0xFFFF00FF;
 		}
-		tex_[i]->LoadTexture("./Resources/white2x2.png");
+		tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
 
 		models_.push_back(std::vector<std::unique_ptr<Model>>());
 
@@ -185,7 +185,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 			models_[i].push_back(std::make_unique<Model>());
 		}
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
-		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
@@ -259,7 +259,17 @@ void Layer::Update(const Camera* camera) {
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[i][static_cast<uint16_t>(Parts::kMain)]->scale.y * 10;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->Update();
 
+		if (kMaxHitPoints_[i] / 3.0f < hitPoints_[i] && hitPoints_[i] < kMaxHitPoints_[i] / 3.0f * 2.0f) {
+			tex_[i]->LoadTexture("./Resources/Layer/layer_front1.png");
+		}
+		else if (hitPoints_[i] < kMaxHitPoints_[i] / 3.0f) {
+			tex_[i]->LoadTexture("./Resources/Layer/layer_front2.png");
+		}
+
+		float texYPos = tex_[i]->pos.y;
+		tex_[i]->pos.y -= tex_[i]->scale.y * 0.5f;
 		tex_[i]->Update();
+		tex_[i]->pos.y = texYPos;
 	}
 
 
@@ -293,11 +303,11 @@ void Layer::Draw2DFar(const Mat4x4& viewProjection) {
 
 void Layer::Draw2DNear(const Mat4x4& viewProjection) {
 
-	/*for (int i = 0; i < kMaxLayerNum_; i++) {
+	for (int i = 0; i < kMaxLayerNum_; i++) {
 		if (hitPoints_[i] != 0) {
 			tex_[i]->Draw(viewProjection, Pipeline::Normal, false);
 		}
-	}*/
+	}
 	gauge_->Draw2D(viewProjection);
 }
 
