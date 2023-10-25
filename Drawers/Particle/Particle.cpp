@@ -969,6 +969,7 @@ void Particle::Debug(const std::string& guiName) {
 		// エミッターの設定
 		if (ImGui::TreeNode("Emitter")) {
 			ImGui::DragFloat3("pos", &settings[i].emitter.pos.x, 0.01f);
+			emitterPos_ = settings[i].emitter.pos;
 			ImGui::DragFloat3("size", &settings[i].emitter.size.x, 0.01f);
 			int32_t type = static_cast<int32_t>(settings[i].emitter.type);
 			ImGui::SliderInt("type", &type, 0, 1);

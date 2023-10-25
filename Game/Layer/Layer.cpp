@@ -200,6 +200,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 	gamePlayTime_ = std::chrono::milliseconds(0);
 
 	breakEffect_.LoadSettingDirectory("break");
+	healEffect_.LoadSettingDirectory("layer-heal");
 }
 
 void Layer::Update(const Camera* camera) {
@@ -265,6 +266,9 @@ void Layer::Update(const Camera* camera) {
 		else if (hitPoints_[i] < kMaxHitPoints_[i] / 3.0f) {
 			tex_[i]->LoadTexture("./Resources/Layer/layer_front2.png");
 		}
+		else {
+			tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
+		}
 
 		float texYPos = tex_[i]->pos.y;
 		tex_[i]->pos.y -= tex_[i]->scale.y * 0.5f;
@@ -273,12 +277,16 @@ void Layer::Update(const Camera* camera) {
 	}
 
 
+	breakEffect_.emitterPos_.y = tex_[nowLayer_]->pos.y;
 	breakEffect_.Update();
+	healEffect_.emitterPos_.y = tex_[nowLayer_]->pos.y;
+	healEffect_.Update();
 }
 
 void Layer::Heal() {
 	if (hitPoints_[nowLayer_] != kMaxHitPoints_[nowLayer_]) {
 		hitPoints_[nowLayer_]++;
+		healEffect_.ParticleStart();
 	}
 }
 
@@ -294,6 +302,7 @@ void Layer::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 
 void Layer::ParticleDraw(const Mat4x4& viewProjections) {
 	breakEffect_.Draw(viewProjections);
+	healEffect_.Draw(viewProjections);
 }
 
 void Layer::Draw2DFar(const Mat4x4& viewProjection) {

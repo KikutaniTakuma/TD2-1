@@ -160,4 +160,7 @@ private:
 
 	// 破壊時エフェクト
 	Particle breakEffect_;
+
+	//回復エフェクト
+	Particle healEffect_;
 };

@@ -14,9 +14,9 @@ GameScene::GameScene() :
 	texs_(),
 	globalVariables_()*/
 
-	Enemy::GlobalVariablesLoad();
-	ShockWave::GlobalVariablesLoad();
-	Layer::GlobalVariablesLoad();
+	//Enemy::GlobalVariablesLoad();
+	//ShockWave::GlobalVariablesLoad();
+	//Layer::GlobalVariablesLoad();
 
 	camera2D_ = std::make_unique<Camera>();
 
@@ -34,7 +34,7 @@ GameScene::GameScene() :
 
 	scaffoldingNums_.push_back(std::vector<int>());
 
-	ShockWave::SetGlobalVariable();
+	//ShockWave::SetGlobalVariable();
 
 	background_ = std::make_unique<Background>();
 

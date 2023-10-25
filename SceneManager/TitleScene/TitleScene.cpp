@@ -16,6 +16,7 @@ TitleScene::TitleScene():
 {
 	camera_.farClip = 3000.0f;
 	camera_.pos.z = -1000.0f;
+	//hoge_.LoadSettingDirectory("layer_heal");
 }
 
 void TitleScene::Initialize() {
@@ -241,6 +242,9 @@ void TitleScene::Update() {
 		nextScene->SetStartStage(1);
 		sceneManager_->SceneChange(nextScene);
 	}
+
+	/*hoge_.Debug("hoge_");
+	hoge_.Update();*/
 }
 
 void TitleScene::Draw() {
@@ -271,4 +275,5 @@ void TitleScene::Draw() {
 	}
 	backToHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
 	startHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	//hoge_.Draw(camera_.GetViewOthographics(), Pipeline::Normal);
 }

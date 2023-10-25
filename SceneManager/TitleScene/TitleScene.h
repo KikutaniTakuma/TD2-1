@@ -80,4 +80,6 @@ private:
 	Texture2D keyEscHud_;
 	Texture2D padStartHud_;
 	Texture2D backToHud_;
+
+	//Particle hoge_;
 };

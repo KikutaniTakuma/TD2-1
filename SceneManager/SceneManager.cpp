@@ -1,6 +1,9 @@
 #include "SceneManager.h"
 #include "Engine/Engine.h"
 #include "Utils/UtilsLib/UtilsLib.h"
+#include "Game/Enemy/Enemy.h"
+#include "Game/ShockWave/ShockWave.h"
+#include "Game/Layer/Layer.h"
 
 BaseScene::BaseScene(BaseScene::ID sceneID):
 	sceneManager_(nullptr),
@@ -67,6 +70,11 @@ void SceneManager::Initialize(BaseScene* firstScene) {
 	for (auto& i : bgmNames) {
 		audioManager->LoadWav(i.string(), true);
 	}
+
+	Enemy::GlobalVariablesLoad();
+	ShockWave::GlobalVariablesLoad();
+	Layer::GlobalVariablesLoad();
+	ShockWave::SetGlobalVariable();
 
 	assert(firstScene != nullptr);
 	scene_.reset(firstScene);
