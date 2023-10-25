@@ -143,7 +143,7 @@ void Pause::SceneChange(int32_t nowStage) {
 				audios_[0]->Start(0.125f);
 			}
 			else if (currentChoose_ == 2) {
-				auto nextScene = new StageSelect{};
+				auto nextScene = new TitleScene{};
 				assert(nextScene);
 				sceneManager_->SceneChange(nextScene);
 				audios_[0]->Start(0.125f);

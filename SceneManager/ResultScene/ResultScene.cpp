@@ -40,9 +40,9 @@ ResultScene::ResultScene():
 	specialStarSE_()
 {
 	clearTimeBasis_ = {
-		std::chrono::milliseconds{30000},  // 30秒
-		std::chrono::milliseconds{60000},  // 1分
-		std::chrono::milliseconds{120000}  // 2分
+		std::chrono::milliseconds{31000-1},  // 30秒
+		std::chrono::milliseconds{61000-1},  // 1分
+		std::chrono::milliseconds{121000-1}  // 2分
 	};
 }
 
