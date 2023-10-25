@@ -31,7 +31,7 @@ ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
 #ifdef _DEBUG
 	currentHandleIndex(1),
 #else
-	currentHadleIndex(0),
+	currentHandleIndex(0),
 #endif // _DEBUG
 	heapHandles(0)/*,
 	isUse(),
