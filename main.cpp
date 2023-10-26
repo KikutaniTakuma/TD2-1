@@ -5,7 +5,7 @@
 
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ライブラリ初期化
-	if (!Engine::Initialize("DirectXGame", Engine::Resolution::HD)) {
+	if (!Engine::Initialize("2106_うさバチン!", Engine::Resolution::HD)) {
 		ErrorCheck::GetInstance()->ErrorTextBox(
 			"InitializeDirect3D() : Engine::Initialize() Failed",
 			"WinMain"
