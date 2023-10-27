@@ -33,9 +33,10 @@ ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
 #else
 	currentHandleIndex(0),
 #endif // _DEBUG
-	heapHandles(0)/*,
-	isUse(),
-	releaseView()*/
+	heapHandles(0),
+	releaseHandle_(),
+	useHandle_(),
+	bookingHandle_()
 {
 	SRVHeap = Engine::CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptor, true);
 
@@ -49,18 +50,11 @@ ShaderResourceHeap::ShaderResourceHeap(UINT numDescriptor) :
 		hadleTmp.second.ptr += Engine::GetIncrementSRVCBVUAVHeap() * i;
 		heapHandles.push_back(hadleTmp);
 	}
-
-	isUseHandle_.resize(numDescriptor);
-	for (size_t i = 0; i < isUseHandle_.size(); i++) {
-		isUseHandle_[i] = false;
-	}
+	bookingHandle_.clear();
 
 #ifdef _DEBUG
-	isUseHandle_[0] = true;
+	useHandle_.push_back(0u);
 #endif // _DEBUG
-
-
-	//isUse.resize(numDescriptor);
 }
 
 ShaderResourceHeap::~ShaderResourceHeap() {
@@ -89,103 +83,130 @@ void ShaderResourceHeap::Reset() {
 	}
 }
 
-//void ShaderResourceHeap::SetReleasedIndexPos(UINT nextCreateViewNum) {
-//	if (releaseView.empty() || nextCreateViewNum > releaseView.size()) {
-//		return;
-//	}
-//}
-
 uint32_t ShaderResourceHeap::CreateTxtureView(Texture* tex) {
 	assert(tex != nullptr);
 	if (tex == nullptr || !*tex) {
 		return currentHandleIndex;
 	}
 	assert(currentHandleIndex < heapSize);
-	if (currentHandleIndex >= heapSize /*|| isUse[currentHadleIndex]*/) {
+	if (currentHandleIndex >= heapSize) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreateTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		return std::numeric_limits<uint32_t>::max();
 	}
 
-	isUseHandle_[currentHandleIndex] = true;
-	tex->CreateSRVView(heapHandles[currentHandleIndex].first);
-
-	//isUse[currentHadleIndex] = true;
-
-	currentHandleIndex++;
-
-	return currentHandleIndex - 1u;
+	if (bookingHandle_.empty()) {
+		useHandle_.push_back(currentHandleIndex);
+		tex->CreateSRVView(heapHandles[currentHandleIndex].first);
+		currentHandleIndex++;
+		return currentHandleIndex - 1u;
+	}
+	// もしリリースした場所に作るなら
+	else {
+		uint32_t nowCreateViewHandle = bookingHandle_.front();
+		useHandle_.push_back(nowCreateViewHandle);
+		tex->CreateSRVView(heapHandles[nowCreateViewHandle].first);
+		bookingHandle_.pop_front();
+		return nowCreateViewHandle;
+	}
 }
+
 void ShaderResourceHeap::CreateTxtureView(Texture* tex, uint32_t heapIndex) {
 	assert(tex != nullptr);
 	assert(heapIndex < heapSize);
-	if (currentHandleIndex >= heapSize/* || isUse[heapIndex]*/) {
+	if (currentHandleIndex >= heapSize) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreatTxtureBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		return;
 	}
-	isUseHandle_[heapIndex] = true;
-	tex->CreateSRVView(heapHandles[heapIndex].first);
 
-	//isUse[heapIndex] = true;
+	tex->CreateSRVView(heapHandles[heapIndex].first);
 }
 
 uint32_t ShaderResourceHeap::CreatePerarenderView(RenderTarget& renderTarget) {
 	assert(currentHandleIndex < heapSize);
-	if (currentHandleIndex >= heapSize/* || isUse[currentHadleIndex]*/) {
+	if (currentHandleIndex >= heapSize) {
 		ErrorCheck::GetInstance()->ErrorTextBox("CreatePerarenderView failed\nOver HeapSize", "ShaderResourceHeap");
 		return std::numeric_limits<uint32_t>::max();
 	}
 
-	isUseHandle_[currentHandleIndex] = true;
-	renderTarget.CreateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
-	currentHandleIndex++;
-
-	//isUse[currentHadleIndex] = true;
-
-	return currentHandleIndex - 1u;
+	if (bookingHandle_.empty()) {
+		useHandle_.push_back(currentHandleIndex);
+		renderTarget.CreateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
+		currentHandleIndex++;
+		return currentHandleIndex - 1u;
+	}
+	else {
+		uint32_t nowCreateViewHandle = bookingHandle_.front();
+		useHandle_.push_back(nowCreateViewHandle);
+		renderTarget.CreateView(heapHandles[nowCreateViewHandle].first, heapHandles[nowCreateViewHandle].second, nowCreateViewHandle);
+		bookingHandle_.pop_front();
+		return nowCreateViewHandle;
+	}
 }
 
 void ShaderResourceHeap::BookingHeapPos(UINT nextCreateViewNum) {
-	bool isLoop = false;
-	auto heapHandleItr = std::find(isUseHandle_.begin(), isUseHandle_.end(), false);
-	do {
-		if (heapHandleItr == isUseHandle_.end()) {
-			ErrorCheck::GetInstance()->ErrorTextBox("SetReleasedIndexPos failed : all view used", "ShaderResourceHeap");
-			return;
+	if (releaseHandle_.empty()) {
+		bookingHandle_.clear();
+		return;
+	}
+	else {
+		for (auto i : releaseHandle_) {
+			std::erase(useHandle_, i);
 		}
+	}
+	if (useHandle_.empty()) {
+		currentHandleIndex = 0u;
+		return;
+	}
 
-
-		size_t startIndex = std::distance(isUseHandle_.begin(), heapHandleItr);
-		size_t index = startIndex;
-
-		for (UINT i = 0u; i < nextCreateViewNum * 10; i++) {
-			if (isUseHandle_[index]) {
-				isLoop = true;
-				for (UINT j = i; j < nextCreateViewNum * 10; j++) {
-					index++;
-				}
-				startIndex = index;
+	auto releaseHandle = releaseHandle_.begin();
+	bool isCanUseHandle = true;
+	bookingHandle_.clear();
+	do {
+		isCanUseHandle = true;
+		bookingHandle_.clear();
+		for (uint32_t i = 0; i < nextCreateViewNum; i++) {
+			bookingHandle_.push_back(*releaseHandle);
+			releaseHandle++;
+			if (releaseHandle == releaseHandle_.end()) {
+				bookingHandle_.clear();
 				break;
 			}
-			else {
-				index++;
+		}
+
+		if (bookingHandle_.empty()) {
+			bookingHandle_.clear();
+			break;
+		}
+
+		for (size_t i = 0; i < bookingHandle_.size() - 1; i++) {
+			if (bookingHandle_[i] != bookingHandle_[i + 1llu]) {
+				isCanUseHandle = false;
+				bookingHandle_.clear();
+				break;
 			}
 		}
+	} while (!isCanUseHandle);
 
-		if (startIndex != index) {
-			isLoop = false;
-		}
+	for (auto& i : bookingHandle_) {
+		std::erase(releaseHandle_, i);
+	}
 
-		if (!isLoop) {
-			currentHandleIndex = static_cast<UINT>(startIndex);
-			return;
-		}
-
-		heapHandleItr = isUseHandle_.begin();
-		std::advance(heapHandleItr, index);
-	} while (isLoop);
+	for (auto& i : bookingHandle_) {
+		std::erase(useHandle_, i);
+	}
 }
 
 
 void ShaderResourceHeap::ReleaseView(UINT viewHandle) {
-	isUseHandle_[viewHandle] = false;
+	if (!releaseHandle_.empty()) {
+		auto isReleased = std::find(releaseHandle_.begin(), releaseHandle_.end(), viewHandle);
+		if (isReleased == releaseHandle_.end()) {
+			return;
+		}
+		isReleased = std::find(useHandle_.begin(), useHandle_.end(), viewHandle);
+		if (isReleased != useHandle_.end()) {
+			return;
+		}
+	}
+	releaseHandle_.push_back(viewHandle);
 }
