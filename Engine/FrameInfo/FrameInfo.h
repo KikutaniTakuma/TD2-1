@@ -48,7 +48,10 @@ public:
 	/// <returns>デルタタイム</returns>
 	inline float GetDelta() const {
 #ifdef _DEBUG
-		return static_cast<float>(1.0 / fpsLimit_);
+		if (isFixedDeltaTime_ || isDebugStopGame_) {
+			return static_cast<float>(1.0 / fpsLimit_);
+		}
+		return static_cast<float>(deltaTime_);
 #else
 		return static_cast<float>(deltaTime_);
 #endif
@@ -137,6 +140,7 @@ private:
 #ifdef _DEBUG
 	bool isDebugStopGame_;
 	bool isOneFrameActive_;
+	bool isFixedDeltaTime_;
 #endif // _DEBUG
 
 };

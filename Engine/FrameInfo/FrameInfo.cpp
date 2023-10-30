@@ -16,6 +16,7 @@ FrameInfo::FrameInfo() :
 #ifdef _DEBUG
 	isDebugStopGame_(false),
 	isOneFrameActive_(false),
+	isFixedDeltaTime_(true),
 #endif // _DEBUG
 	frameStartTime_(),
 	deltaTime_(0.0),
@@ -138,6 +139,9 @@ void FrameInfo::Debug() {
 			if (ImGui::Button("DEBUG frame next")) {
 				isOneFrameActive_ = true;
 			}
+		}
+		else {
+			ImGui::Checkbox("is fixed deltaTime", &isFixedDeltaTime_);
 		}
 		ImGui::TreePop();
 	}
