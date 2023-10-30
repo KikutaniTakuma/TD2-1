@@ -1,19 +1,14 @@
 #include "Model.h"
-#include "Engine/Engine.h"
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <algorithm>
 #include <cassert>
-#include <numbers>
 #include <climits>
-#include <filesystem>
 #include "Utils/ConvertString/ConvertString.h"
-#include "Engine/ShaderManager/ShaderManager.h"
+#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "externals/imgui/imgui.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/PipelineManager/PipelineManager.h"
 #include "MeshManager/MeshManager.h"
+#undef max
+#undef min
 
 Shader Model::shader = {};
 
@@ -61,23 +56,22 @@ void Model::CreateGraphicsPipeline() {
 		range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 		range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 
-		std::array<D3D12_ROOT_PARAMETER, 4> paramates = {};
+		std::array<D3D12_DESCRIPTOR_RANGE, 1> rangeCBV = {};
+		rangeCBV[0].NumDescriptors = 3;
+		rangeCBV[0].BaseShaderRegister = 0;
+		rangeCBV[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		rangeCBV[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+
+		std::array<D3D12_ROOT_PARAMETER, 2> paramates = {};
 		paramates[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 		paramates[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 		paramates[0].DescriptorTable.pDescriptorRanges = range.data();
 		paramates[0].DescriptorTable.NumDescriptorRanges = UINT(range.size());
 
 		paramates[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-		paramates[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-		paramates[1].Descriptor.ShaderRegister = 0;
-
-		paramates[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-		paramates[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-		paramates[2].Descriptor.ShaderRegister = 1;
-
-		paramates[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-		paramates[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-		paramates[3].Descriptor.ShaderRegister = 2;
+		paramates[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		paramates[1].DescriptorTable.pDescriptorRanges = rangeCBV.data();
+		paramates[1].DescriptorTable.NumDescriptorRanges = UINT(rangeCBV.size());
 
 		PipelineManager::CreateRootSgnature(paramates.data(), paramates.size(), true);
 
@@ -129,6 +123,11 @@ Model::Model() :
 
 	colorBuf.shaderRegister = 2;
 	*colorBuf = UintToVector4(color);
+
+	auto descriptorHeap = ShaderResourceHeap::GetInstance();
+	descriptorHeap->CreateConstBufferView(wvpData);
+	descriptorHeap->CreateConstBufferView(dirLig);
+	descriptorHeap->CreateConstBufferView(colorBuf);
 }
 
 Model::Model(const std::string& fileName) :
@@ -276,23 +275,18 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 		light.eyePos = cameraPos;
 		dirLig->eyePos = cameraPos;
 
-		auto commandlist = Engine::GetCommandList();
+		auto commandlist = Direct12::GetInstance()->GetCommandList();
 
 		if (!pipeline) {
 			ErrorCheck::GetInstance()->ErrorTextBox("pipeline is nullptr", "Model");
 			return;
 		}
 
-		[[maybe_unused]] size_t indexVertex = 0;
-
 		for (auto& i : data) {
 			pipeline->Use();
 			i.second.tex->Use(0);
 
-
-			commandlist->SetGraphicsRootConstantBufferView(1, wvpData.GetGPUVtlAdrs());
-			commandlist->SetGraphicsRootConstantBufferView(2, dirLig.GetGPUVtlAdrs());
-			commandlist->SetGraphicsRootConstantBufferView(3, colorBuf.GetGPUVtlAdrs());
+			commandlist->SetGraphicsRootDescriptorTable(1, wvpData.GetViewHandle());
 
 			commandlist->IASetVertexBuffers(0, 1, &i.second.resource.second);
 			commandlist->DrawInstanced(i.second.vertNum, 1, 0, 0);

@@ -8,6 +8,7 @@
 #include <cmath>
 #include <algorithm>
 #include "AudioManager/AudioManager.h"
+#include "Engine/Engine.h"
 
 std::unique_ptr<GlobalVariables> Enemy::globalVariables_ = std::make_unique<GlobalVariables>();
 

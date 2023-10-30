@@ -194,6 +194,12 @@
     <ClCompile Include="SceneManager\SubMenu\Pause.cpp">
       <Filter>SceneManager\SubMenu\Pause</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\EngineParts\Direct12\Direct12.cpp">
+      <Filter>Engine\EngineParts\Direct12</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\EngineParts\Direct3D\Direct3D.cpp">
+      <Filter>Engine\EngineParts\Direct3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -384,6 +390,15 @@
     </Filter>
     <Filter Include="SceneManager\SubMenu\Pause">
       <UniqueIdentifier>{04a9be3d-ee96-4702-aed8-2163bdef5d5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\EngineParts">
+      <UniqueIdentifier>{96280cf1-e725-451f-b2c3-7785311cff9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\EngineParts\Direct12">
+      <UniqueIdentifier>{7407d1f9-6f36-4fac-ac94-9e1b2d3dc8bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\EngineParts\Direct3D">
+      <UniqueIdentifier>{83e8b6ba-a462-4248-8b3b-cdf7a458008d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -587,6 +602,12 @@
     </ClInclude>
     <ClInclude Include="SceneManager\SubMenu\Pause.h">
       <Filter>SceneManager\SubMenu\Pause</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\EngineParts\Direct12\Direct12.h">
+      <Filter>Engine\EngineParts\Direct12</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\EngineParts\Direct3D\Direct3D.h">
+      <Filter>Engine\EngineParts\Direct3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

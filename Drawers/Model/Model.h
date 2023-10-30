@@ -1,11 +1,6 @@
 #pragma once
-#include "Utils/Math/Vector3.h"
-#include "Utils/Math/Mat4x4.h"
-#include "Utils/Math/Vector2.h"
-#include "Utils/Math/Vector4.h"
 #include <string>
 #include "Engine/ConstBuffer/ConstBuffer.h"
-#include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "Engine/RootSignature/RootSignature.h"
 #include "TextureManager/TextureManager.h"
 #include "Engine/ShaderManager/ShaderManager.h"

@@ -1,12 +1,8 @@
 #include "Particle.h"
-#include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
-#include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/FrameInfo/FrameInfo.h"
 #include "Engine/WinApp/WinApp.h"
-#include "Engine/Engine.h"
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
-#include <numeric>
 
 #include "externals/nlohmann/json.hpp"
 #include <cassert>
@@ -31,7 +27,7 @@ void Particle::Initialize(const std::string& vsFileName, const std::string& psFi
 	uint16_t indices[] = {
 			0,1,3, 1,2,3
 	};
-	indexResource = Engine::CreateBufferResuorce(sizeof(indices));
+	indexResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(indices));
 	indexView.BufferLocation = indexResource->GetGPUVirtualAddress();
 	indexView.SizeInBytes = sizeof(indices);
 	indexView.Format = DXGI_FORMAT_R16_UINT;
@@ -135,7 +131,7 @@ Particle::Particle() :
 
 	if (vertexResource) { vertexResource->Release(); }
 
-	vertexResource = Engine::CreateBufferResuorce(sizeof(VertexData) * 4);
+	vertexResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
 	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexView.SizeInBytes = sizeof(VertexData) * 4;
@@ -204,7 +200,7 @@ Particle::Particle(uint32_t indexNum) :
 
 	if (vertexResource) { vertexResource->Release(); }
 
-	vertexResource = Engine::CreateBufferResuorce(sizeof(VertexData) * 4);
+	vertexResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
 	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexView.SizeInBytes = sizeof(VertexData) * 4;
@@ -910,7 +906,7 @@ void Particle::Draw(
 
 
 		if (0 < drawCount) {
-			auto commandlist = Engine::GetCommandList();
+			auto commandlist = Direct12::GetInstance()->GetCommandList();
 			// 各種描画コマンドを積む
 			graphicsPipelineState[blend]->Use();
 			tex->Use(0);

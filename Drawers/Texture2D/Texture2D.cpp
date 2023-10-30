@@ -1,10 +1,10 @@
 #include "Texture2D.h"
-#include "Engine/ShaderManager/ShaderManager.h"
 #include "externals/imgui/imgui.h"
-#include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Utils/UtilsLib/UtilsLib.h"
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include <numeric>
+#undef max
+#undef min
 
 /// <summary>
 /// 静的変数のインスタンス化
@@ -39,7 +39,7 @@ Texture2D::Texture2D() :
 
 	if (vertexResource) { vertexResource->Release(); }
 
-	vertexResource = Engine::CreateBufferResuorce(sizeof(VertexData) * 4);
+	vertexResource =Direct3D::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * 4);
 
 	vertexView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 	vertexView.SizeInBytes = sizeof(VertexData) * 4;
@@ -156,7 +156,7 @@ void Texture2D::Initialize(const std::string& vsFileName, const std::string& psF
 	uint16_t indices[] = {
 			0,1,3, 1,2,3
 	};
-	indexResource = Engine::CreateBufferResuorce(sizeof(indices));
+	indexResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(indices));
 	indexView.BufferLocation = indexResource->GetGPUVirtualAddress();
 	indexView.SizeInBytes = sizeof(indices);
 	indexView.Format = DXGI_FORMAT_R16_UINT;
@@ -320,7 +320,7 @@ void Texture2D::Draw(
 
 		*wvpMat = viewProjection;
 
-		auto commandlist = Engine::GetCommandList();
+		auto commandlist = Direct12::GetInstance()->GetCommandList();
 
 
 		// 各種描画コマンドを積む

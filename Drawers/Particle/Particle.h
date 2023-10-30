@@ -3,10 +3,7 @@
 #include "Engine/PipelineManager/PipelineManager.h"
 #include "Engine/StructuredBuffer/StructuredBuffer.h"
 
-#include "Utils/Math/Vector3.h"
 #include "Utils/Math/Mat4x4.h"
-#include "Utils/Math/Vector2.h"
-#include "Utils/Math/Vector4.h"
 
 #include "Utils/UtilsLib/UtilsLib.h"
 #include "Utils/Easeing/Easeing.h"

@@ -1,5 +1,6 @@
 #include "Scaffolding.h"
 #include "Utils/Camera/Camera.h"
+#include "Engine/Engine.h"
 
 Scaffolding::Scaffolding(const Vector3& pos, const Vector2& scale)
 {

@@ -1,5 +1,6 @@
 #pragma once
-#include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/Direct12/Direct12.h"
 #include <cassert>
 #include <wrl.h>
 #include "Engine/ErrorCheck/ErrorCheck.h"
@@ -12,7 +13,43 @@ concept IsNotPtrSB = !std::is_pointer_v<T>;
 template<IsNotPtrSB T>
 class StructuredBuffer {
 public:
-	StructuredBuffer() = delete;
+	StructuredBuffer() noexcept :
+		bufferResource(),
+		srvDesc(),
+		data(nullptr),
+		isWright(true),
+		isCreateView(false),
+		range(),
+		roootParamater(),
+		instanceNum(1u)
+	{
+		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * 1u);
+		srvDesc = {};
+		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		srvDesc.Buffer.FirstElement = 0;
+		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		srvDesc.Buffer.NumElements = UINT(instanceNum);
+		srvDesc.Buffer.StructureByteStride = sizeof(T);
+
+		if (isWright) {
+			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
+		}
+
+		range = {};
+		range.BaseShaderRegister = 1;
+		range.NumDescriptors = 1;
+		range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+
+		roootParamater = {};
+		roootParamater.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		roootParamater.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+		roootParamater.DescriptorTable.pDescriptorRanges = &range;
+		roootParamater.DescriptorTable.NumDescriptorRanges = 1;
+	}
 
 	inline StructuredBuffer(uint32_t instanceNum) noexcept :
 		bufferResource(),
@@ -24,7 +61,7 @@ public:
 		roootParamater(),
 		instanceNum(instanceNum)
 	{
-		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * instanceNum);
+		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum);
 		srvDesc = {};
 		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -106,7 +143,7 @@ public:
 
 		instanceNum = indexNum;
 		
-		bufferResource = Engine::CreateBufferResuorce(sizeof(T) * instanceNum);
+		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(T) * instanceNum);
 		srvDesc = {};
 		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -134,7 +171,8 @@ public:
 	}
 
 	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHandleGPU, UINT dsecIndex) noexcept {
-		Engine::GetDevice()->CreateShaderResourceView(bufferResource.Get(), &srvDesc, descHandle);
+		static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+		device->CreateShaderResourceView(bufferResource.Get(), &srvDesc, descHandle);
 		isCreateView = true;
 		descriptorHandle_ = descHandleGPU;
 		dsecIndex_ = dsecIndex;

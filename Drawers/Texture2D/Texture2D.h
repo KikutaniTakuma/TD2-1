@@ -1,7 +1,5 @@
 #pragma once
 #include "TextureManager/TextureManager.h"
-#include "Engine/Engine.h"
-#include "Engine/ConstBuffer/ConstBuffer.h"
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "Engine/PipelineManager/PipelineManager.h"
 

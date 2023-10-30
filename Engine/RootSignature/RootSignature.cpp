@@ -2,6 +2,7 @@
 #include <cassert>
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct3D/Direct3D.h"
 
 RootSignature::RootSignature():
 	rootSignature{},
@@ -102,7 +103,8 @@ void RootSignature::Create(D3D12_ROOT_PARAMETER* rootParamater_, size_t rootPara
 	if (rootSignature) {
 		rootSignature.Reset();
 	}
-	hr = Engine::GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf()));
+	static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("Device::CreateRootSignature() failed", "RootSignature");

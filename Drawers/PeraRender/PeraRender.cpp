@@ -1,9 +1,9 @@
 #include "PeraRender.h"
-#include "Engine/Engine.h"
-#include <cassert>
 #include "Utils/ConvertString/ConvertString.h"
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
 #include "externals/imgui/imgui.h"
+#include "Engine/EngineParts/Direct12/Direct12.h"
+#include <cassert>
 
 PeraRender::PeraRender():
 	render(),
@@ -42,7 +42,7 @@ void PeraRender::Initialize(const std::string& vsFileName, const std::string& ps
 		Vector3{  1.0f, 1.0f, 0.1f }, Vector2{ 1.0f, 0.0f }
 	};
 
-	peraVertexResource = Engine::CreateBufferResuorce(sizeof(pv));
+	peraVertexResource = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(pv));
 
 	peraVertexView.BufferLocation = peraVertexResource->GetGPUVirtualAddress();
 	peraVertexView.SizeInBytes = sizeof(pv);
@@ -131,8 +131,9 @@ void PeraRender::Draw(Pipeline::Blend blend, PeraRender* pera) {
 		piplines[2]->Use();
 		break;
 	}
-	Engine::GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &peraVertexView);
+	ID3D12GraphicsCommandList* commandList = Direct12::GetInstance()->GetCommandList();
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	commandList->IASetVertexBuffers(0, 1, &peraVertexView);
 	render.UseThisRenderTargetShaderResource();
-	Engine::GetCommandList()->DrawInstanced(4, 1, 0, 0);
+	commandList->DrawInstanced(4, 1, 0, 0);
 }

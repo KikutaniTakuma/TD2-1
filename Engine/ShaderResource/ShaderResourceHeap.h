@@ -2,14 +2,10 @@
 #include <memory>
 #include <vector>
 #include <list>
-#include <wrl.h>
-#include <d3d12.h>
-#pragma comment(lib, "d3d12.lib")
-#include "Engine/ConstBuffer/ConstBuffer.h"
+#include <deque>
 #include "Engine/StructuredBuffer/StructuredBuffer.h"
 #include "TextureManager/Texture/Texture.h"
 #include "Engine/RenderTarget/RenderTarget.h"
-#include "Engine/ErrorCheck/ErrorCheck.h"
 
 class ShaderResourceHeap {
 private:
@@ -50,12 +46,20 @@ public:
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
 
-		isUseHandle_[currentHandleIndex] = true;
+		if (bookingHandle_.empty()) {
+			useHandle_.push_back(currentHandleIndex);
+			conBuf.CrerateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
+			currentHandleIndex++;
+			return currentHandleIndex - 1u;
+		}
+		else {
+			uint32_t nowCreateViewHandle = bookingHandle_.front();
+			useHandle_.push_back(nowCreateViewHandle);
+			conBuf.CrerateView(heapHandles[nowCreateViewHandle].first, heapHandles[nowCreateViewHandle].second, nowCreateViewHandle);
+			bookingHandle_.pop_front();
+			return nowCreateViewHandle;
+		}
 
-		conBuf.CrerateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
-		currentHandleIndex++;
-
-		return currentHandleIndex - 1u;
 	}
 
 	/// <summary>
@@ -70,8 +74,6 @@ public:
 		if (heapIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateConstBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
-
-		isUseHandle_[heapIndex] = true;
 
 		conBuf.CrerateView(heapHandles[heapIndex].first, heapHandles[heapIndex].second, heapIndex);
 	}
@@ -88,11 +90,19 @@ public:
 		if (currentHandleIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
-		isUseHandle_[currentHandleIndex] = true;
-		strcBuf.CrerateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
-		currentHandleIndex++;
-
-		return currentHandleIndex - 1u;
+		if (bookingHandle_.empty()) {
+			useHandle_.push_back(currentHandleIndex);
+			strcBuf.CrerateView(heapHandles[currentHandleIndex].first, heapHandles[currentHandleIndex].second, currentHandleIndex);
+			currentHandleIndex++;
+			return currentHandleIndex - 1u;
+		}
+		else {
+			uint32_t nowCreateViewHandle = bookingHandle_.front();
+			useHandle_.push_back(nowCreateViewHandle);
+			strcBuf.CrerateView(heapHandles[nowCreateViewHandle].first, heapHandles[nowCreateViewHandle].second, nowCreateViewHandle);
+			bookingHandle_.pop_front();
+			return nowCreateViewHandle;
+		}
 	}
 
 	/// <summary>
@@ -107,7 +117,7 @@ public:
 		if (heapIndex >= heapSize) {
 			ErrorCheck::GetInstance()->ErrorTextBox("CreateStructuredBufferView failed\nOver HeapSize", "ShaderResourceHeap");
 		}
-		isUseHandle_[heapIndex] = true;
+		
 		strcBuf.CrerateView(heapHandles[heapIndex].first, heapHandles[heapIndex].second, heapIndex);
 	}
 
@@ -164,7 +174,10 @@ private:
 	UINT heapSize;
 	UINT currentHandleIndex;
 
-	std::vector<bool> isUseHandle_;
+	std::list<uint32_t> releaseHandle_;
+	std::list<uint32_t> useHandle_;
+	std::deque<uint32_t> bookingHandle_;
+
 
 	std::vector<std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE>> heapHandles;
 };

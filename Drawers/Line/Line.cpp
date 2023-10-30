@@ -1,5 +1,4 @@
 #include "Line.h"
-#include "Engine/Engine.h"
 #include <algorithm>
 #include "Engine/PipelineManager/PipelineManager.h"
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
@@ -42,7 +41,7 @@ Line::Line() :
 	start(),
 	end()
 {
-	vertexBuffer = Engine::CreateBufferResuorce(sizeof(VertexData) * kVertexNum);
+	vertexBuffer = Direct3D::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * kVertexNum);
 	vertexView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
 	vertexView.SizeInBytes = sizeof(VertexData) * kVertexNum;
 	vertexView.StrideInBytes = sizeof(VertexData);
@@ -95,6 +94,7 @@ void Line::Draw(const Mat4x4& viewProjection, uint32_t color) {
 
 	pipline->Use();
 	heap->Use(wvpMat.GetViewHandleUINT(), 0);
-	Engine::GetCommandList()->IASetVertexBuffers(0, 1, &vertexView);
-	Engine::GetCommandList()->DrawInstanced(kVertexNum, 1, 0, 0);
+	auto commandList = Direct12::GetInstance()->GetCommandList();
+	 commandList->IASetVertexBuffers(0, 1, &vertexView);
+	 commandList->DrawInstanced(kVertexNum, 1, 0, 0);
 }

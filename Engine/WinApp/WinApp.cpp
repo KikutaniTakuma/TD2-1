@@ -79,5 +79,8 @@ void WinApp::Create(const std::wstring& windowTitle, int32_t width, int32_t heig
 
 
 Vector2 WinApp::GetWindowSize() const {
-	return Vector2(float(windowRect.right), float(windowRect.bottom));
+	return Vector2(
+		static_cast<float>(windowRect.right), 
+		static_cast<float>(windowRect.bottom)
+	);
 }

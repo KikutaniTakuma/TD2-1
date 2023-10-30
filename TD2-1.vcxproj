@@ -160,6 +160,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Engine.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>
+    <ClCompile Include="Engine\EngineParts\Direct12\Direct12.cpp" />
+    <ClCompile Include="Engine\EngineParts\Direct3D\Direct3D.cpp" />
     <ClCompile Include="Engine\ErrorCheck\ErrorCheck.cpp" />
     <ClCompile Include="Engine\FrameInfo\FrameInfo.cpp" />
     <ClCompile Include="Engine\PipelineManager\PipelineManager.cpp" />
@@ -234,6 +236,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Drawers\Texture2D\Texture2D.h" />
     <ClInclude Include="Engine\ConstBuffer\ConstBuffer.h" />
     <ClInclude Include="Engine\Engine.h" />
+    <ClInclude Include="Engine\EngineParts\Direct12\Direct12.h" />
+    <ClInclude Include="Engine\EngineParts\Direct3D\Direct3D.h" />
     <ClInclude Include="Engine\ErrorCheck\ErrorCheck.h" />
     <ClInclude Include="Engine\FrameInfo\FrameInfo.h" />
     <ClInclude Include="Engine\PipelineManager\PipelineManager.h" />

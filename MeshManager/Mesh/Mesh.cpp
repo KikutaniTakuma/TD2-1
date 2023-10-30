@@ -1,6 +1,5 @@
 #include "Mesh.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
-#include "Engine/Engine.h"
 #include "TextureManager/TextureManager.h"
 #include <fstream>
 #include <sstream>
@@ -193,7 +192,7 @@ std::unordered_map<std::string, Mesh::CopyData> Mesh::CreateResource() {
 		// コンテナに追加
 		resource[mesh.first];
 		// resource生成
-		resource[mesh.first].resource.first = Engine::CreateBufferResuorce(mesh.second.sizeInBytes);
+		resource[mesh.first].resource.first = Direct3D::GetInstance()->CreateBufferResuorce(mesh.second.sizeInBytes);
 		// view情報追加
 		resource[mesh.first].resource.second.BufferLocation = resource[mesh.first].resource.first->GetGPUVirtualAddress();
 		resource[mesh.first].resource.second.SizeInBytes = mesh.second.sizeInBytes;

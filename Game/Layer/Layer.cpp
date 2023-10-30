@@ -2,6 +2,7 @@
 
 #include <numbers>
 #include "Utils/Camera/Camera.h"
+#include "Engine/Engine.h"
 
 std::unique_ptr<GlobalVariables> Layer::globalVariables_ = std::make_unique<GlobalVariables>();
 

@@ -8,6 +8,7 @@
 #include "Game/Enemy/Enemy.h"
 #include "externals/imgui/imgui.h"
 #include "AudioManager/AudioManager.h"
+#include "Engine/Engine.h"
 
 Player::Player() {
 	

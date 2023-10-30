@@ -1,5 +1,6 @@
 #pragma once
-#include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct3D/Direct3D.h"
+#include "Engine/EngineParts/Direct12/Direct12.h"
 #include <cassert>
 #include <wrl.h>
 #include "Engine/ErrorCheck/ErrorCheck.h"
@@ -23,7 +24,7 @@ public:
 		shaderRegister(0)
 	{
 		// バイトサイズは256アライメントする(vramを効率的に使うための仕組み)
-		bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
+		bufferResource = Direct3D::GetInstance()->CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
 		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
 
@@ -40,42 +41,11 @@ public:
 		}
 	}
 
-	inline ConstBuffer(const ConstBuffer& right) noexcept :
-		bufferResource(),
-		cbvDesc(),
-		data(nullptr),
-		isWright(true),
-		roootParamater(),
-		shaderVisibility(D3D12_SHADER_VISIBILITY_ALL),
-		shaderRegister(0)
-	{
-		*this = right;
-	}
+	inline ConstBuffer(const ConstBuffer&) noexcept = delete;
+	inline ConstBuffer(ConstBuffer&&) noexcept = delete;
 
-	inline ConstBuffer<T>& operator=(const ConstBuffer& right) {
-
-		if (bufferResource) {
-			bufferResource->Release();
-			bufferResource.Reset();
-		}
-		bufferResource = Engine::CreateBufferResuorce((sizeof(T) + 0xff) & ~0xff);
-		cbvDesc.BufferLocation = bufferResource->GetGPUVirtualAddress();
-		cbvDesc.SizeInBytes = UINT(bufferResource->GetDesc().Width);
-
-		if (isWright) {
-			bufferResource->Map(0, nullptr, reinterpret_cast<void**>(&data));
-		}
-		roootParamater = right.roootParamater;
-
-		*data = *right.data;
-
-		if (!isCreateView) {
-			assert(!"created view");
-			ErrorCheck::GetInstance()->ErrorTextBox("operator= Created view fail", "Const Buffer");
-		}
-
-		return *this;
-	}
+	inline ConstBuffer<T>& operator=(const ConstBuffer&) = delete;
+	inline ConstBuffer<T>& operator=(ConstBuffer&&) = delete;
 
 public:
 	void OnWright() noexcept {
@@ -111,7 +81,8 @@ public:
 	}
 
 	void CrerateView(D3D12_CPU_DESCRIPTOR_HANDLE descHandle, D3D12_GPU_DESCRIPTOR_HANDLE descHandleGPU, UINT dsecIndex) noexcept {
-		Engine::GetDevice()->CreateConstantBufferView(&cbvDesc, descHandle);
+		static ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+		device->CreateConstantBufferView(&cbvDesc, descHandle);
 		descriptorHandle = descHandleGPU;
 		dsecIndex_ = dsecIndex;
 		isCreateView = true;

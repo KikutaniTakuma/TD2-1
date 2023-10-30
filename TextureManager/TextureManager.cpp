@@ -1,6 +1,7 @@
 #include "TextureManager.h"
 #include "Engine/ErrorCheck/ErrorCheck.h"
 #include "Engine/Engine.h"
+#include "Engine/EngineParts/Direct3D/Direct3D.h"
 #include <cassert>
 #include "Engine/ShaderResource/ShaderResourceHeap.h"
 
@@ -32,10 +33,12 @@ TextureManager::TextureManager() :
 	fenceEvent(nullptr),
 	srvHeap(nullptr)
 {
+	ID3D12Device* device = Direct3D::GetInstance()->GetDevice();
+
 	// コマンドキューを作成
 	commandQueue = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-	HRESULT hr = Engine::GetDevice()->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(commandQueue.GetAddressOf()));
+	HRESULT hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(commandQueue.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateCommandQueue() Failed", "TextureManager");
@@ -44,7 +47,7 @@ TextureManager::TextureManager() :
 
 	// コマンドアロケータを生成する
 	commandAllocator = nullptr;
-	hr = Engine::GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator.GetAddressOf()));
+	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateCommandAllocator() Failed", "TextureManager");
@@ -53,7 +56,7 @@ TextureManager::TextureManager() :
 
 	// コマンドリストを作成する
 	commandList = nullptr;
-	hr = Engine::GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(commandList.GetAddressOf()));
+	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(commandList.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateCommandList() Failed", "TextureManager");
@@ -63,7 +66,7 @@ TextureManager::TextureManager() :
 	// 初期値0でFenceを作る
 	fence = nullptr;
 	fenceVal = 0;
-	hr = Engine::GetDevice()->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf()));
+	hr = device->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
 		ErrorCheck::GetInstance()->ErrorTextBox("TextureManager() : CreateFence() Failed", "TextureManager");
@@ -300,7 +303,7 @@ void TextureManager::ResetCommandList() {
 }
 
 void TextureManager::Use(int32_t texIndex, UINT rootParam) {
-	auto* const mainComlist = Engine::GetCommandList();
+	auto* const mainComlist = Direct12::GetInstance()->GetCommandList();
 	mainComlist->SetGraphicsRootDescriptorTable(
 		rootParam, srvHeap->GetSrvGpuHeapHandle(texIndex));
 }

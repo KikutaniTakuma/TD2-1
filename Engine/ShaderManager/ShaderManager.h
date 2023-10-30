@@ -1,8 +1,4 @@
 #pragma once
-#include <Windows.h>
-#undef max
-#undef min
-
 #include <d3d12.h>
 #pragma comment(lib, "d3d12.lib")
 #include <dxgi1_6.h>
