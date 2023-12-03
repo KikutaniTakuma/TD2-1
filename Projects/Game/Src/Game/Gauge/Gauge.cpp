@@ -1,0 +1,132 @@
+#include "Gauge.h"
+
+#include <algorithm>
+
+Gauge::Gauge() {
+
+	globalVariables_ = std::make_unique<GlobalVariables>();
+
+	for (int i = 0; i < static_cast<int>(TextureNames::kEnd); i++) {
+		textures_.push_back(std::make_unique<Texture2D>());
+		textures_[i]->LoadTexture("./Resources/Gauge/gage_nakami.png");
+	}
+
+	textures_[static_cast<int>(TextureNames::kMostBack)]->LoadTexture("./Resources/Gauge/gage_flame.png");
+
+	textures_[static_cast<int>(TextureNames::kMostBack)]->color_ = 0xFFFFFFFF;
+	textures_[static_cast<int>(TextureNames::kGaugeBack)]->color_ = 0x444444FF;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->color_ = 0xFFFFFFFF;
+
+	num_ = 1;
+	kMax_ = 1;
+
+	SetGlobalVariable();
+}
+
+void Gauge::SetGlobalVariable()
+{
+	globalVariables_->CreateGroup(groupName_);
+
+	globalVariables_->AddItem(groupName_, "kPos", textures_[static_cast<int>(TextureNames::kMostBack)]->pos_);
+	globalVariables_->AddItem(groupName_, "kAllScale", textures_[static_cast<int>(TextureNames::kMostBack)]->scale_);
+	globalVariables_->AddItem(groupName_, "kGaugeScale", textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_);
+
+	globalVariables_->LoadFile(groupName_);
+	ApplyGlobalVariable();
+}
+
+void Gauge::ApplyGlobalVariable(const float& y)
+{
+	textures_[static_cast<int>(TextureNames::kMostBack)]->pos_ = globalVariables_->GetVector3Value(groupName_, "kPos");
+	textures_[static_cast<int>(TextureNames::kMostBack)]->pos_.y += y;
+	textures_[static_cast<int>(TextureNames::kMostBack)]->scale_ = globalVariables_->GetVector2Value(groupName_, "kAllScale");
+	textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_ = globalVariables_->GetVector2Value(groupName_, "kGaugeScale");
+
+	textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_ = textures_[static_cast<int>(TextureNames::kMostBack)]->pos_;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos_.y = textures_[static_cast<int>(TextureNames::kMostBack)]->pos_.y;
+}
+
+void Gauge::DamageUpdate(const int& damage)
+{
+
+	float t = 0.0f;
+
+	if (damage > 0) {
+
+		int num = 0;
+		if (num_ < damage) {
+			num = num_;
+		}
+		else {
+			num = damage;
+		}
+
+		if (num_ == 0) {
+			t = 1.0f;
+		}
+		else {
+			t = float(num) / num_;
+		}
+
+		/*std::unique_ptr<Texture2D> damageTex = std::make_unique<Texture2D>();
+		damageTex->pos_ = 
+			damageTex->color_ = 0xFF4444FF;
+
+		damageGaugeTextures_.push_back(damageTex);*/
+
+
+	}
+
+	t = float(num_) / kMax_;
+
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos_.x = t * textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_.x +
+		(1.0f - t) * (textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_.x + textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_.x / 2.0f);
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale_.x = t * textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_.x;
+
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos_.y = textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_.y;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale_.y = textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_.y;
+}
+
+void Gauge::Initialize(const int& num, const int& Max)
+{
+	num_ = num;
+	kMax_ = Max;
+
+	textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_ = textures_[static_cast<int>(TextureNames::kMostBack)]->pos_;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos_ = textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale_ = textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_;
+
+}
+
+void Gauge::Update(const int& num, const int& Max, const int& damage, const float& y)
+{
+	globalVariables_->Update();
+
+	ApplyGlobalVariable(y);
+
+	num_ = num;
+	kMax_ = Max;
+
+	DamageUpdate(damage);
+
+	for (std::unique_ptr<Texture2D>& tex : damageGaugeTextures_) {
+		tex->Update();
+	}
+
+	for (std::unique_ptr<Texture2D>& tex : textures_) {
+		tex->Update();
+	}
+}
+
+void Gauge::Draw2D(const Mat4x4& viewProjection)
+{
+	for (std::unique_ptr<Texture2D>& tex : damageGaugeTextures_) {
+		tex->Draw(viewProjection, Pipeline::Normal, false);
+	}
+
+	for (std::unique_ptr<Texture2D>& tex : textures_) {
+		tex->Draw(viewProjection, Pipeline::Normal, false);
+	}
+}
+
+

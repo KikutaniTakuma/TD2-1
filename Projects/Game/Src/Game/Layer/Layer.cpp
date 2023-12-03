@@ -1,0 +1,332 @@
+#include "Layer.h"
+
+#include <numbers>
+#include "Utils/Camera/Camera.h"
+
+#include "Engine/Core/WindowFactory/WindowFactory.h"
+
+std::unique_ptr<GlobalVariables> Layer::globalVariables_ = std::make_unique<GlobalVariables>();
+
+Vector2 Layer::kLayer2DScale_ = { 1300.0f,80.0f };
+
+float Layer::kFirstLayerCenterPosY_ = -40.0f;
+
+const std::string Layer::groupName_ = "staticLayer";
+
+Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
+
+	kMaxLayerNum_ = kMaxLayerNum;
+	kMaxHitPoints_ = kMaxHitPoints;
+	hitPoints_ = kMaxHitPoints_;
+	nowLayer_ = 0;
+
+	for (int i = 0; i < kMaxLayerNum_; i++) {
+		tex_.push_back(std::make_unique<Texture2D>());
+		tex_[i]->scale_ = kLayer2DScale_;
+		tex_[i]->pos_ = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
+		tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
+		if (i % 3 == 0) {
+			tex_[i]->color_ = 0xFFFFFFFF;
+		}
+		else if (i % 3 == 1) {
+			tex_[i]->color_ = 0xFFFFFFFF;
+		}
+		else {
+			tex_[i]->color_ = 0xFFFFFFFF;
+		}
+		tex_[i]->Update();
+
+		models_.push_back(std::vector<std::unique_ptr<Model>>());
+
+		for (int j = 0; j < static_cast<int>(Parts::kEnd); j++) {
+			models_[i].push_back(std::make_unique<Model>());
+		}
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light_.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light_.ligColor = { 1.0f,1.0f,1.0f };
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light_.ptRange = 10000.0f;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate_.y = std::numbers::pi_v<float>;
+	}
+
+	isChangeLayer_ = false;
+	isClear_ = false;
+
+	gauge_ = std::make_unique<Gauge>();
+	gauge_->Initialize(nowLayer_, kMaxHitPoints_[nowLayer_]);
+
+	SetGlobalVariable();
+}
+
+void Layer::SetParametar(std::vector<int> kMaxHitPoints) {
+	kMaxHitPoints_ = kMaxHitPoints;
+}
+
+void Layer::SetGlobalVariable() {
+
+	globalVariables_->CreateGroup(groupName_);
+
+	globalVariables_->AddItem(groupName_, "kLayer2DScale", kLayer2DScale_);
+
+	globalVariables_->AddItem(groupName_, "kFirstLayerCenterPosY", kFirstLayerCenterPosY_);
+
+	globalVariables_->LoadFile(groupName_);
+	ApplyGlobalVariable();
+
+}
+
+void Layer::ApplyGlobalVariable() {
+
+	kLayer2DScale_ = globalVariables_->GetVector2Value(groupName_, "kLayer2DScale");
+
+	kFirstLayerCenterPosY_ = globalVariables_->GetFloatValue(groupName_, "kFirstLayerCenterPosY");
+
+	if (static_cast<int>(tex_.size()) != kMaxLayerNum_) {
+		tex_.clear();
+		models_.clear();
+		for (int i = 0; i < kMaxLayerNum_; i++) {
+			tex_.push_back(std::make_unique<Texture2D>());
+			tex_[i]->scale_ = kLayer2DScale_;
+			tex_[i]->pos_ = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
+			tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
+			if (i % 3 == 0) {
+				tex_[i]->color_ = 0xFFFFFFFF;
+			}
+			else if (i % 3 == 1) {
+				tex_[i]->color_ = 0xFFFFFFFF;
+			}
+			else {
+				tex_[i]->color_ = 0xFFFFFFFF;
+			}
+
+			models_.push_back(std::vector<std::unique_ptr<Model>>());
+
+			for (int j = 0; j < static_cast<int>(Parts::kEnd); j++) {
+				models_[i].push_back(std::make_unique<Model>());
+			}
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light_.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();;
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light_.ligColor = { 1.0f,1.0f,1.0f };
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light_.ptRange = 10000.0f;
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate_.y = std::numbers::pi_v<float>;
+
+			tex_[i]->Update();
+		}
+	}
+	else {
+		for (int i = 0; i < kMaxLayerNum_; i++) {
+
+			tex_[i]->scale_ = kLayer2DScale_;
+			tex_[i]->pos_ = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
+			if (i % 3 == 0) {
+				tex_[i]->color_ = 0xFFFFFFFF;
+			}
+			else if (i % 3 == 1) {
+				tex_[i]->color_ = 0xFFFFFFFF;
+			}
+			else {
+				tex_[i]->color_ = 0xFFFFFFFF;
+			}
+
+
+			tex_[i]->Update();
+		}
+	}
+}
+
+void Layer::Reset() {
+
+	hitPoints_ = kMaxHitPoints_;
+	nowLayer_ = 0;
+
+	for (int i = 0; i < kMaxLayerNum_; i++) {
+
+		if (i % 3 == 0) {
+			tex_[i]->color_ = 0xFFFFFFFF;
+		}
+		else if (i % 3 == 1) {
+			tex_[i]->color_ = 0xFFFFFFFF;
+		}
+		else {
+			tex_[i]->color_ = 0xFFFFFFFF;
+		}
+		tex_[i]->scale_ = kLayer2DScale_;
+		tex_[i]->pos_ = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
+		tex_[i]->Update();
+	}
+}
+
+void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
+
+	kMaxLayerNum_ = kMaxLayerNum;
+	kMaxHitPoints_ = kMaxHitPoints;
+
+	hitPoints_ = kMaxHitPoints_;
+	nowLayer_ = 0;
+
+	tex_.clear();
+	models_.clear();
+
+	for (int i = 0; i < kMaxLayerNum_; i++) {
+		tex_.push_back(std::make_unique<Texture2D>());
+		tex_[i]->scale_ = kLayer2DScale_;
+		tex_[i]->pos_ = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
+		if (i % 3 == 0) {
+			tex_[i]->color_ = 0xFFFFFFFF;
+		}
+		else if (i % 3 == 1) {
+			tex_[i]->color_ = 0xFF0000FF;
+		}
+		else {
+			tex_[i]->color_ = 0xFFFF00FF;
+		}
+		tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
+
+		models_.push_back(std::vector<std::unique_ptr<Model>>());
+
+		for (int j = 0; j < static_cast<int>(Parts::kEnd); j++) {
+			models_[i].push_back(std::make_unique<Model>());
+		}
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light_.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light_.ligColor = { 1.0f,1.0f,1.0f };
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light_.ptRange = 10000.0f;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate_.y = std::numbers::pi_v<float>;
+
+		tex_[i]->Update();
+	}
+
+	gauge_->Initialize(hitPoints_[nowLayer_], kMaxHitPoints_[nowLayer_]);
+
+	TimerStart();
+
+	gamePlayTime_ = std::chrono::milliseconds(0);
+
+	breakEffect_.LoadSettingDirectory("break");
+	healEffect_.LoadSettingDirectory("layer-heal");
+}
+
+void Layer::Update(const Camera* camera) {
+	isClear_.Update();
+
+	[[maybe_unused]]auto nowTime = std::chrono::steady_clock::now();
+
+	ApplyGlobalVariable();
+
+	gauge_->Update(hitPoints_[nowLayer_], kMaxHitPoints_[nowLayer_], damage_, GetHighestPosY());
+
+	hitPoints_[nowLayer_] -= damage_;
+
+	if (hitPoints_[nowLayer_] <= 0) {
+		hitPoints_[nowLayer_] = 0;
+
+		if (nowLayer_ == kMaxLayerNum_ - 1) {
+			if (!breakEffect_.GetIsParticleStart() && !breakEffect_.GetIsParticleStart().OnExit()) {
+				breakEffect_.ParticleStart();
+			}
+
+			if (breakEffect_.GetIsParticleStart().OnExit()) {
+				// クリア処理
+				isClear_ = true;
+
+				// クリアした時間を計算して代入
+				if (isClear_.OnEnter()) {
+					TimerStop();
+				}
+
+				//// 今は仮で層のリセット
+				//Reset();
+			}
+		}
+		else {
+			nowLayer_++;
+			hitPoints_[nowLayer_] = kMaxHitPoints_[nowLayer_];
+			// ここ
+
+			breakEffect_.ParticleStart();
+		}
+	}
+
+	damage_ = 0;
+
+	for (int i = 0; i < kMaxLayerNum_; i++) {
+
+		float ratio = WindowFactory::GetInstance()->GetClientSize().y /
+			(std::tanf(camera->fov / 2) * (models_[i][static_cast<uint16_t>(Parts::kMain)]->pos_.z - camera->pos.z) * 2);
+
+		float indication = 185.0f;
+
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->pos_.x = tex_[i]->pos_.x / ratio + camera->pos.x - camera->pos.x / ratio;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->pos_.y = tex_[i]->pos_.y / ratio + camera->pos.y - camera->pos.y / ratio;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale_.y = tex_[i]->scale_.y / (indication * std::tanf(camera->fov / 2) * 2) *
+			(models_[i][static_cast<uint16_t>(Parts::kMain)]->pos_.z - camera->pos.z) / indication;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->scale_.z = models_[i][static_cast<uint16_t>(Parts::kMain)]->scale_.y * 10;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->Update();
+
+		if (kMaxHitPoints_[i] / 3.0f <= hitPoints_[i] && hitPoints_[i] < kMaxHitPoints_[i] / 3.0f * 2.0f) {
+			tex_[i]->LoadTexture("./Resources/Layer/layer_front1.png");
+		}
+		else if (hitPoints_[i] < kMaxHitPoints_[i] / 3.0f) {
+			tex_[i]->LoadTexture("./Resources/Layer/layer_front2.png");
+		}
+		else if(hitPoints_[i] >= kMaxHitPoints_[i] / 3.0f * 2.0f){
+			tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
+		}
+
+		float texYPos = tex_[i]->pos_.y;
+		tex_[i]->pos_.y -= tex_[i]->scale_.y * 0.5f;
+		tex_[i]->Update();
+		tex_[i]->pos_.y = texYPos;
+	}
+
+
+	breakEffect_.emitterPos_.y = tex_[nowLayer_]->pos_.y;
+	breakEffect_.Update();
+	healEffect_.emitterPos_.y = tex_[nowLayer_]->pos_.y;
+	healEffect_.Update();
+}
+
+void Layer::Heal() {
+	if (hitPoints_[nowLayer_] != kMaxHitPoints_[nowLayer_]) {
+		hitPoints_[nowLayer_]++;
+		healEffect_.ParticleStart();
+	}
+}
+
+void Layer::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
+	for (int i = 0; i < kMaxLayerNum_; i++) {
+		if (hitPoints_[i] != 0) {
+			for (const std::unique_ptr<Model>& model : models_[i]) {
+				model->Draw(viewProjection, cameraPos);
+			}
+		}
+	}
+}
+
+void Layer::ParticleDraw(const Mat4x4& viewProjections) {
+	breakEffect_.Draw(Vector3::zero, viewProjections);
+	healEffect_.Draw(Vector3::zero, viewProjections);
+}
+
+void Layer::Draw2DFar(const Mat4x4& viewProjection) {
+
+	gauge_->Draw2D(viewProjection);
+}
+
+void Layer::Draw2DNear(const Mat4x4& viewProjection) {
+
+	for (int i = 0; i < kMaxLayerNum_; i++) {
+		if (hitPoints_[i] != 0) {
+			tex_[i]->Draw(viewProjection, Pipeline::Normal, false);
+		}
+	}
+	gauge_->Draw2D(viewProjection);
+}
+
+void Layer::TimerStart() {
+	playStartTime_ = std::chrono::steady_clock::now();
+}
+
+void Layer::TimerStop() {
+	auto nowTime = std::chrono::steady_clock::now();
+	gamePlayTime_ += std::chrono::duration_cast<decltype(gamePlayTime_)>(nowTime - playStartTime_);
+}
