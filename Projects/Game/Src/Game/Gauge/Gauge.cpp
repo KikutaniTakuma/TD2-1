@@ -80,7 +80,7 @@ void Gauge::DamageUpdate(const int& damage)
 	t = float(num_) / kMax_;
 
 	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos.x = t * textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos.x +
-		(1.0f - t) * (textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos.x + textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale.x / 2.0f);
+		(1.0f - t) * (textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos.x - textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale.x / 2.0f);
 	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale.x = t * textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale.x;
 
 	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos.y = textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos.y;
