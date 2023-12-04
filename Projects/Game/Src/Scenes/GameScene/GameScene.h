@@ -256,23 +256,23 @@ private:
 	std::chrono::milliseconds playTime_;
 
 	// 背景パーティクル
-	Particle backGroundParticle_;
+	std::unique_ptr<Particle> backGroundParticle_;
 
 
 	// ポーズ画面
-	Pause pause_;
+	std::unique_ptr<Pause> pause_;
 
 	Audio* bgm_;
 
 	// hud
-	Texture2D aButtonHud_;
-	Texture2D stickHud_;
-	Texture2D puaseHud_;
+	std::unique_ptr<Texture2D> aButtonHud_;
+	std::unique_ptr<Texture2D> stickHud_;
+	std::unique_ptr<Texture2D> puaseHud_;
 
-	Texture2D spaceHud_;
-	Texture2D rightKeyHud_;
-	Texture2D leftKeyHud_;
-	Texture2D puaseKeyHud_;
+	std::unique_ptr<Texture2D> spaceHud_;
+	std::unique_ptr<Texture2D> rightKeyHud_;
+	std::unique_ptr<Texture2D> leftKeyHud_;
+	std::unique_ptr<Texture2D> puaseKeyHud_;
 
 
 	///

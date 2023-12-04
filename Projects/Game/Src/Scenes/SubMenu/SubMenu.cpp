@@ -1,7 +1,8 @@
 #include "SubMenu.h"
 
 SubMenu::SubMenu():
-	isActive_(false)
+	isActive_(false),
+	camera_(new Camera{})
 {}
 
 void SubMenu::ActiveUpdate() {

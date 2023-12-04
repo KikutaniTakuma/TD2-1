@@ -15,7 +15,7 @@ BaseScene::BaseScene(BaseScene::ID sceneID) :
 	input_(nullptr),
 	stringOutPutManager_(nullptr),
 	sceneID_(sceneID),
-	camera_()
+	camera_(new Camera{})
 {}
 
 void BaseScene::SceneInitialize(SceneManager* sceneManager) {

@@ -52,8 +52,8 @@ ResultScene::ResultScene():
 void ResultScene::Initialize() {
 	sceneManager_->SetClearMilliSecond(stageNumber_ - 1, clearTime_);
 
-	camera_.farClip = 3000.0f;
-	camera_.pos.z = -1000.0f;
+	camera_->farClip = 3000.0f;
+	camera_->pos.z = -1000.0f;
 
 	globalVariables_.LoadFile();
 
@@ -622,60 +622,60 @@ void ResultScene::Update() {
 }
 
 void ResultScene::Draw() {
-	camera_.Update();
+	camera_->Update();
 
 	backGroundBlur_.PreDraw();
 	for (auto& i : backGround_) {
-		i.Draw(camera_.GetViewOthographics());
+		i.Draw(camera_->GetViewOthographics());
 	}
-	backGroundBlur_.Draw(camera_.GetViewOthographics(), Pipeline::None);
+	backGroundBlur_.Draw(camera_->GetViewOthographics(), Pipeline::None);
 
-	backGroundParticle_.Draw(camera_.rotate, camera_.GetViewOthographics(), Pipeline::Normal);
+	backGroundParticle_.Draw(camera_->rotate, camera_->GetViewOthographics(), Pipeline::Normal);
 
 	for (auto& model : models_) {
-		model.Draw(camera_.GetViewProjection(), camera_.GetPos());
+		model.Draw(camera_->GetViewProjection(), camera_->GetPos());
 	}
 
 	for (auto& tex : texs_) {
-		tex.Draw(camera_.GetViewOthographics());
+		tex.Draw(camera_->GetViewOthographics());
 	}
 
-	speechBubble_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	speechBubble_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 
 	// グレースケール化する
 	grayPera_.PreDraw();
 
 	for (auto& i : starsGray_) {
-		i.Draw(camera_.GetViewOthographics());
+		i.Draw(camera_->GetViewOthographics());
 	}
 
-	grayPera_.Draw(camera_.GetViewOthographics(), Pipeline::None);
+	grayPera_.Draw(camera_->GetViewOthographics(), Pipeline::None);
 
 	for (auto& i : stars_) {
-		i.Draw(camera_.GetViewOthographics());
+		i.Draw(camera_->GetViewOthographics());
 	}
 
-	timer_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	timerUI_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	timer_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	timerUI_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 
 	if (isCanSelect_) {
-		stageSelectMassage_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		stageSelectMassage_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 		if (stageNumber_ < static_cast<int32_t>(sceneManager_->isClearStage_.size())) {
-			nextStageMassage_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+			nextStageMassage_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 		}
-		arrow_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		arrow_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	}
 
-	tenMinutes_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	minutes_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	tenSeconds_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	seconds_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	colon1_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	colon2_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	resultUI_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	stageNumberTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	tenMinutes_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	minutes_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	tenSeconds_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	seconds_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	colon1_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	colon2_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	resultUI_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	stageNumberTex_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	if (static_cast<int32_t>(sceneManager_->isClearStage_.size()) <= stageNumber_) {
-		stageTenNumberTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		stageTenNumberTex_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	}
-	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
+	player_.Draw(camera_->GetViewOthographics(), camera_->pos);
 }

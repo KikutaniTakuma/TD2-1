@@ -17,8 +17,8 @@ TitleScene::TitleScene():
 	playerAnimationDuration_(),
 	staticCamera_{}
 {
-	camera_.farClip = 3000.0f;
-	camera_.pos.z = -1000.0f;
+	camera_->farClip = 3000.0f;
+	camera_->pos.z = -1000.0f;
 	//hoge_.LoadSettingDirectory("layer_heal");
 	staticCamera_.Update();
 }
@@ -254,31 +254,31 @@ void TitleScene::Update() {
 
 void TitleScene::Draw() {
 
-	camera_.Update();
+	camera_->Update();
 
 	backGroundBlur_.PreDraw();
 	for (auto& i : backGround_) {
-		i.Draw(camera_.GetViewOthographics());
+		i.Draw(camera_->GetViewOthographics());
 	}
 	backGroundBlur_.Draw(staticCamera_.GetOthographics(), Pipeline::None);
-	backGroundParticle_.Draw(camera_.rotate, camera_.GetViewOthographics());
+	backGroundParticle_.Draw(camera_->rotate, camera_->GetViewOthographics());
 
-	floor_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	titleTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	floor_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	titleTex_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 
-	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
+	player_.Draw(camera_->GetViewOthographics(), camera_->pos);
 
-	smoke_.Draw(camera_.rotate, camera_.GetViewOthographics());
+	smoke_.Draw(camera_->rotate, camera_->GetViewOthographics());
 
 	if (sceneManager_->GetIsPad()) {
-		aButtonHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-		padStartHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		aButtonHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+		padStartHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	}
 	else {
-		spaceHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-		keyEscHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		spaceHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+		keyEscHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	}
-	backToHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	startHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	//hoge_.Draw(camera_.GetViewOthographics(), Pipeline::Normal);
+	backToHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	startHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	//hoge_.Draw(camera_->GetViewOthographics(), Pipeline::Normal);
 }

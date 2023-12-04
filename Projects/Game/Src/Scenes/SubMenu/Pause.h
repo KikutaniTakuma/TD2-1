@@ -29,19 +29,19 @@ public:
 
 private:
 	// 背景を少し暗くする
-	Texture2D backGround_;
-	Texture2D backGround2_;
-	Texture2D backGround3_;
+	std::unique_ptr<Texture2D> backGround_;
+	std::unique_ptr<Texture2D> backGround2_;
+	std::unique_ptr<Texture2D> backGround3_;
 
-	Texture2D goToTitle_;
-	Texture2D goToStageSelect_;
-	Texture2D goToGame_;
+	std::unique_ptr<Texture2D> goToTitle_;
+	std::unique_ptr<Texture2D> goToStageSelect_;
+	std::unique_ptr<Texture2D> goToGame_;
 
-	Texture2D pauseTex_;
+	std::unique_ptr<Texture2D> pauseTex_;
 
 	int32_t currentChoose_;
 
-	Texture2D arrow_;
+	std::unique_ptr<Texture2D> arrow_;
 	// 今選択しているところ(0:nextStage, 1:stageSelect)
 	int32_t nowChoose_;
 	std::array<float, 3> arrowPosY_;

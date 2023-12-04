@@ -1,5 +1,6 @@
 #pragma once
 #include "Utils/Camera/Camera.h"
+#include <memory>
 
 class BaseScene {
 	friend class SceneManager;
@@ -52,5 +53,5 @@ protected:
 	BaseScene::ID sceneID_;
 
 protected:
-	Camera camera_;
+	std::unique_ptr<Camera> camera_;
 };

@@ -31,8 +31,8 @@ StageSelect::StageSelect():
 }
 
 void StageSelect::Initialize() {
-	camera_.farClip = 3000.0f;
-	camera_.pos.z = -2000.0f;
+	camera_->farClip = 3000.0f;
+	camera_->pos.z = -2000.0f;
 	currentStage_ = std::clamp(currentStage_, 1, static_cast<int32_t>(sceneManager_->isClearStage_.size()));
 	maxStage_ = static_cast<decltype(maxStage_)>(sceneManager_->isClearStage_.size());
 
@@ -434,42 +434,42 @@ void StageSelect::Update() {
 }
 
 void StageSelect::Draw() {
-	camera_.Update();
+	camera_->Update();
 
 	backGroundBlur_.PreDraw();
 	for (auto& i : backGround_) {
-		i.Draw(camera_.GetViewOthographics());
+		i.Draw(camera_->GetViewOthographics());
 	}
 	backGroundBlur_.Draw(staticCamera_.GetViewOthographics(), Pipeline::None);
-	backGroundParticle_.Draw(camera_.rotate, camera_.GetViewOthographics());
+	backGroundParticle_.Draw(camera_->rotate, camera_->GetViewOthographics());
 
-	bubble_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	bubble_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	
-	stageTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	stageNumberTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	stageTenNumberTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	stageTex_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	stageNumberTex_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	stageTenNumberTex_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 
-	arrowRight_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-	arrowLeft_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	arrowRight_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	arrowLeft_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 
 	if (sceneManager_->isClearStage_[currentStage_-1]) {
-		isClearTex_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		isClearTex_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	}
 
-	moon_.Draw(camera_.GetViewOthographics(), camera_.pos);
+	moon_.Draw(camera_->GetViewOthographics(), camera_->pos);
 
-	player_.Draw(camera_.GetViewOthographics(), camera_.pos);
+	player_.Draw(camera_->GetViewOthographics(), camera_->pos);
 
 	if (sceneManager_->GetIsPad()) {
-		aButtonHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-		padStartHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		aButtonHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+		padStartHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	}
 	else {
-		spaceHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
-		keyEscHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+		spaceHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+		keyEscHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	}
 
-	backToHud_.Draw(camera_.GetViewOthographics(), Pipeline::Normal, false);
+	backToHud_.Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 }
 
 void StageSelect::SetStartStage(int32_t startStageNumber) {
