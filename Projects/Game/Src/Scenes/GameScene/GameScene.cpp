@@ -6,6 +6,7 @@
 #include "imgui.h"
 #include "Scenes/ResultScene/ResultScene.h"
 #include "Utils/Random/Random.h"
+#include "Engine/Core/WindowFactory/WindowFactory.h"
 
 GameScene::GameScene() :
 	BaseScene(BaseScene::ID::Game)
@@ -1013,7 +1014,9 @@ void GameScene::Update() {
 
 
 
-
+	if (!WindowFactory::GetInstance()->IsThisWindowaActive()) {
+		pause_->isActive_ = true;
+	}
 
 	pause_->ActiveUpdate();
 	pause_->SceneChange(stage_ + 1);

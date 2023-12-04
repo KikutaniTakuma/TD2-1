@@ -37,6 +37,7 @@ private:
 
 public:
 	 void Input();
+	 void InputReset();
 
 	 bool Pushed(Mouse::Button button);
 	 bool LongPush(Mouse::Button button);

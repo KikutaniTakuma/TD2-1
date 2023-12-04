@@ -74,8 +74,8 @@ private:
 	// 背景パーティクル
 	std::unique_ptr<Particle> backGroundParticle_;
 
-	Audio* bgm_;
-	Audio* decideSE_;
+	class Audio* bgm_;
+	class Audio* decideSE_;
 
 	std::unique_ptr<Texture2D> keyEscHud_;
 	std::unique_ptr<Texture2D> padStartHud_;

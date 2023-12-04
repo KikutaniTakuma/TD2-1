@@ -18,6 +18,11 @@ void KeyInput::Input() {
 	keyBoard_->GetDeviceState(DWORD(key_.size()), key_.data());
 }
 
+void KeyInput::InputReset() {
+	key_ = { 0 };
+	std::copy(key_.begin(), key_.end(), preKey_.begin());
+}
+
 bool KeyInput::Pushed(uint8_t keyType) {
 	if (!initalizeSucceeded_) {
 		return false;

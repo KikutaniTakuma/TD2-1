@@ -72,6 +72,8 @@ public:
 	/// </summary>
 	void Input();
 
+	void InputReset();
+
 public:
 	/// <summary>
 	/// ボタンの状態取得

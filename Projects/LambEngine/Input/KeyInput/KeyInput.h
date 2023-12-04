@@ -24,6 +24,8 @@ private:
 public:
 	void Input();
 
+	void InputReset();
+
 	bool GetKey(uint8_t keyType) {
 		return (instance_->key_[keyType] & 0x80);
 	}

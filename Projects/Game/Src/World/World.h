@@ -1,9 +1,12 @@
 #pragma once
 #include "Framework/Framework.h"
+#include <memory>
+#include "Utils/Math/Mat4x4.h"
+#include "Drawers/Texture2D/Texture2D.h"
 
 class World final : public Framework {
 public:
-	World() = default;
+	World();
 	World(const World&) = delete;
 	World(World&&) = delete;
 	~World() = default;
@@ -24,4 +27,7 @@ private:
 	class SceneManager* sceneManager_;
 
 	class ParticleEditor* particleEditor_;
+
+	std::unique_ptr<Texture2D> inactiveSprite_;
+	std::unique_ptr<Mat4x4> staticCameraMatrix_;
 };
