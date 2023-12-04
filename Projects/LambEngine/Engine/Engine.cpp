@@ -32,14 +32,14 @@
 
 
 #ifdef _DEBUG
-Engine::Debug Engine::debugLayer;
+Engine::Debug Engine::debugLayer_;
 
 Engine::Debug::Debug() :
-	debugController(nullptr)
+	debugController_(nullptr)
 {}
 
 Engine::Debug::~Debug() {
-	debugController.Reset();
+	debugController_.Reset();
 
 	// リソースリークチェック
 	Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
@@ -55,11 +55,11 @@ Engine::Debug::~Debug() {
 /// 
 
 void Engine::Debug::InitializeDebugLayer() {
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(debugController.GetAddressOf())))) {
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(debugController_.GetAddressOf())))) {
 		// デバッグレイヤーを有効化する
-		debugController->EnableDebugLayer();
+		debugController_->EnableDebugLayer();
 		// さらにGPU側でもチェックするようにする
-		debugController->SetEnableGPUBasedValidation(TRUE);
+		debugController_->SetEnableGPUBasedValidation(TRUE);
 	}
 }
 
@@ -69,17 +69,17 @@ void Engine::Debug::InitializeDebugLayer() {
 /// 各種初期化処理
 /// 
 
-Engine* Engine::engine = nullptr;
+Engine* Engine::instance_ = nullptr;
 
 bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize) {
 	HRESULT hr =  CoInitializeEx(0, COINIT_MULTITHREADED);
 	if (hr != S_OK) {
-		Log::ErrorLog("CoInitializeEx failed","Initialize()", "Engine");
+		Lamb::ErrorLog("CoInitializeEx failed","Initialize()", "Engine");
 		return false;
 	}
 
-	engine = new Engine();
-	assert(engine);
+	instance_ = new Engine();
+	assert(instance_);
 
 	const auto&& windowTitle = ConvertString(windowName);
 
@@ -88,11 +88,11 @@ bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize
 
 #ifdef _DEBUG
 	// DebugLayer有効化
-	debugLayer.InitializeDebugLayer();
+	debugLayer_.InitializeDebugLayer();
 #endif
 
 	// デバイス生成
-	engine->InitializeDirectXDevice();
+	instance_->InitializeDirectXDevice();
 
 	// ディスクリプタヒープ初期化
 	RtvHeap::Initialize(128u);
@@ -100,19 +100,19 @@ bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize
 	CbvSrvUavHeap::Initialize(4096u);
 
 	// コマンドリスト生成
-	engine->InitializeDirectXCommand();
+	instance_->InitializeDirectXCommand();
 
 	// スワップチェーン生成
-	engine->InitializeDirectXSwapChain();
+	instance_->InitializeDirectXSwapChain();
 
 	ImGuiManager::Initialize();
 
-	if (!engine->InitializeDraw()) {
-		Log::ErrorLog("InitializeDraw() Failed","Initialize()", "Engine");
+	if (!instance_->InitializeDraw()) {
+		Lamb::ErrorLog("InitializeDraw() Failed","Initialize()", "Engine");
 		return false;
 	}
 
-	engine->InitializeDirectXTK();
+	instance_->InitializeDirectXTK();
 
 	// 各種マネージャー初期化
 	ShaderManager::Initialize();
@@ -125,7 +125,7 @@ bool Engine::Initialize(const std::string& windowName, const Vector2& windowSize
 }
 
 void Engine::Finalize() {
-	engine->isFinalize = true;
+	instance_->isFinalize_ = true;
 
 	// 各種マネージャー解放
 	MeshManager::Finalize();
@@ -136,7 +136,7 @@ void Engine::Finalize() {
 
 	StringOutPutManager::Finalize();
 
-	engine->depthStencil_.reset();
+	instance_->depthStencil_.reset();
 
 	CbvSrvUavHeap::Finalize();
 	DsvHeap::Finalize();
@@ -148,19 +148,19 @@ void Engine::Finalize() {
 	DirectXCommand::Finalize();
 	DirectXDevice::Finalize();
 
-	delete engine;
-	engine = nullptr;
+	delete instance_;
+	instance_ = nullptr;
 
 	// COM 終了
 	CoUninitialize();
 }
 
 bool Engine::IsFinalize() {
-	return engine->isFinalize;
+	return instance_->isFinalize_;
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE Engine::GetDsvHandle() {
-	return engine->depthStencil_->GetDepthHandle();
+	return instance_->depthStencil_->GetDepthHandle();
 }
 
 
@@ -214,7 +214,7 @@ bool Engine::InitializeDraw() {
 	DsvHeap* dsvHeap = DsvHeap::GetInstance();
 	if(!dsvHeap) {
 		assert(!"CreateDescriptorHeap failed");
-		Log::ErrorLog("CreateDescriptorHeap()  Failed","InitializeDraw()", "Engine");
+		Lamb::ErrorLog("CreateDescriptorHeap()  Failed","InitializeDraw()", "Engine");
 		return false;
 	}
 
@@ -245,13 +245,13 @@ void Engine::FrameStart() {
 
 	ImGuiManager::GetInstance()->Start();
 
-	engine->directXSwapChain_->ChangeBackBufferState();
-	engine->directXSwapChain_->SetMainRenderTarget();
-	engine->directXSwapChain_->ClearBackBuffer();
+	instance_->directXSwapChain_->ChangeBackBufferState();
+	instance_->directXSwapChain_->SetMainRenderTarget();
+	instance_->directXSwapChain_->ClearBackBuffer();
 
 	// ビューポート
 	Vector2 clientSize = WindowFactory::GetInstance()->GetClientSize();
-	engine->directXSwapChain_->SetViewPort(static_cast<int32_t>(clientSize.x), static_cast<int32_t>(clientSize.y));
+	instance_->directXSwapChain_->SetViewPort(static_cast<int32_t>(clientSize.x), static_cast<int32_t>(clientSize.y));
 
 	// SRV用のヒープ
 	static auto const srvDescriptorHeap = CbvSrvUavHeap::GetInstance();
@@ -272,23 +272,23 @@ void Engine::FrameEnd() {
 
 	ImGuiManager::GetInstance()->End();
 	
-	engine->directXSwapChain_->ChangeBackBufferState();
+	instance_->directXSwapChain_->ChangeBackBufferState();
 
 	// コマンドリストを確定させる
-	engine->directXCommand_->CloseCommandlist();
+	instance_->directXCommand_->CloseCommandlist();
 
 	// GPUにコマンドリストの実行を行わせる
-	engine->directXCommand_->ExecuteCommandLists();
+	instance_->directXCommand_->ExecuteCommandLists();
 
 
 	// GPUとOSに画面の交換を行うように通知する
-	engine->directXSwapChain_->SwapChainPresent();
+	instance_->directXSwapChain_->SwapChainPresent();
 
-	engine->stringOutPutManager_->GmemoryCommit();
+	instance_->stringOutPutManager_->GmemoryCommit();
 
-	engine->directXCommand_->WaitForFinishCommnadlist();
+	instance_->directXCommand_->WaitForFinishCommnadlist();
 
-	engine->directXCommand_->ResetCommandlist();
+	instance_->directXCommand_->ResetCommandlist();
 	
 	// テクスチャの非同期読み込み
 	auto textureManager = TextureManager::GetInstance();

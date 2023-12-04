@@ -4,85 +4,85 @@
 #include "Utils/ExecutionLog/ExecutionLog.h"
 
 void KeyInput::Input() {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return;
 	}
 
-	std::copy(key.begin(), key.end(), preKey.begin());
+	std::copy(key_.begin(), key_.end(), preKey_.begin());
 	
 	// キーボード情報取得開始
-	keyBoard->Acquire();
+	keyBoard_->Acquire();
 
 	// キー入力
-	key = { 0 };
-	keyBoard->GetDeviceState(DWORD(key.size()), key.data());
+	key_ = { 0 };
+	keyBoard_->GetDeviceState(DWORD(key_.size()), key_.data());
 }
 
 bool KeyInput::Pushed(uint8_t keyType) {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return false;
 	}
-	return (key[keyType] & 0x80) && !(preKey[keyType] & 0x80);
+	return (key_[keyType] & 0x80) && !(preKey_[keyType] & 0x80);
 }
 bool KeyInput::LongPush(uint8_t keyType) {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return false;
 	}
-	return (key[keyType] & 0x80) && (preKey[keyType] & 0x80);
+	return (key_[keyType] & 0x80) && (preKey_[keyType] & 0x80);
 }
 bool KeyInput::Released(uint8_t keyType) {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return false;
 	}
-	return !(key[keyType] & 0x80) && (preKey[keyType] & 0x80);
+	return !(key_[keyType] & 0x80) && (preKey_[keyType] & 0x80);
 }
 
 bool KeyInput::PushAnyKey() {
-	return key != preKey;
+	return key_ != preKey_;
 }
 
-KeyInput* KeyInput::instance = nullptr;
+KeyInput* KeyInput::instance_ = nullptr;
 
 void KeyInput::Initialize(IDirectInput8* input) {
 	assert(input);
-	instance = new KeyInput(input);
+	instance_ = new KeyInput(input);
 }
 void KeyInput::Finalize() {
-	delete instance;
-	instance = nullptr;
+	delete instance_;
+	instance_ = nullptr;
 }
 
 KeyInput::KeyInput(IDirectInput8* input):
-	keyBoard(),
-	key{0},
-	preKey{0},
-	initalizeSucceeded(false)
+	keyBoard_(),
+	key_{0},
+	preKey_{0},
+	initalizeSucceeded_(false)
 {
 	
-	HRESULT hr = input->CreateDevice(GUID_SysKeyboard, keyBoard.GetAddressOf(), NULL);
+	HRESULT hr = input->CreateDevice(GUID_SysKeyboard, keyBoard_.GetAddressOf(), NULL);
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateDevice failed","Constructor", "KeyInput");
+		Lamb::ErrorLog("CreateDevice failed","Constructor", "KeyInput");
 		return;
 	}
 
-	hr = keyBoard->SetDataFormat(&c_dfDIKeyboard);
+	hr = keyBoard_->SetDataFormat(&c_dfDIKeyboard);
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("SetDataFormat failed", "Constructor", "KeyInput");
+		Lamb::ErrorLog("SetDataFormat failed", "Constructor", "KeyInput");
 		return;
 	}
 
-	hr = keyBoard->SetCooperativeLevel(WindowFactory::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	hr = keyBoard_->SetCooperativeLevel(WindowFactory::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("SetCooperativeLevel failed", "Constructor", "KeyInput");
+		Lamb::ErrorLog("SetCooperativeLevel failed", "Constructor", "KeyInput");
 		return;
 	}
 
-	initalizeSucceeded = true;
+	initalizeSucceeded_ = true;
 }
 
 KeyInput::~KeyInput() {
-	keyBoard->Unacquire();
+	keyBoard_->Unacquire();
 }

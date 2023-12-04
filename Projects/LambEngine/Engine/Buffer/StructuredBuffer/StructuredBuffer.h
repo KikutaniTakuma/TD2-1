@@ -170,7 +170,7 @@ public:
 		}
 
 		if (indexNum < 1) {
-			Log::ErrorLog("Index must be greater than or equal to 1 ->" + std::to_string(indexNum), "Resize()","StructuredBuffer");
+			Lamb::ErrorLog("Index must be greater than or equal to 1 ->" + std::to_string(indexNum), "Resize()","StructuredBuffer");
 			return;
 		}
 

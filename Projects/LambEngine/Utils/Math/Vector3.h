@@ -75,23 +75,23 @@ public:
 	/// <summary>
 	/// x = 1.0f, y = 1.0f, z = 1.0f
 	/// </summary>
-	static const Vector3 identity;
+	static const Vector3 kIdentity;
 	/// <summary>
 	/// x = 0.0f, y = 0.0f, z = 0.0f
 	/// </summary>
-	static const Vector3 zero;
+	static const Vector3 kZero;
 	/// <summary>
 	/// x = 1.0f, y = 0.0f, z = 0.0f
 	/// </summary>
-	static const Vector3 xIdy;
+	static const Vector3 kXIndentity;
 	/// <summary>
 	/// x = 0.0f, y = 1.0f, z = 0.0f
 	/// </summary>
-	static const Vector3 yIdy;
+	static const Vector3 kYIndentity;
 	/// <summary>
 	/// x = 0.0f, y = 0.0f, z = 1.0f
 	/// </summary>
-	static const Vector3 zIdy;
+	static const Vector3 kZIndentity;
 
 /// <summary>
 /// メンバ変数

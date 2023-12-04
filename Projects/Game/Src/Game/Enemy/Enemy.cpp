@@ -973,9 +973,9 @@ void Enemy::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 }
 
 void Enemy::DrawParticle(const Mat4x4& viewProjection) {
-	enemyStepOnParticle_.Draw(Vector3::zero, viewProjection);
-	enemyDeathParticle_.Draw(Vector3::zero, viewProjection);
-	generationDeleteParticle_.Draw(Vector3::zero, viewProjection);
+	enemyStepOnParticle_.Draw(Vector3::kZero, viewProjection);
+	enemyDeathParticle_.Draw(Vector3::kZero, viewProjection);
+	generationDeleteParticle_.Draw(Vector3::kZero, viewProjection);
 }
 
 void Enemy::Draw2D(const Mat4x4& viewProjection) {

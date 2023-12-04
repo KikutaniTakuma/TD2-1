@@ -25,11 +25,11 @@ public:
 	void Input();
 
 	bool GetKey(uint8_t keyType) {
-		return (instance->key[keyType] & 0x80);
+		return (instance_->key_[keyType] & 0x80);
 	}
 
 	bool GetPreKey(uint8_t keyType) {
-		return (instance->preKey[keyType] & 0x80);
+		return (instance_->preKey_[keyType] & 0x80);
 	}
 
 	bool Pushed(uint8_t keyType);
@@ -47,20 +47,20 @@ public:
 	static void Finalize();
 
 private:
-	static KeyInput* instance;
+	static KeyInput* instance_;
 
 public:
 	static KeyInput* const GetInstance() {
-		return instance;
+		return instance_;
 	}
 
 
 private:
-	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyBoard;
+	Microsoft::WRL::ComPtr<IDirectInputDevice8> keyBoard_;
 
 	// キー入力バッファー
-	std::array<BYTE, 0x100> key;
-	std::array<BYTE, 0x100> preKey;
+	std::array<BYTE, 0x100> key_;
+	std::array<BYTE, 0x100> preKey_;
 
-	bool initalizeSucceeded;
+	bool initalizeSucceeded_;
 };

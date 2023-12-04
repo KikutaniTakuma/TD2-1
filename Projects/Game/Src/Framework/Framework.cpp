@@ -16,7 +16,7 @@
 void Framework::Initialize() {
 	// ライブラリ初期化
 	if (!Engine::Initialize("DirectXGame", Vector2{ 1280.0f, 720.0f })) {
-		Log::ErrorLog(
+		Lamb::ErrorLog(
 			"somthing error",
 			"Engine::Initialize()",
 			"Framework"

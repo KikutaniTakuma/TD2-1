@@ -44,7 +44,7 @@ TextureManager::TextureManager() :
 	HRESULT hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(commandQueue_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateCommandQueue() Failed", "Constructor", "TextureManager");
+		Lamb::ErrorLog("CreateCommandQueue() Failed", "Constructor", "TextureManager");
 		return;
 	}
 
@@ -53,7 +53,7 @@ TextureManager::TextureManager() :
 	hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocator_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateCommandAllocator() Failed", "Constructor", "TextureManager");
+		Lamb::ErrorLog("CreateCommandAllocator() Failed", "Constructor", "TextureManager");
 		return;
 	}
 
@@ -62,7 +62,7 @@ TextureManager::TextureManager() :
 	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_.Get(), nullptr, IID_PPV_ARGS(commandList_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateCommandList() Failed", "Constructor", "TextureManager");
+		Lamb::ErrorLog("CreateCommandList() Failed", "Constructor", "TextureManager");
 		return;
 	}
 
@@ -72,7 +72,7 @@ TextureManager::TextureManager() :
 	hr = device->CreateFence(fenceVal_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateFence() Failed", "Constructor", "TextureManager");
+		Lamb::ErrorLog("CreateFence() Failed", "Constructor", "TextureManager");
 		return;
 	}
 
@@ -81,7 +81,7 @@ TextureManager::TextureManager() :
 	fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
 	assert(fenceEvent_ != nullptr);
 	if (!(fenceEvent_ != nullptr)) {
-		Log::ErrorLog("CreateEvent() Failed", "Constructor", "TextureManager");
+		Lamb::ErrorLog("CreateEvent() Failed", "Constructor", "TextureManager");
 		return;
 	}
 
@@ -124,20 +124,20 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 		auto hr = commandAllocator_->Reset();
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
-			Log::ErrorLog("CommandAllocator somthing error", "Reset()", "TextureManager");
+			Lamb::ErrorLog("CommandAllocator somthing error", "Reset()", "TextureManager");
 		}
 		hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
-			Log::ErrorLog("CommandList somthing error", "Reset()", "TextureManager");
+			Lamb::ErrorLog("CommandList somthing error", "Reset()", "TextureManager");
 		}
 		///
 
-		if (!tex->isLoad) {
+		if (!tex->isLoad_) {
 			return nullptr;
 		}
 
-		tex->srvHeapHandleUint = srvHeap_->CreateTxtureView(tex.get());
+		tex->srvHeapHandleUint_ = srvHeap_->CreateTxtureView(tex.get());
 		
 		textures_.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -171,20 +171,20 @@ Texture* TextureManager::LoadTexture(const std::string& fileName) {
 			auto hr = commandAllocator_->Reset();
 			assert(SUCCEEDED(hr));
 			if (!SUCCEEDED(hr)) {
-				Log::ErrorLog("CommandAllocator somthing error", "Reset()", "TextureManager");
+				Lamb::ErrorLog("CommandAllocator somthing error", "Reset()", "TextureManager");
 			}
 			hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 			assert(SUCCEEDED(hr));
 			if (!SUCCEEDED(hr)) {
-				Log::ErrorLog("CommandList somthing error", "Reset()", "TextureManager");
+				Lamb::ErrorLog("CommandList somthing error", "Reset()", "TextureManager");
 			}
 			///
 
-			if (!tex->isLoad) {
+			if (!tex->isLoad_) {
 				return nullptr;
 			}
 
-			tex->srvHeapHandleUint = srvHeap_->CreateTxtureView(tex.get());
+			tex->srvHeapHandleUint_ = srvHeap_->CreateTxtureView(tex.get());
 
 			textures_.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -199,11 +199,11 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 	if (textures_.empty()) {
 		auto tex = std::make_unique<Texture>();
 		tex->Load(fileName, commandList);
-		if (!tex->isLoad) {
+		if (!tex->isLoad_) {
 			return nullptr;
 		}
 
-		tex->srvHeapHandleUint = srvHeap_->CreateTxtureView(tex.get());
+		tex->srvHeapHandleUint_ = srvHeap_->CreateTxtureView(tex.get());
 
 		textures_.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -214,11 +214,11 @@ Texture* TextureManager::LoadTexture(const std::string& fileName, ID3D12Graphics
 		if (itr == textures_.end()) {
 			auto tex = std::make_unique<Texture>();
 			tex->Load(fileName, commandList);
-			if (!tex->isLoad) {
+			if (!tex->isLoad_) {
 				return nullptr;
 			}
 
-			tex->srvHeapHandleUint = srvHeap_->CreateTxtureView(tex.get());
+			tex->srvHeapHandleUint_ = srvHeap_->CreateTxtureView(tex.get());
 
 			textures_.insert(std::make_pair(fileName, std::move(tex)));
 
@@ -297,12 +297,12 @@ void TextureManager::ResetCommandList() {
 		auto hr = commandAllocator_->Reset();
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
-			Log::ErrorLog("CommandAllocator somthing error", "Reset()", "TextureManager");
+			Lamb::ErrorLog("CommandAllocator somthing error", "Reset()", "TextureManager");
 		}
 		hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
-			Log::ErrorLog("CommandList somthing error", "Reset()", "TextureManager");
+			Lamb::ErrorLog("CommandList somthing error", "Reset()", "TextureManager");
 		}
 
 		isThreadFinish_ = false;

@@ -39,10 +39,10 @@ void Mesh::LoadObj(const std::string& objFileName) {
 		assert(objFile);
 		if (objFile.fail()) {
 			if (std::filesystem::exists(std::filesystem::path(objFileName))) {
-				Log::ErrorLog(objFileName + " open failed", "LoadObj()", "Mesh");
+				Lamb::ErrorLog(objFileName + " open failed", "LoadObj()", "Mesh");
 			}
 			else {
-				Log::ErrorLog("Not found objFile -> " + objFileName, "LoadObj()", "Mesh");
+				Lamb::ErrorLog("Not found objFile -> " + objFileName, "LoadObj()", "Mesh");
 			}
 
 			return;
@@ -107,7 +107,7 @@ void Mesh::LoadObj(const std::string& objFileName) {
 					// エラーチェック
 					if (idnexItr == indcoes.rend()) {
 						//assert(!"Obj Load Error : Cannot Load Rectangles or more");
-						Log::ErrorLog("Not supported for rectangles or more", "LoadObj()", "Mesh");
+						Lamb::ErrorLog("Not supported for rectangles or more", "LoadObj()", "Mesh");
 						objFile.close();
 						return;
 					}
@@ -174,7 +174,7 @@ void Mesh::LoadObj(const std::string& objFileName) {
 void Mesh::LoadMtl(const std::string& fileName) {
 	std::ifstream file(fileName);
 	assert(file);
-	if (!file) { Log::ErrorLog("Not Found mtlFile", "LoadMtl()", "Mesh"); }
+	if (!file) { Lamb::ErrorLog("Not Found mtlFile", "LoadMtl()", "Mesh"); }
 
 	std::string lineBuf;
 	std::unordered_map<std::string, Texture*>::iterator texItr;
@@ -213,10 +213,10 @@ void Mesh::ThreadLoadObj(const std::string& objFileName) {
 		assert(objFile);
 		if (objFile.fail()) {
 			if (std::filesystem::exists(std::filesystem::path(objFileName))) {
-				Log::ErrorLog(objFileName + " open failed", "ThreadLoadObj()", "Mesh");
+				Lamb::ErrorLog(objFileName + " open failed", "ThreadLoadObj()", "Mesh");
 			}
 			else {
-				Log::ErrorLog("Not found objFile -> " + objFileName, "ThreadLoadObj()", "Mesh");
+				Lamb::ErrorLog("Not found objFile -> " + objFileName, "ThreadLoadObj()", "Mesh");
 			}
 
 			return;
@@ -285,7 +285,7 @@ void Mesh::ThreadLoadObj(const std::string& objFileName) {
 					// エラーチェック
 					if (idnexItr == indcoes.rend()) {
 						//assert(!"Obj Load Error : Cannot Load Rectangles or more");
-						Log::ErrorLog("Not supported for rectangles or more", "ThreadLoadObj()", "Mesh");
+						Lamb::ErrorLog("Not supported for rectangles or more", "ThreadLoadObj()", "Mesh");
 						objFile.close();
 						return;
 					}
@@ -348,7 +348,7 @@ void Mesh::ThreadLoadObj(const std::string& objFileName) {
 void Mesh::ThreadLoadMtl(const std::string& fileName) {
 	std::ifstream file(fileName);
 	assert(file);
-	if (!file) { Log::ErrorLog("Not Found mtlFile", "ThreadLoadMtl()", "Mesh"); }
+	if (!file) { Lamb::ErrorLog("Not Found mtlFile", "ThreadLoadMtl()", "Mesh"); }
 
 	std::string lineBuf;
 	std::unordered_map<std::string, Texture*>::iterator texItr;
@@ -489,7 +489,7 @@ void Mesh::Draw() {
 		auto commandList = DirectXCommand::GetInstance()->GetCommandList();
 
 		if (!pipeline_) {
-		Log::ErrorLog("pipeline is nullptr", "Draw()", "Mesh");
+		Lamb::ErrorLog("pipeline is nullptr", "Draw()", "Mesh");
 			return;
 		}
 

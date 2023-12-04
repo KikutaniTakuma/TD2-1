@@ -303,8 +303,8 @@ void Layer::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 }
 
 void Layer::ParticleDraw(const Mat4x4& viewProjections) {
-	breakEffect_.Draw(Vector3::zero, viewProjections);
-	healEffect_.Draw(Vector3::zero, viewProjections);
+	breakEffect_.Draw(Vector3::kZero, viewProjections);
+	healEffect_.Draw(Vector3::kZero, viewProjections);
 }
 
 void Layer::Draw2DFar(const Mat4x4& viewProjection) {

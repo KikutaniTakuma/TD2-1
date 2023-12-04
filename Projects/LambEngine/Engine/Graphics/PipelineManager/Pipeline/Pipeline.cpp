@@ -203,7 +203,7 @@ void Pipeline::Create(
 	HRESULT hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(graphicsPipelineState_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateGraphicsPipelineState", "Create()", "Pipeline");
+		Lamb::ErrorLog("CreateGraphicsPipelineState", "Create()", "Pipeline");
 		return;
 	}
 }
@@ -213,7 +213,7 @@ void Pipeline::Use() const {
 
 	assert(graphicsPipelineState_);
 	if (!graphicsPipelineState_) {
-		Log::ErrorLog("GraphicsPipelineState is nullptr", "Use()", "Pipeline");
+		Lamb::ErrorLog("GraphicsPipelineState is nullptr", "Use()", "Pipeline");
 		return;
 	}
 	auto commandlist = DirectXCommand::GetInstance()->GetCommandList();
@@ -234,7 +234,7 @@ void Pipeline::Use() const {
 	default:
 	case D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED:
 	case D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT:
-		Log::ErrorLog("Cannot use this primitive topology type", "Use()", "Pipline");
+		Lamb::ErrorLog("Cannot use this primitive topology type", "Use()", "Pipline");
 		break;
 	}
 }

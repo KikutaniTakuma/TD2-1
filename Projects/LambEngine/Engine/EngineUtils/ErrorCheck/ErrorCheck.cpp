@@ -50,6 +50,6 @@ void ErrorCheck::ErrorLog(const std::string& text, const std::string& boxName) {
 	std::ofstream file(directoryPath.string() + "Error.log", std::ios::app);
 	assert(file);
 
-	file << Log::NowTime() << ":"  << std::format("{} / {}", boxName, text) << std::endl;
+	file << Lamb::NowTime() << ":"  << std::format("{} / {}", boxName, text) << std::endl;
 	file.close();
 }

@@ -9,7 +9,7 @@
 #undef min
 #include <immintrin.h>
 
-const Mat4x4 Mat4x4::kIdentity_ = Mat4x4{
+const Mat4x4 Mat4x4::kIdentity = Mat4x4{
 	std::array<Vector4, 4>{
 		Vector4{1.0f, 0.0f, 0.0f, 0.0f},
 		Vector4{0.0f, 1.0f, 0.0f, 0.0f},
@@ -18,7 +18,7 @@ const Mat4x4 Mat4x4::kIdentity_ = Mat4x4{
 	}
 };
 
-const Mat4x4 Mat4x4::kZero_ = Mat4x4{
+const Mat4x4 Mat4x4::kZero = Mat4x4{
 	std::array<Vector4, 4>{
 		Vector4{0.0f, 0.0f, 0.0f, 0.0f},
 		Vector4{0.0f, 0.0f, 0.0f, 0.0f},
@@ -28,7 +28,7 @@ const Mat4x4 Mat4x4::kZero_ = Mat4x4{
 };
 
 Mat4x4::Mat4x4()
-	:m()
+	:m_()
 {}
 
 Mat4x4::Mat4x4(const Mat4x4& mat) {
@@ -44,7 +44,7 @@ Mat4x4::Mat4x4(const std::initializer_list<float>& num) {
 	assert(num.size() <= 16llu);
 	for (size_t y = 0llu; y < 4llu; y++) {
 		for (size_t x = 0; x < 4llu; x++) {
-			m[y][x] = *i;
+			m_[y][x] = *i;
 			i++;
 			if (i == num.end()) {
 				return;
@@ -54,27 +54,27 @@ Mat4x4::Mat4x4(const std::initializer_list<float>& num) {
 }
 
 Mat4x4::Mat4x4(const std::array<Vector4, 4>& num) {
-	m = num;
+	m_ = num;
 }
 
 Mat4x4::Mat4x4(const std::array<float, 16>& num) {
 	size_t i = 0;
 	for (size_t y = 0llu; y < 4llu; y++) {
 		for (size_t x = 0; x < 4llu; x++) {
-			m[y][x] = num[i];
+			m_[y][x] = num[i];
 			i++;
 		}
 	}
 }
 
 Mat4x4& Mat4x4::operator=(const Mat4x4& mat) {
-	std::copy(mat.m.begin(), mat.m.end(), m.begin());
+	std::copy(mat.m_.begin(), mat.m_.end(), m_.begin());
 
 	return *this;
 }
 
 Mat4x4& Mat4x4::operator=(Mat4x4&& mat) noexcept {
-	m = std::move(mat.m);
+	m_ = std::move(mat.m_);
 
 	return *this;
 }
@@ -82,10 +82,10 @@ Mat4x4& Mat4x4::operator=(Mat4x4&& mat) noexcept {
 Mat4x4 Mat4x4::operator*(const Mat4x4& mat) const {
 	Mat4x4 result;
 
-	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
-		for (int x = 0; x < Mat4x4::WIDTH; x++) {
-			for (int i = 0; i < Mat4x4::WIDTH; i++) {
-				result.m[y][x] += this->m[y][i] * mat.m[i][x];
+	for (int y = 0; y < Mat4x4::kHeight_; y++) {
+		for (int x = 0; x < Mat4x4::kWidth_; x++) {
+			for (int i = 0; i < Mat4x4::kWidth_; i++) {
+				result.m_[y][x] += this->m_[y][i] * mat.m_[i][x];
 			}
 		}
 	}
@@ -102,18 +102,18 @@ Mat4x4& Mat4x4::operator*=(const Mat4x4& mat) {
 Mat4x4 Mat4x4::operator+(const Mat4x4& mat) const {
 	Mat4x4 tmp;
 
-	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
-		for (int x = 0; x < Mat4x4::WIDTH; x++) {
-			tmp[y][x] = this->m[y][x] + mat.m[y][x];
+	for (int y = 0; y < Mat4x4::kHeight_; y++) {
+		for (int x = 0; x < Mat4x4::kWidth_; x++) {
+			tmp[y][x] = this->m_[y][x] + mat.m_[y][x];
 		}
 	}
 
 	return tmp;
 }
 Mat4x4& Mat4x4::operator+=(const Mat4x4& mat) {
-	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
-		for (int x = 0; x < Mat4x4::WIDTH; x++) {
-			this->m[y][x] += mat.m[y][x];
+	for (int y = 0; y < Mat4x4::kHeight_; y++) {
+		for (int x = 0; x < Mat4x4::kWidth_; x++) {
+			this->m_[y][x] += mat.m_[y][x];
 		}
 	}
 
@@ -122,18 +122,18 @@ Mat4x4& Mat4x4::operator+=(const Mat4x4& mat) {
 Mat4x4 Mat4x4::operator-(const Mat4x4& mat) const {
 	Mat4x4 tmp;
 
-	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
-		for (int x = 0; x < Mat4x4::WIDTH; x++) {
-			tmp[y][x] = this->m[y][x] - mat.m[y][x];
+	for (int y = 0; y < Mat4x4::kHeight_; y++) {
+		for (int x = 0; x < Mat4x4::kWidth_; x++) {
+			tmp[y][x] = this->m_[y][x] - mat.m_[y][x];
 		}
 	}
 
 	return tmp;
 }
 Mat4x4& Mat4x4::operator-=(const Mat4x4& mat) {
-	for (int y = 0; y < Mat4x4::HEIGHT; y++) {
-		for (int x = 0; x < Mat4x4::WIDTH; x++) {
-			this->m[y][x] -= mat.m[y][x];
+	for (int y = 0; y < Mat4x4::kHeight_; y++) {
+		for (int x = 0; x < Mat4x4::kWidth_; x++) {
+			this->m_[y][x] -= mat.m_[y][x];
 		}
 	}
 
@@ -141,80 +141,80 @@ Mat4x4& Mat4x4::operator-=(const Mat4x4& mat) {
 }
 
 bool Mat4x4::operator==(const Mat4x4& mat) const {
-	return m == mat.m;
+	return m_ == mat.m_;
 }
 
 bool Mat4x4::operator!=(const Mat4x4& mat) const {
-	return m != mat.m;
+	return m_ != mat.m_;
 }
 
 const Mat4x4& Mat4x4::Identity() {
-	*this = Mat4x4::kIdentity_;
+	*this = Mat4x4::kIdentity;
 
 	return *this;
 }
 
 const Mat4x4& Mat4x4::Translate(const Vector3& vec) {
-	this->m = {};
+	this->m_ = {};
 
-	this->m[0][0] = 1.0f;
-	this->m[1][1] = 1.0f;
-	this->m[2][2] = 1.0f;
-	this->m[3][3] = 1.0f;
+	this->m_[0][0] = 1.0f;
+	this->m_[1][1] = 1.0f;
+	this->m_[2][2] = 1.0f;
+	this->m_[3][3] = 1.0f;
 
-	this->m[3][0] = vec.x;
-	this->m[3][1] = vec.y;
-	this->m[3][2] = vec.z;
+	this->m_[3][0] = vec.x;
+	this->m_[3][1] = vec.y;
+	this->m_[3][2] = vec.z;
 
 	return *this;
 }
 
 const Mat4x4& Mat4x4::Scalar(const Vector3& vec) {
-	this->m = {};
+	this->m_ = {};
 
-	this->m[0][0] = vec.x;
-	this->m[1][1] = vec.y;
-	this->m[2][2] = vec.z;
-	this->m[3][3] = 1.0f;
+	this->m_[0][0] = vec.x;
+	this->m_[1][1] = vec.y;
+	this->m_[2][2] = vec.z;
+	this->m_[3][3] = 1.0f;
 
 	return *this;
 }
 
 const Mat4x4& Mat4x4::RotateX(float rad) {
-	this->m = {};
-	this->m[0][0] = 1.0f;
-	this->m[3][3] = 1.0f;
+	this->m_ = {};
+	this->m_[0][0] = 1.0f;
+	this->m_[3][3] = 1.0f;
 
-	this->m[1][1] = std::cos(rad);
-	this->m[1][2] = std::sin(rad);
-	this->m[2][1] = -std::sin(rad);
-	this->m[2][2] = std::cos(rad);
+	this->m_[1][1] = std::cos(rad);
+	this->m_[1][2] = std::sin(rad);
+	this->m_[2][1] = -std::sin(rad);
+	this->m_[2][2] = std::cos(rad);
 
 	return *this;
 }
 
 const Mat4x4& Mat4x4::RotateY(float rad) {
-	this->m = {};
-	this->m[1][1] = 1.0f;
-	this->m[3][3] = 1.0f;
+	this->m_ = {};
+	this->m_[1][1] = 1.0f;
+	this->m_[3][3] = 1.0f;
 
-	this->m[0][0] = std::cos(rad);
-	this->m[0][2] = -std::sin(rad);
-	this->m[2][0] = std::sin(rad);
-	this->m[2][2] = std::cos(rad);
+	this->m_[0][0] = std::cos(rad);
+	this->m_[0][2] = -std::sin(rad);
+	this->m_[2][0] = std::sin(rad);
+	this->m_[2][2] = std::cos(rad);
 
 	return *this;
 }
 
 const Mat4x4& Mat4x4::RotateZ(float rad) {
-	this->m = {};
-	this->m[2][2] = 1.0f;
-	this->m[3][3] = 1.0f;
+	this->m_ = {};
+	this->m_[2][2] = 1.0f;
+	this->m_[3][3] = 1.0f;
 	
-	this->m[0][0] = std::cos(rad);
-	this->m[0][1] = -std::sin(rad);
-	this->m[1][0] = std::sin(rad);
-	this->m[1][1] = std::cos(rad);
+	this->m_[0][0] = std::cos(rad);
+	this->m_[0][1] = -std::sin(rad);
+	this->m_[1][0] = std::sin(rad);
+	this->m_[1][1] = std::cos(rad);
 
 	return *this;
 }
@@ -223,9 +223,9 @@ const Mat4x4& Mat4x4::Affin(const Vector3& scale, const Vector3& rad, const Vect
 	Mat4x4 rotate = MakeMatrixRotateX(rad.x) * MakeMatrixRotateY(rad.y) * MakeMatrixRotateZ(rad.z);
 
 	*this = Mat4x4{ 
-		scale.x * rotate.m[0][0], scale.x * rotate.m[0][1],scale.x * rotate.m[0][2], 0.0f,
-		scale.y * rotate.m[1][0], scale.y * rotate.m[1][1],scale.y * rotate.m[1][2], 0.0f,
-		scale.z * rotate.m[2][0], scale.z * rotate.m[2][1],scale.z * rotate.m[2][2], 0.0f,
+		scale.x * rotate.m_[0][0], scale.x * rotate.m_[0][1],scale.x * rotate.m_[0][2], 0.0f,
+		scale.y * rotate.m_[1][0], scale.y * rotate.m_[1][1],scale.y * rotate.m_[1][2], 0.0f,
+		scale.z * rotate.m_[2][0], scale.z * rotate.m_[2][1],scale.z * rotate.m_[2][2], 0.0f,
 		translate.x, translate.y, translate.z, 1.0f
 	};
 
@@ -236,20 +236,20 @@ const Mat4x4& Mat4x4::Affin(const Vector3& scale, const Vector3& rad, const Vect
 const Mat4x4& Mat4x4::Inverse() {
 	Mat4x4 tmp = *this;
 
-	Mat4x4 identity = Mat4x4::kIdentity_;
+	Mat4x4 identity = Mat4x4::kIdentity;
 
 	float toOne = tmp[0][0];
 
 	float tmpNum = 0.0f;
 
-	for (int i = 0; i < Mat4x4::HEIGHT; i++) {
-		if (tmp.m[i][i] == 0.0f && i < Mat4x4::HEIGHT) {
+	for (int i = 0; i < Mat4x4::kHeight_; i++) {
+		if (tmp.m_[i][i] == 0.0f && i < Mat4x4::kHeight_) {
 			int pibIndex = i;
-			float pibot = fabsf(tmp.m[i][i]);
+			float pibot = fabsf(tmp.m_[i][i]);
 
-			for (int y = i + 1; y < Mat4x4::HEIGHT; y++) {
-				if (tmp.m[y][i] != 0.0f && pibot < fabsf(tmp.m[y][i])) {
-					pibot = fabsf(tmp.m[y][i]);
+			for (int y = i + 1; y < Mat4x4::kHeight_; y++) {
+				if (tmp.m_[y][i] != 0.0f && pibot < fabsf(tmp.m_[y][i])) {
+					pibot = fabsf(tmp.m_[y][i]);
 					pibIndex = y;
 				}
 			}
@@ -258,30 +258,30 @@ const Mat4x4& Mat4x4::Inverse() {
 				return *this;
 			}
 
-			tmp.m[i].m.swap(tmp.m[pibIndex].m);
-			identity.m[i].m.swap(identity.m[pibIndex].m);
+			tmp.m_[i].m.swap(tmp.m_[pibIndex].m);
+			identity.m_[i].m.swap(identity.m_[pibIndex].m);
 		}
 
-		toOne = tmp.m[i][i];
-		for (int x = 0; x < Mat4x4::HEIGHT; x++) {
-			tmp.m[i][x] /= toOne;
-			identity.m[i][x] /= toOne;
+		toOne = tmp.m_[i][i];
+		for (int x = 0; x < Mat4x4::kHeight_; x++) {
+			tmp.m_[i][x] /= toOne;
+			identity.m_[i][x] /= toOne;
 		}
 
-		for (int y = 0; y < Mat4x4::HEIGHT; ++y) {
+		for (int y = 0; y < Mat4x4::kHeight_; ++y) {
 			if (i == y) {
 				continue;
 			}
 
-			tmpNum = -tmp.m[y][i];
-			for (int x = 0; x < Mat4x4::WIDTH; x++) {
-				tmp.m[y][x] += tmpNum * tmp.m[i][x];
-				identity.m[y][x] += tmpNum * identity.m[i][x];
+			tmpNum = -tmp.m_[y][i];
+			for (int x = 0; x < Mat4x4::kWidth_; x++) {
+				tmp.m_[y][x] += tmpNum * tmp.m_[i][x];
+				identity.m_[y][x] += tmpNum * identity.m_[i][x];
 			}
 		}
 	}
 
-	if (tmp != kIdentity_) {
+	if (tmp != kIdentity) {
 		return *this;
 	}
 
@@ -292,54 +292,54 @@ const Mat4x4& Mat4x4::Inverse() {
 
 
 const Mat4x4& Mat4x4::Transepose() {
-	std::swap(m[1][0], m[0][1]);
-	std::swap(m[2][0], m[0][2]);
-	std::swap(m[3][0], m[0][3]);
-	std::swap(m[2][1], m[1][2]);
-	std::swap(m[2][3], m[3][2]);
-	std::swap(m[3][1], m[1][3]);
+	std::swap(m_[1][0], m_[0][1]);
+	std::swap(m_[2][0], m_[0][2]);
+	std::swap(m_[3][0], m_[0][3]);
+	std::swap(m_[2][1], m_[1][2]);
+	std::swap(m_[2][3], m_[3][2]);
+	std::swap(m_[3][1], m_[1][3]);
 
 	return *this;
 }
 
 const Mat4x4& Mat4x4::PerspectiveFov(float fovY, float aspectRatio, float nearClip, float farClip) {
-	m = {};
+	m_ = {};
 
-	m[0][0] = (1.0f / aspectRatio) * (1.0f / std::tan(fovY / 2.0f));
-	m[1][1] = 1.0f / std::tan(fovY / 2.0f);
-	m[2][2] = farClip / (farClip - nearClip);
-	m[2][3] = 1.0f;
-	m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
+	m_[0][0] = (1.0f / aspectRatio) * (1.0f / std::tan(fovY / 2.0f));
+	m_[1][1] = 1.0f / std::tan(fovY / 2.0f);
+	m_[2][2] = farClip / (farClip - nearClip);
+	m_[2][3] = 1.0f;
+	m_[3][2] = (-nearClip * farClip) / (farClip - nearClip);
 
 	return *this;
 }
 
 const Mat4x4& Mat4x4::Orthographic(float left, float top, float right, float bottom, float nearClip, float farClip) {
-	m = {};
+	m_ = {};
 
-	m[0][0] = 2.0f / (right - left);
-	m[1][1] = 2.0f / (top - bottom);
-	m[2][2] = 1.0f / (farClip - nearClip);
-	m[3][3] = 1.0f;
+	m_[0][0] = 2.0f / (right - left);
+	m_[1][1] = 2.0f / (top - bottom);
+	m_[2][2] = 1.0f / (farClip - nearClip);
+	m_[3][3] = 1.0f;
 
-	m[3][0] = (left + right) / (left - right);
-	m[3][1] = (top + bottom) / (bottom - top);
-	m[3][2] = nearClip / (nearClip - farClip);
+	m_[3][0] = (left + right) / (left - right);
+	m_[3][1] = (top + bottom) / (bottom - top);
+	m_[3][2] = nearClip / (nearClip - farClip);
 
 	return *this;
 }
 
 const Mat4x4& Mat4x4::ViewPort(float left, float top, float width, float height, float minDepth, float maxDepth) {
-	m = {};
+	m_ = {};
 
-	m[0][0] = width / 2.0f;
-	m[1][1] = height/ -2.0f;
-	m[2][2] = maxDepth - minDepth;
-	m[3][3] = 1.0f;
+	m_[0][0] = width / 2.0f;
+	m_[1][1] = height/ -2.0f;
+	m_[2][2] = maxDepth - minDepth;
+	m_[3][3] = 1.0f;
 
-	m[3][0] = left + (width / 2.0f);
-	m[3][1] = top + (height / 2.0f);
-	m[3][2] = minDepth;
+	m_[3][0] = left + (width / 2.0f);
+	m_[3][1] = top + (height / 2.0f);
+	m_[3][2] = minDepth;
 
 	return *this;
 }
@@ -399,7 +399,7 @@ Mat4x4 MakeMatrixRotateZ(float rad) {
 Mat4x4 MakeMatrixRotate(const Vector3& rad) {
 	Mat4x4 tmp;
 
-	tmp.Affin(Vector3::identity, rad, Vector3::zero);
+	tmp.Affin(Vector3::kIdentity, rad, Vector3::kZero);
 
 	return tmp;
 }
@@ -476,7 +476,7 @@ Mat4x4 DirectionToDirection(const Vector3& from, const Vector3& to) {
 				normal.z * normal.z * (1.0f - theataCos) + theataCos,
 				0.0f
 			},
-			Vector4::wIdy
+			Vector4::kWIndentity
 		}
 	};
 
@@ -508,7 +508,7 @@ Mat4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
 				axis.z * axis.z * (1.0f - angleCos) + angleCos,
 				0.0f
 			},
-			Vector4::wIdy
+			Vector4::kWIndentity
 		}
 	};
 

@@ -23,7 +23,7 @@ ScreenOut::ScreenOut() :
 {
 	sout_ = std::make_unique<StringOut>();
 	sout_->SetFormat("./Resources/Font/default.spritefont");
-	sout_->scale_ *= 0.3f;
+	sout_->scale *= 0.3f;
 }
 
 namespace Lamb {

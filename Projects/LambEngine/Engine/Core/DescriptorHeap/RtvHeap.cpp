@@ -73,7 +73,7 @@ void RtvHeap::CreateBackBuffer(
 
 		assert(SUCCEEDED(hr));
 		if (!SUCCEEDED(hr)) {
-			Log::ErrorLog("GetBuffer() Failed", "CreateBackBuffer()", "RtvHeap");
+			Lamb::ErrorLog("GetBuffer() Failed", "CreateBackBuffer()", "RtvHeap");
 			return;
 		}
 
@@ -120,7 +120,7 @@ void RtvHeap::ClearRenderTargetView(uint32_t handle, const Vector4& clearColor) 
 uint32_t RtvHeap::CreateView(class RenderTarget& peraRender) {
 	assert(currentHandleIndex_ < heapSize_);
 	if (currentHandleIndex_ >= heapSize_) {
-		Log::ErrorLog("Over HeapSize", "CreateView", "RtvHeap");
+		Lamb::ErrorLog("Over HeapSize", "CreateView", "RtvHeap");
 	}
 
 	if (bookingHandle_.empty()) {

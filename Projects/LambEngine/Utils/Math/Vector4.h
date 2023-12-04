@@ -78,27 +78,27 @@ public:
 	/// <summary>
 	/// x = 1.0f, y = 1.0f, z = 1.0f w = 1.0f
 	/// </summary>
-	static const Vector4 identity;
+	static const Vector4 kIdentity;
 	/// <summary>
 	/// x = 0.0f, y = 0.0f, z = 0.0f w = 0.0f
 	/// </summary>
-	static const Vector4 zero;
+	static const Vector4 kZero;
 	/// <summary>
 	/// x = 1.0f, y = 0.0f, z = 0.0f w = 0.0f
 	/// </summary>
-	static const Vector4 xIdy;
+	static const Vector4 kXIndentity;
 	/// <summary>
 	/// x = 0.0f, y = 1.0f, z = 0.0f w = 0.0f
 	/// </summary>
-	static const Vector4 yIdy;
+	static const Vector4 kYIndentity;
 	/// <summary>
 	/// x = 0.0f, y = 0.0f, z = 1.0f w = 0.0f
 	/// </summary>
-	static const Vector4 zIdy;
+	static const Vector4 kZIndentity;
 	/// <summary>
 	/// x = 0.0f, y = 0.0f, z = 0.0f w = 1.0f
 	/// </summary>
-	static const Vector4 wIdy;
+	static const Vector4 kWIndentity;
 
 
 	/// <summary>

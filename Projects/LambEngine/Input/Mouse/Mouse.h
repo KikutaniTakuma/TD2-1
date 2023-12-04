@@ -64,20 +64,20 @@ public:
 	void Debug();
 
 private:
-	static Mouse* instance;
+	static Mouse* instance_;
 
 public:
 	static Mouse* const GetInstance() {
-		return instance;
+		return instance_;
 	}
 
 private:
-	Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse;
+	Microsoft::WRL::ComPtr<IDirectInputDevice8> mouse_;
 
-	DIMOUSESTATE2 mosueState;
-	DIMOUSESTATE2 preMosueState;
+	DIMOUSESTATE2 mosueState_;
+	DIMOUSESTATE2 preMosueState_;
 
-	size_t wheel;
+	size_t wheel_;
 
-	bool initalizeSucceeded;
+	bool initalizeSucceeded_;
 };

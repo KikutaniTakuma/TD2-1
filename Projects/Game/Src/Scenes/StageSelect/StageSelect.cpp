@@ -38,7 +38,7 @@ void StageSelect::Initialize() {
 
 	moon_.LoadObj("./Resources/StageSelect/moon/moon.obj");
 	moon_.light.ligDirection = { 0.0f, 0.0f, 1.0f };
-	moon_.light.ligColor = Vector3::identity;
+	moon_.light.ligColor = Vector3::kIdentity;
 	moon_.light.ptRange = std::numeric_limits<float>::max();
 	moon_.rotate.y = std::numbers::pi_v<float>;
 	moon_.scale *= 300.0f;
@@ -47,7 +47,7 @@ void StageSelect::Initialize() {
 
 	player_.LoadObj("./Resources/Player/player.obj");
 	player_.light.ligDirection = { 0.0f, 0.0f, 1.0f };
-	player_.light.ligColor = Vector3::identity;
+	player_.light.ligColor = Vector3::kIdentity;
 	player_.light.ptRange = std::numeric_limits<float>::max();
 	player_.pos.y = -63.0f;
 	player_.pos.z = -800.0f;
@@ -388,8 +388,8 @@ void StageSelect::Update() {
 	}
 	aButtonHud_.Update();
 	spaceHud_.Update();
-	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
-	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
+	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::kIdentity, Vector4{ Vector3::kIdentity, 0.2f }));
+	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::kIdentity, Vector4{ Vector3::kIdentity, 0.2f }));
 	hudAlphaEase_.Update();
 
 	if (input_->GetGamepad()->GetButton(Gamepad::Button::START)) {

@@ -103,7 +103,7 @@ void Particle::CreateGraphicsPipeline() {
 
 	for (auto& i : graphicsPipelineState_) {
 		if (!i) {
-			Log::ErrorLog("pipeline is nullptr", "CreateGraphicsPipeline()","Particle");
+			Lamb::ErrorLog("pipeline is nullptr", "CreateGraphicsPipeline()","Particle");
 			return;
 		}
 	}
@@ -134,11 +134,11 @@ Particle::Particle() :
 	srvHeap_->CreateStructuredBufferView<Mat4x4>(wvpMat_);
 	srvHeap_->CreateStructuredBufferView<Vector4>(colorBuf_);
 	for (uint32_t i = 0; i < wvpMat_.Size(); i++) {
-		wvpMat_[i] = Mat4x4::kIdentity_;
+		wvpMat_[i] = Mat4x4::kIdentity;
 	}
 
 	for (uint32_t i = 0; i < colorBuf_.Size(); i++) {
-		colorBuf_[i] = Vector4::identity;
+		colorBuf_[i] = Vector4::kIdentity;
 	}
 
 	if (vertexResource_) { 
@@ -210,11 +210,11 @@ Particle::Particle(uint32_t indexNum) :
 	srvHeap_->CreateStructuredBufferView<Vector4>(colorBuf_);
 
 	for (uint32_t i = 0; i < wvpMat_.Size();i++) {
-		wvpMat_[i] = Mat4x4::kIdentity_;
+		wvpMat_[i] = Mat4x4::kIdentity;
 	}
 	
 	for (uint32_t i = 0; i < colorBuf_.Size(); i++) {
-		colorBuf_[i] = Vector4::identity;
+		colorBuf_[i] = Vector4::kIdentity;
 	}
 
 	if (vertexResource_) {
@@ -820,7 +820,7 @@ void Particle::Update() {
 					maxPos.x += settings_[currentSettingIndex_].emitter_.circleSize_;
 					pos = Lamb::Random(settings_[currentSettingIndex_].emitter_.pos_, maxPos);
 					posRotate = Lamb::Random(settings_[currentSettingIndex_].emitter_.rotate_.first, settings_[currentSettingIndex_].emitter_.rotate_.second);
-					pos *= MakeMatrixAffin(Vector3::identity, posRotate, Vector3::zero);
+					pos *= MakeMatrixAffin(Vector3::kIdentity, posRotate, Vector3::kZero);
 					break;
 				}
 
@@ -842,7 +842,7 @@ void Particle::Update() {
 				Vector3 moveRotate = Lamb::Random(settings_[currentSettingIndex_].moveRotate_.first, settings_[currentSettingIndex_].moveRotate_.second);
 
 				// 速度回転
-				velocity *= MakeMatrixAffin(Vector3::identity, moveRotate, Vector3::zero);
+				velocity *= MakeMatrixAffin(Vector3::kIdentity, moveRotate, Vector3::kZero);
 
 				// 回転
 				Vector3 rotate = Lamb::Random(settings_[currentSettingIndex_].rotate_.first, settings_[currentSettingIndex_].rotate_.second);
@@ -953,7 +953,7 @@ void Particle::Draw(
 			}
 		}
 		else {
-			billboardMat = Mat4x4::kIdentity_;
+			billboardMat = Mat4x4::kIdentity;
 		}
 
 		for (uint32_t i = 0; i < wvpMat_.Size();i++) {

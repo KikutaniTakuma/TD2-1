@@ -1028,7 +1028,7 @@ void GameScene::Draw() {
 
 	background_->Draw2D(camera2D_->GetViewOthographics());
 
-	backGroundParticle_.Draw(Vector3::zero, camera2D_->GetViewOthographics());
+	backGroundParticle_.Draw(Vector3::kZero, camera2D_->GetViewOthographics());
 
 	//layer_->Draw2DFar(camera2D_->GetViewOthographics());
 

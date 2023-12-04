@@ -25,13 +25,13 @@ AudioManager::AudioManager() :
 	HRESULT hr = XAudio2Create(xAudio2_.GetAddressOf(), 0u, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("XAudio2Create()", "Constructor", "AudioManager");
+		Lamb::ErrorLog("XAudio2Create()", "Constructor", "AudioManager");
 	}
 
 	hr = xAudio2_->CreateMasteringVoice(&masterVoice_);
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateMasteringVoicey()", "Constructor", "AudioManager");
+		Lamb::ErrorLog("CreateMasteringVoicey()", "Constructor", "AudioManager");
 	}
 }
 AudioManager::~AudioManager() {
@@ -43,7 +43,7 @@ AudioManager::~AudioManager() {
 
 Audio* AudioManager::LoadWav(const std::string& fileName, bool loopFlg) {
 	if (!std::filesystem::exists(std::filesystem::path(fileName))) {
-		Log::ErrorLog(" There is not this file -> " + fileName, "LoadWav()", "AudioManager");
+		Lamb::ErrorLog(" There is not this file -> " + fileName, "LoadWav()", "AudioManager");
 	}
 
 	if (audios_.empty()) {

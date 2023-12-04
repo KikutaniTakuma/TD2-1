@@ -42,11 +42,11 @@ public:
 
 	template<std::integral T>
 	Vector4& operator[](T index) {
-		return m[index];
+		return m_[index];
 	}
 	template<std::integral T>
 	const Vector4& operator[](T index) const {
-		return m[index];
+		return m_[index];
 	}
 
 	bool operator==(const Mat4x4& mat) const;
@@ -141,21 +141,21 @@ public:
 /// 静的定数
 /// </summary>
 private:
-	static constexpr int32_t HEIGHT = 4;
-	static constexpr int32_t WIDTH = 4;
+	static constexpr int32_t kHeight_ = 4;
+	static constexpr int32_t kWidth_ = 4;
 
 /// <summary>
 /// メンバ変数
 /// </summary>
 private:
-	std::array<Vector4, 4> m;
+	std::array<Vector4, 4> m_;
 
 /// <summary>
 /// 静的定数
 /// </summary>
 public:
-	static const Mat4x4 kIdentity_;
-	static const Mat4x4 kZero_;
+	static const Mat4x4 kIdentity;
+	static const Mat4x4 kZero;
 };
 
 Mat4x4 MakeMatrixTranslate(Vector3 vec);

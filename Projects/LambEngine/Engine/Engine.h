@@ -47,14 +47,14 @@ private:
 	/// <summary>
 	/// シングルトンインスタンス
 	/// </summary>
-	static Engine* engine;
+	static Engine* instance_;
 
 private:
-	bool isFinalize;
+	bool isFinalize_;
 
 public:
-	static inline Engine* GetInstance() {
-		return engine;
+	static inline Engine* const GetInstance() {
+		return instance_;
 	}
 
 	static D3D12_CPU_DESCRIPTOR_HANDLE GetDsvHandle();
@@ -73,10 +73,10 @@ private:
 		void InitializeDebugLayer();
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Debug1> debugController;
+		Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_;
 	};
 
-	static Debug debugLayer;
+	static Debug debugLayer_;
 #endif
 
 

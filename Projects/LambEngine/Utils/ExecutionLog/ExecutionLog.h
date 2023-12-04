@@ -14,7 +14,7 @@
 /// <summary>
 /// ログ関連
 /// </summary>
-namespace Log {
+namespace Lamb {
 	/// <summary>
 	/// 実行ログをファイルに出力する
 	/// </summary>

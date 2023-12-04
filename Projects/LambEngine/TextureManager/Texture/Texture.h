@@ -29,11 +29,11 @@ public:
 
 public:
 	inline explicit operator bool() const noexcept {
-		return isLoad;
+		return isLoad_;
 	}
 
 	inline bool operator!() const noexcept {
-		return !isLoad;
+		return !isLoad_;
 	}
 
 
@@ -70,7 +70,7 @@ private:
 
 public:
 	bool CanUse() const {
-		return static_cast<bool>(textureResouce) && !static_cast<bool>(intermediateResource) && isLoad;
+		return static_cast<bool>(textureResouce_) && !static_cast<bool>(intermediateResource_) && isLoad_;
 	}
 
 public:
@@ -88,29 +88,29 @@ public:
 /// メンバ変数
 /// </summary>
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResouce;
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResouce_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_;
 
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc_;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHeapHandle;
-	uint32_t srvHeapHandleUint;
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHeapHandle_;
+	uint32_t srvHeapHandleUint_;
 
-	bool isLoad;
-	bool threadLoadFlg;
+	bool isLoad_;
+	bool threadLoadFlg_;
 
 
 
-	Vector2 size;
+	Vector2 size_;
 public:
 	inline const Vector2& getSize() const {
-		return size;
+		return size_;
 	}
 
 private:
-	std::string fileName;
+	std::string fileName_;
 public:
 	inline const std::string& GetFileName() const {
-		return fileName;
+		return fileName_;
 	}
 };

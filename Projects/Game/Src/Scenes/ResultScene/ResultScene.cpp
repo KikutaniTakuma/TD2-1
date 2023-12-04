@@ -147,7 +147,7 @@ void ResultScene::Initialize() {
 	// プレイヤーモデルのロード
 	player_.LoadObj("./Resources/Player/player.obj");
 	player_.light.ligDirection = { 0.0f, 0.0f, 1.0f };
-	player_.light.ligColor = Vector3::identity;
+	player_.light.ligColor = Vector3::kIdentity;
 	player_.light.ptRange = std::numeric_limits<float>::max();
 	player_.rotate = { -0.1f, 2.962f, -0.12f };
 	player_.pos = { -357.0f, -33.7f,-400.0f };

@@ -141,12 +141,12 @@ public:
 	/// <summary>
 	/// x = 0.0f, y = 0.0f, z = 0.0f w = 1.0f
 	/// </summary>
-	static const Quaternion identity;
+	static const Quaternion kIdentity;
 
 	/// <summary>
 	/// x = 0.0f, y = 0.0f, z = 0.0f w = 0.0f
 	/// </summary>
-	static const Quaternion zero;
+	static const Quaternion kZero;
 
 /// <summary>
 /// メンバ変数
@@ -154,19 +154,19 @@ public:
 public:
 	union
 	{
-		std::array<float, 4> m_;
-		__m128 m128_;
-		Vector4 vector4_;
+		std::array<float, 4> m;
+		__m128 m128;
+		Vector4 vector4;
 		struct {
-			Vector3 vector3_;
-			float w_;
-		}vector_;
+			Vector3 vector3;
+			float w;
+		}vector;
 
 		struct {
-			float x_;
-			float y_;
-			float z_;
-			float w_;
-		}quaternion_;
+			float x;
+			float y;
+			float z;
+			float w;
+		}quaternion;
 	};
 };

@@ -32,14 +32,14 @@ DirectXDevice::DirectXDevice():
 	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(dxgiFactory_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("somthing error", "CreateDXGIFactory()", "DirectXDevice");
+		Lamb::ErrorLog("somthing error", "CreateDXGIFactory()", "DirectXDevice");
 		return;
 	}
 
 	// 使用するグラボの設定
 	SettingAdapter();
 	if (useAdapter_ == nullptr) {
-		Log::ErrorLog("GPU not Found", "SettingAdapter()","DirectXDevice");
+		Lamb::ErrorLog("GPU not Found", "SettingAdapter()","DirectXDevice");
 		return;
 	}
 
@@ -67,12 +67,12 @@ void DirectXDevice::SettingAdapter() {
 		DXGI_ADAPTER_DESC3 adapterDesc{};
 		HRESULT hr = useAdapter_->GetDesc3(&adapterDesc);
 		if (hr != S_OK) {
-			Log::ErrorLog("GetDesc3() Failed", "SettingAdapter()", "DirectXDevice");
+			Lamb::ErrorLog("GetDesc3() Failed", "SettingAdapter()", "DirectXDevice");
 			return;
 		}
 
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
-			Log::AddLog(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
+			Lamb::AddLog(ConvertString(std::format(L"Use Adapter:{}\n", adapterDesc.Description)));
 			break;
 		}
 		useAdapter_.Reset();
@@ -95,7 +95,7 @@ void DirectXDevice::CreateDevice() {
 		HRESULT hr = D3D12CreateDevice(useAdapter_.Get(), featureLevels[i], IID_PPV_ARGS(device_.GetAddressOf()));
 
 		if (SUCCEEDED(hr)) {
-			Log::AddLog(std::format("FeatureLevel:{}\n", featureLevelString[i]));
+			Lamb::AddLog(std::format("FeatureLevel:{}\n", featureLevelString[i]));
 			break;
 		}
 	}
@@ -103,7 +103,7 @@ void DirectXDevice::CreateDevice() {
 	if (device_ == nullptr) {
 		return;
 	}
-	Log::AddLog("Complete create D3D12Device!!!\n");
+	Lamb::AddLog("Complete create D3D12Device!!!\n");
 }
 
 #ifdef _DEBUG
@@ -157,7 +157,7 @@ ID3D12DescriptorHeap* DirectXDevice::CreateDescriptorHeap(
 		return descriptorHeap;
 	}
 	assert(!"Failed");
-	Log::ErrorLog("somthing error", "CreateDescriptorHeap()", "DirectXDevice");
+	Lamb::ErrorLog("somthing error", "CreateDescriptorHeap()", "DirectXDevice");
 
 	return nullptr;
 }
@@ -191,7 +191,7 @@ ID3D12Resource* DirectXDevice::CreateBufferResuorce(size_t sizeInBytes) {
 	HRESULT hr = device_->CreateCommittedResource(&uploadHeapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource));
 	if (!SUCCEEDED(hr)) {
 		OutputDebugStringA("CreateCommittedResource Function Failed!!");
-		Log::ErrorLog("somthing error", "CreateBufferResuorce()", "DirectXDevice");
+		Lamb::ErrorLog("somthing error", "CreateBufferResuorce()", "DirectXDevice");
 		return nullptr;
 	}
 
@@ -227,7 +227,7 @@ ID3D12Resource* DirectXDevice::CreateDepthStencilTextureResource(int32_t width, 
 			IID_PPV_ARGS(&resource))
 	)) {
 		assert(!"CreateDepthStencilTextureResource Failed");
-		Log::ErrorLog("somthing error", "CreateDepthStencilTextureResource()", "DirectXDevice");
+		Lamb::ErrorLog("somthing error", "CreateDepthStencilTextureResource()", "DirectXDevice");
 	}
 
 	return resource;

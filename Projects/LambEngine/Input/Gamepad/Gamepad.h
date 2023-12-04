@@ -58,8 +58,8 @@ private:
 	Gamepad& operator=(Gamepad&&) = delete;
 
 private:
-	WORD preButton;
-	XINPUT_STATE state;
+	WORD preButton_;
+	XINPUT_STATE state_;
 	XINPUT_VIBRATION vibration_;
 
 public:

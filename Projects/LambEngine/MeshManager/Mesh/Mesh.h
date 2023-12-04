@@ -204,7 +204,7 @@ private:
 	);
 	static void CreateGraphicsPipeline();
 
-public:
+private:
 	static Shader shader_;
 
 	static class Pipeline* pipeline_;

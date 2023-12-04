@@ -5,8 +5,8 @@
 #include "Utils/Math/Vector2.h"
 
 Gamepad::Gamepad() :
-	preButton(0),
-	state({0}),
+	preButton_(0),
+	state_({0}),
 	vibration_({0})
 {}
 
@@ -16,16 +16,16 @@ Gamepad* const Gamepad::GetInstance() {
 }
 
 void Gamepad::Input() {
-	preButton = state.Gamepad.wButtons;
-    XInputGetState(0, &state);
+	preButton_ = state_.Gamepad.wButtons;
+    XInputGetState(0, &state_);
 }
 
 bool Gamepad::GetButton(Button type) {
-    return (state.Gamepad.wButtons >> static_cast<short>(type)) % 2 == 1;
+    return (state_.Gamepad.wButtons >> static_cast<short>(type)) % 2 == 1;
 }
 
 bool Gamepad::GetPreButton(Button type) {
-	return (preButton >> static_cast<short>(type)) % 2 == 1;
+	return (preButton_ >> static_cast<short>(type)) % 2 == 1;
 }
 
 bool Gamepad::Pushed(Button type) {
@@ -47,8 +47,8 @@ bool Gamepad::PushAnyKey() {
 	float rightStickX = GetStick(Stick::RIGHT_X);
 	float rightStickY = GetStick(Stick::RIGHT_Y);
 
-	if (instance->state.Gamepad.bLeftTrigger
-		|| instance->state.Gamepad.bRightTrigger
+	if (instance->state_.Gamepad.bLeftTrigger
+		|| instance->state_.Gamepad.bRightTrigger
 		|| leftStickX < -0.3f || 0.3f <leftStickX
 		|| leftStickY < -0.3f || 0.3f <leftStickY
 		|| rightStickX < -0.3f || 0.3f < rightStickX
@@ -57,7 +57,7 @@ bool Gamepad::PushAnyKey() {
 		return true;
 	}
 
-	return instance->state.Gamepad.wButtons != instance->preButton;
+	return instance->state_.Gamepad.wButtons != instance->preButton_;
 }
 
 float Gamepad::GetTriger(Triger type, float deadZone) {
@@ -66,11 +66,11 @@ float Gamepad::GetTriger(Triger type, float deadZone) {
 	switch (type)
 	{
 	case Gamepad::Triger::LEFT:
-		moveTriger = static_cast<float>(state.Gamepad.bLeftTrigger) * kNormal;
+		moveTriger = static_cast<float>(state_.Gamepad.bLeftTrigger) * kNormal;
 		break;
 
 	case Gamepad::Triger::RIGHT:
-		moveTriger = static_cast<float>(state.Gamepad.bRightTrigger) * kNormal;
+		moveTriger = static_cast<float>(state_.Gamepad.bRightTrigger) * kNormal;
 		break;
 
 	default:
@@ -88,16 +88,16 @@ float Gamepad::GetStick(Stick type, float deadZone) {
 	switch (type)
 	{
 	case Gamepad::Stick::LEFT_X:
-		moveStick = static_cast<float>(state.Gamepad.sThumbLX) * kNormal;
+		moveStick = static_cast<float>(state_.Gamepad.sThumbLX) * kNormal;
 		break;
 	case Gamepad::Stick::LEFT_Y:
-		moveStick = static_cast<float>(state.Gamepad.sThumbLY) * kNormal;
+		moveStick = static_cast<float>(state_.Gamepad.sThumbLY) * kNormal;
 		break;
 	case Gamepad::Stick::RIGHT_X:
-		moveStick = static_cast<float>(state.Gamepad.sThumbRX) * kNormal;
+		moveStick = static_cast<float>(state_.Gamepad.sThumbRX) * kNormal;
 		break;
 	case Gamepad::Stick::RIGHT_Y:
-		moveStick = static_cast<float>(state.Gamepad.sThumbRY) * kNormal;
+		moveStick = static_cast<float>(state_.Gamepad.sThumbRY) * kNormal;
 		break;
 	default:
 		return 0.0f;

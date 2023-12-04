@@ -47,7 +47,7 @@ RenderTarget::RenderTarget():
 			IID_PPV_ARGS(resource_.GetAddressOf())
 		);
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateCommittedResource Function Failed", "Constructor", "RenderTarget");
+		Lamb::ErrorLog("CreateCommittedResource Function Failed", "Constructor", "RenderTarget");
 		return;
 	}
 
@@ -101,7 +101,7 @@ RenderTarget::RenderTarget(uint32_t width, uint32_t height) :
 			IID_PPV_ARGS(resource_.GetAddressOf())
 		);
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateCommittedResource Function Failed", "Constructor", "RenderTarget");
+		Lamb::ErrorLog("CreateCommittedResource Function Failed", "Constructor", "RenderTarget");
 		return;
 	}
 

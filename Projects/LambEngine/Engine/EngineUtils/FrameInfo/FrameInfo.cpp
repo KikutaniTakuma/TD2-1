@@ -58,7 +58,7 @@ FrameInfo::FrameInfo() :
 	SetFpsLimit(fps_);
 
 	fpsStringOutPut_.SetFormat("./Resources/Font/default.spritefont");
-	fpsStringOutPut_.scale_ *= 0.3f;
+	fpsStringOutPut_.scale *= 0.3f;
 }
 
 FrameInfo::~FrameInfo() {
@@ -86,10 +86,10 @@ FrameInfo::~FrameInfo() {
 
 	avgFps /= size;
 
-	Log::AddLog(std::format("Average Fps : {:.2f}\n", avgFps));
+	Lamb::AddLog(std::format("Average Fps : {:.2f}\n", avgFps));
 	if (std::chrono::duration_cast<std::chrono::seconds>(end - gameStartTime_) > std::chrono::seconds(1)) {
-		Log::AddLog(std::format("Max Fps : {:.2f}\n", maxFps_));
-		Log::AddLog(std::format("Min Fps : {:.2f}\n", minFps_));
+		Lamb::AddLog(std::format("Max Fps : {:.2f}\n", maxFps_));
+		Lamb::AddLog(std::format("Min Fps : {:.2f}\n", minFps_));
 	}
 }
 

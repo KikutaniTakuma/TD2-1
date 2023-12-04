@@ -14,11 +14,11 @@ StringOut::StringOut():
 
 	format_(),
 	str_(),
-	pos_(),
-	rotation_(0.0f),
-	scale_(Vector2::identity),
-	color_(0xffffffff),
-	isHorizontal_(false)
+	pos(),
+	rotation(0.0f),
+	scale(Vector2::identity),
+	color(0xffffffff),
+	isHorizontal(false)
 {
 	str_.reserve(0x40);
 }
@@ -26,11 +26,11 @@ StringOut::StringOut():
 StringOut::StringOut(const std::string& formatName) :
 	format_(formatName),
 	str_(),
-	pos_(),
-	rotation_(0.0f),
-	scale_(Vector2::identity),
-	color_(0xffffffff),
-	isHorizontal_(false)
+	pos(),
+	rotation(0.0f),
+	scale(Vector2::identity),
+	color(0xffffffff),
+	isHorizontal(false)
 {
 	str_.reserve(0x40);
 }
@@ -38,11 +38,11 @@ StringOut::StringOut(const std::string& formatName) :
 StringOut::StringOut(const std::wstring& formatName) :
 	format_(ConvertString(formatName)),
 	str_(),
-	pos_(),
-	rotation_(0.0f),
-	scale_(Vector2::identity),
-	color_(0xffffffff),
-	isHorizontal_(false)
+	pos(),
+	rotation(0.0f),
+	scale(Vector2::identity),
+	color(0xffffffff),
+	isHorizontal(false)
 {
 	str_.reserve(0x40);
 }
@@ -99,7 +99,7 @@ StringOut& StringOut::operator<<(const Vector4& right) {
 	return *this;
 }
 StringOut& StringOut::operator<<(const Quaternion& right) {
-	*this << right.vector4_;
+	*this << right.vector4;
 
 	return *this;
 }
@@ -135,11 +135,11 @@ void StringOut::Draw() {
 	stringOutPutManager->GetFont(format_)->DrawString(
 		stringOutPutManager->GetBatch(format_),
 		str_.c_str(),
-		DirectX::XMFLOAT2(pos_.x, pos_.y),
-		UintToVector4(color_).m128,
-		rotation_,
+		DirectX::XMFLOAT2(pos.x, pos.y),
+		UintToVector4(color).m128,
+		rotation,
 		DirectX::XMFLOAT2(0.0f, 0.0f),
-		DirectX::XMFLOAT2(scale_.x, scale_.y)
+		DirectX::XMFLOAT2(scale.x, scale.y)
 	);
 	batch->End();
 }
@@ -151,22 +151,22 @@ void StringOut::Clear() {
 void StringOut::Debug([[maybe_unused]]const std::string& debugName) {
 #ifdef _DEBUG
 	static Vector4 debugColor;
-	debugColor = UintToVector4(color_);
+	debugColor = UintToVector4(color);
 	debugStr_.resize(64);
 	debugStr_ = ConvertString(str_);
 
 	ImGui::Begin(debugName.c_str());
 	ImGui::InputText("text", debugStr_.data(), debugStr_.size());
-	ImGui::DragFloat2("pos", &pos_.x);
-	ImGui::DragFloat("rotation", &rotation_, 0.01f);
-	ImGui::DragFloat2("scale", &scale_.x, 0.01f);
+	ImGui::DragFloat2("pos", &pos.x);
+	ImGui::DragFloat("rotation", &rotation, 0.01f);
+	ImGui::DragFloat2("scale", &scale.x, 0.01f);
 	ImGui::ColorEdit4("SphereColor", &debugColor.color.r);
-	ImGui::Checkbox("isHorizontal", &isHorizontal_);
+	ImGui::Checkbox("isHorizontal", &isHorizontal);
 	ImGui::End();
 
 	str_ = ConvertString(debugStr_);
 
-	color_ = Vector4ToUint(debugColor);
+	color = Vector4ToUint(debugColor);
 #endif // _DEBUG
 }
 

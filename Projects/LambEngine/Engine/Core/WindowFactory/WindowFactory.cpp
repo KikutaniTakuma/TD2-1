@@ -48,7 +48,7 @@ void WindowFactory::Create(
 	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	assert(SUCCEEDED(hr));
 	if (FAILED(hr)) {
-		Log::ErrorLog("CoInitializeEx failed", "Create()", "WindowFactory");
+		Lamb::ErrorLog("CoInitializeEx failed", "Create()", "WindowFactory");
 
 		return;
 	}

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <chrono>
 
-namespace Log {
+namespace Lamb {
 	bool AddLog(const std::string& text) {
 		static const std::filesystem::path fileName = "./Log/Execution.log";
 		static bool isOpned = false;
@@ -54,7 +54,7 @@ namespace Log {
 	}
 
 	void DebugLog(const std::string& text, const Quaternion& quaternion) {
-		DebugLog(text, quaternion.vector4_);
+		DebugLog(text, quaternion.vector4);
 	}
 
 	void ErrorLog(

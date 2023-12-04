@@ -33,11 +33,11 @@ Vector3::Vector3(Vector3&& right) noexcept
 	*this = std::move(right);
 }
 
-const Vector3 Vector3::identity = { 1.0f,1.0f,1.0f };
-const Vector3 Vector3::zero = { 0.0f, 0.0f,0.0f };
-const Vector3 Vector3::xIdy = { 1.0f,0.0f,0.0f };
-const Vector3 Vector3::yIdy = { 0.0f,1.0f,0.0f };
-const Vector3 Vector3::zIdy = { 0.0f,0.0f,1.0f };
+const Vector3 Vector3::kIdentity = { 1.0f,1.0f,1.0f };
+const Vector3 Vector3::kZero = { 0.0f, 0.0f,0.0f };
+const Vector3 Vector3::kXIndentity = { 1.0f,0.0f,0.0f };
+const Vector3 Vector3::kYIndentity = { 0.0f,1.0f,0.0f };
+const Vector3 Vector3::kZIndentity = { 0.0f,0.0f,1.0f };
 
 Vector3 Vector3::operator+() const noexcept {
 	return *this;
@@ -114,7 +114,7 @@ Vector3 Vector3::operator*(const Mat4x4& mat) const noexcept {
 	float&& w = x * mat[0][3] + y * mat[1][3] + z * mat[2][3] + 1.0f * mat[3][3];
 	assert(w != 0.0f);
 	if (w == 0.0f) {
-		Log::ErrorLog("Vector3 * Matrix4x4 : w = 0.0f", "operator*", "Vector3");
+		Lamb::ErrorLog("Vector3 * Matrix4x4 : w = 0.0f", "operator*", "Vector3");
 	}
 	w = 1.0f / w;
 	result.x *= w;
@@ -134,7 +134,7 @@ Vector3 operator*(const Mat4x4& left, const Vector3& right) {
 	float&& w = left[3].Dot(vec);
 	assert(w != 0.0f);
 	if (w == 0.0f) {
-		Log::ErrorLog("Vector3 * Matrix4x4 : w = 0.0f", "operator*", "Vector3");
+		Lamb::ErrorLog("Vector3 * Matrix4x4 : w = 0.0f", "operator*", "Vector3");
 	}
 
 	w = 1.0f / w;
@@ -159,7 +159,7 @@ Vector3& Vector3::operator=(const Vector2& right) noexcept {
 }
 
 Vector3 Vector3::operator*(const Quaternion& right) const {
-	return (right * Quaternion{ *this, 0.0f } * right.Inverce()).vector_.vector3_;
+	return (right * Quaternion{ *this, 0.0f } * right.Inverce()).vector.vector3;
 }
 
 Vector3& Vector3::operator*=(const Quaternion& right) {
@@ -206,8 +206,8 @@ Vector3 Vector3::Cross(const Vector3& right) const noexcept {
 }
 
 Vector3 Vector3::Normalize() const noexcept {
-	if (*this == Vector3::zero) {
-		return Vector3::zero;
+	if (*this == Vector3::kZero) {
+		return Vector3::kZero;
 	}
 
 	return *this / this->Length();

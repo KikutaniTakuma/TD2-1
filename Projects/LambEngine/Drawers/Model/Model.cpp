@@ -96,7 +96,7 @@ void Model::CreateGraphicsPipeline() {
 Model::Model() :
 	pos(),
 	rotate(),
-	scale(Vector3::identity),
+	scale(Vector3::kIdentity),
 	color(std::numeric_limits<uint32_t>::max()),
 	parent_(nullptr),
 	mesh_(nullptr),
@@ -108,8 +108,8 @@ Model::Model() :
 {
 
 	wvpData_.shaderRegister_ = 0;
-	wvpData_->worldMat = Mat4x4::kIdentity_;
-	wvpData_->viewProjectoionMat = Mat4x4::kIdentity_;
+	wvpData_->worldMat = Mat4x4::kIdentity;
+	wvpData_->viewProjectoionMat = Mat4x4::kIdentity;
 
 
 	dirLig_.shaderRegister_ = 1;
@@ -117,8 +117,8 @@ Model::Model() :
 	light.ligDirection = light.ligDirection.Normalize();
 	light.ligColor = UintToVector4(0xffffadff).GetVector3();
 
-	light.ptPos = Vector3::zero;
-	light.ptColor = Vector3::zero;
+	light.ptPos = Vector3::kZero;
+	light.ptColor = Vector3::kZero;
 	light.ptRange = std::numeric_limits<float>::max();
 
 	*dirLig_ = light;
@@ -219,7 +219,7 @@ void Model::LoadObj(const std::string& fileName) {
 		mesh_ = MeshManager::GetInstance()->LoadObj(fileName);
 
 		if (!mesh_) {
-			Log::ErrorLog("mesh is nullptr","LoadObj()", "Model");
+			Lamb::ErrorLog("mesh is nullptr","LoadObj()", "Model");
 			return;
 		}
 
@@ -289,7 +289,7 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 		auto commandlist = DirectXCommand::GetInstance()->GetCommandList();
 
 		if (!pipeline_) {
-			Log::ErrorLog("pipeline is nullptr", "Draw()", "Model");
+			Lamb::ErrorLog("pipeline is nullptr", "Draw()", "Model");
 			return;
 		}
 

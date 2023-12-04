@@ -35,8 +35,8 @@ Texture2D::Texture2D() :
 	isSameTexSize(),
 	texScalar(1.0f)
 {
-	*wvpMat_ = Mat4x4::kIdentity_;
-	*colorBuf_ = Vector4::identity;
+	*wvpMat_ = Mat4x4::kIdentity;
+	*colorBuf_ = Vector4::kIdentity;
 
 	if (vertexResource_) {
 		vertexResource_->Release();
@@ -238,7 +238,7 @@ void Texture2D::CreateGraphicsPipeline() {
 
 	for (auto& i : graphicsPipelineState_) {
 		if (!i) {
-			Log::ErrorLog("pipeline is nullptr", "CreateGraphicsPipeline()", "Texture2D");
+			Lamb::ErrorLog("pipeline is nullptr", "CreateGraphicsPipeline()", "Texture2D");
 			return;
 		}
 	}

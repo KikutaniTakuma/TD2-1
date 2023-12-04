@@ -5,12 +5,12 @@
 #include <cmath>
 #include <limits>
 
-const Vector4 Vector4::identity = { 1.0f,1.0f,1.0f,1.0f };
-const Vector4 Vector4::zero = { 0.0f, 0.0f, 0.0f, 0.0f };
-const Vector4 Vector4::xIdy= { 1.0f, 0.0f, 0.0f, 0.0f };
-const Vector4 Vector4::yIdy= { 0.0f, 1.0f, 0.0f, 0.0f };
-const Vector4 Vector4::zIdy= { 0.0f, 0.0f, 1.0f, 0.0f };
-const Vector4 Vector4::wIdy= { 0.0f, 0.0f, 0.0f, 1.0f };
+const Vector4 Vector4::kIdentity = { 1.0f,1.0f,1.0f,1.0f };
+const Vector4 Vector4::kZero = { 0.0f, 0.0f, 0.0f, 0.0f };
+const Vector4 Vector4::kXIndentity= { 1.0f, 0.0f, 0.0f, 0.0f };
+const Vector4 Vector4::kYIndentity= { 0.0f, 1.0f, 0.0f, 0.0f };
+const Vector4 Vector4::kZIndentity= { 0.0f, 0.0f, 1.0f, 0.0f };
+const Vector4 Vector4::kWIndentity= { 0.0f, 0.0f, 0.0f, 1.0f };
 
 Vector4::Vector4() noexcept :
 	m{0.0f}

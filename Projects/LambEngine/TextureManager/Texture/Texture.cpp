@@ -10,15 +10,15 @@
 #include "Engine/Core/DescriptorHeap/CbvSrvUavHeap.h"
 
 Texture::Texture():
-	textureResouce(nullptr),
-	intermediateResource(nullptr),
-	srvDesc(),
-	isLoad(false),
-	threadLoadFlg(false),
-	size(),
-	fileName(),
-	srvHeapHandleUint(0),
-	srvHeapHandle{}
+	textureResouce_(nullptr),
+	intermediateResource_(nullptr),
+	srvDesc_(),
+	isLoad_(false),
+	threadLoadFlg_(false),
+	size_(),
+	fileName_(),
+	srvHeapHandleUint_(0),
+	srvHeapHandle_{}
 {}
 
 Texture::~Texture() {
@@ -30,91 +30,91 @@ Texture::Texture(Texture&& tex) noexcept {
 	*this = std::move(tex);
 }
 Texture& Texture::operator=(Texture&& tex) noexcept {
-	this->textureResouce = std::move(tex.textureResouce);
-	this->intermediateResource = std::move(tex.intermediateResource);
-	this->srvDesc = tex.srvDesc;
-	isLoad = tex.isLoad;
-	fileName = tex.fileName;
+	this->textureResouce_ = std::move(tex.textureResouce_);
+	this->intermediateResource_ = std::move(tex.intermediateResource_);
+	this->srvDesc_ = tex.srvDesc_;
+	isLoad_ = tex.isLoad_;
+	fileName_ = tex.fileName_;
 
 	return *this;
 }
 
 void Texture::Load(const std::string& filePath) {
-	if (!isLoad && !threadLoadFlg) {
-		this->fileName = filePath;
+	if (!isLoad_ && !threadLoadFlg_) {
+		this->fileName_ = filePath;
 
 		DirectX::ScratchImage mipImages = LoadTexture(filePath);
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-		size = { static_cast<float>(metadata.width),static_cast<float>(metadata.height) };
-		textureResouce = CreateTextureResource(metadata);
+		size_ = { static_cast<float>(metadata.width),static_cast<float>(metadata.height) };
+		textureResouce_ = CreateTextureResource(metadata);
 
-		if (textureResouce && !DirectXCommand::GetInstance()->GetIsCloseCommandList()) {
-			intermediateResource = UploadTextureData(textureResouce.Get(), mipImages);
+		if (textureResouce_ && !DirectXCommand::GetInstance()->GetIsCloseCommandList()) {
+			intermediateResource_ = UploadTextureData(textureResouce_.Get(), mipImages);
 		}
 		else {
 			return;
 		}
 
-		srvDesc.Format = metadata.format;
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+		srvDesc_.Format = metadata.format;
+		srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc_.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 		// load済み
-		isLoad = true;
+		isLoad_ = true;
 	}
 }
 
 void Texture::Load(const std::string& filePath, ID3D12GraphicsCommandList* commandList) {
-	if (!isLoad && !threadLoadFlg) {
-		this->fileName = filePath;
+	if (!isLoad_ && !threadLoadFlg_) {
+		this->fileName_ = filePath;
 
 		DirectX::ScratchImage mipImages = LoadTexture(filePath);
 		const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-		size = { static_cast<float>(metadata.width),static_cast<float>(metadata.height) };
-		textureResouce = CreateTextureResource(metadata);
+		size_ = { static_cast<float>(metadata.width),static_cast<float>(metadata.height) };
+		textureResouce_ = CreateTextureResource(metadata);
 
-		if (textureResouce) {
-			intermediateResource = UploadTextureData(textureResouce.Get(), mipImages, commandList);
+		if (textureResouce_) {
+			intermediateResource_ = UploadTextureData(textureResouce_.Get(), mipImages, commandList);
 		}
 		else {
 			return;
 		}
 
-		srvDesc.Format = metadata.format;
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+		srvDesc_.Format = metadata.format;
+		srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc_.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 		// load済み
-		isLoad = true;
+		isLoad_ = true;
 	}
 }
 
 void Texture::Unload() {
-	if (isLoad) {
-		srvDesc = {};
+	if (isLoad_) {
+		srvDesc_ = {};
 
-		if (intermediateResource) {
-			intermediateResource->Release();
-			intermediateResource.Reset();
+		if (intermediateResource_) {
+			intermediateResource_->Release();
+			intermediateResource_.Reset();
 		}
-		if (textureResouce) {
-			textureResouce->Release();
-			textureResouce.Reset();
+		if (textureResouce_) {
+			textureResouce_->Release();
+			textureResouce_.Reset();
 		}
 
-		CbvSrvUavHeap::GetInstance()->ReleaseView(srvHeapHandleUint);
+		CbvSrvUavHeap::GetInstance()->ReleaseView(srvHeapHandleUint_);
 
 		// Unload済み
-		isLoad = false;
+		isLoad_ = false;
 	}
 }
 
 
 DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 	if (!std::filesystem::exists(std::filesystem::path(filePath))) {
-		Log::ErrorLog("This file is not exist -> " + filePath, "LoadTexture()", "Texture");
+		Lamb::ErrorLog("This file is not exist -> " + filePath, "LoadTexture()", "Texture");
 		return DirectX::ScratchImage();
 	}
 
@@ -123,7 +123,7 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 	std::wstring filePathW = ConvertString(filePath);
 	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("DirectX::LoadFromWICFile() failed", "LoadTexture()", "Texture");
+		Lamb::ErrorLog("DirectX::LoadFromWICFile() failed", "LoadTexture()", "Texture");
 		return DirectX::ScratchImage();
 	}
 
@@ -131,7 +131,7 @@ DirectX::ScratchImage Texture::LoadTexture(const std::string& filePath) {
 	DirectX::ScratchImage mipImages{};
 	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("DirectX::GenerateMipMaps failed", "LoadTexture()", "Texture");
+		Lamb::ErrorLog("DirectX::GenerateMipMaps failed", "LoadTexture()", "Texture");
 		return DirectX::ScratchImage();
 	}
 
@@ -172,7 +172,7 @@ ID3D12Resource* Texture::CreateTextureResource(const DirectX::TexMetadata& metaD
 		IID_PPV_ARGS(&resource)
 	);
 	if (hr != S_OK) {
-		Log::ErrorLog("somehitng error","CreateTextureResource", "Texture");
+		Lamb::ErrorLog("somehitng error","CreateTextureResource", "Texture");
 		return nullptr;
 	}
 	return resource;
@@ -237,24 +237,24 @@ void Texture::CreateSRVView(
 	UINT descHeapHandleUINT
 ) {
 	static ID3D12Device* device = DirectXDevice::GetInstance()->GetDevice();
-	device->CreateShaderResourceView(textureResouce.Get(), &srvDesc, descHeapHandle);
+	device->CreateShaderResourceView(textureResouce_.Get(), &srvDesc_, descHeapHandle);
 
-	srvHeapHandle = descHeapHandleGPU;
-	srvHeapHandleUint = descHeapHandleUINT;
+	srvHeapHandle_ = descHeapHandleGPU;
+	srvHeapHandleUint_ = descHeapHandleUINT;
 }
 
 
 void Texture::ReleaseIntermediateResource() {
-	if (intermediateResource) {
-		intermediateResource->Release();
-		intermediateResource.Reset();
+	if (intermediateResource_) {
+		intermediateResource_->Release();
+		intermediateResource_.Reset();
 	}
 }
 
 void Texture::Use(UINT rootParamator) {
 	static TextureManager* textureManager = TextureManager::GetInstance();
 	assert(textureManager);
-	textureManager->Use(srvHeapHandleUint, rootParamator);
+	textureManager->Use(srvHeapHandleUint_, rootParamator);
 }
 
 void Texture::Set(
@@ -265,17 +265,17 @@ void Texture::Set(
 ) {
 	if (CanUse()) {
 		CbvSrvUavHeap* srvHeap = CbvSrvUavHeap::GetInstance();
-		srvHeap->ReleaseView(srvHeapHandleUint);
-		textureResouce->Release();
-		textureResouce.Reset();
+		srvHeap->ReleaseView(srvHeapHandleUint_);
+		textureResouce_->Release();
+		textureResouce_.Reset();
 	}
 
 	resource->AddRef();
-	textureResouce = resource;
-	srvDesc = viewDesc;
-	srvHeapHandle = handle;
-	srvHeapHandleUint = handleUINT;
+	textureResouce_ = resource;
+	srvDesc_ = viewDesc;
+	srvHeapHandle_ = handle;
+	srvHeapHandleUint_ = handleUINT;
 
 	// load済み
-	isLoad = true;
+	isLoad_ = true;
 }

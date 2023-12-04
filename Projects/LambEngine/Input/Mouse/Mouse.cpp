@@ -4,85 +4,85 @@
 #include "Utils/ExecutionLog/ExecutionLog.h"
 
 
-Mouse* Mouse::instance = nullptr;
+Mouse* Mouse::instance_ = nullptr;
 
 void Mouse::Initialize(IDirectInput8* input) {
-	instance = new Mouse(input);
-	assert(instance);
-	if (!instance) {
-		Log::ErrorLog("instance failed", "Initialize()", "Mouse");
+	instance_ = new Mouse(input);
+	assert(instance_);
+	if (!instance_) {
+		Lamb::ErrorLog("instance failed", "Initialize()", "Mouse");
 		return;
 	}
 }
 
 
 void Mouse::Finalize() {
-	delete instance;
-	instance = nullptr;
+	delete instance_;
+	instance_ = nullptr;
 }
 
 Mouse::Mouse(IDirectInput8* input) :
-	mouse(),
-	mosueState(),
-	preMosueState(),
-	wheel(0),
-	initalizeSucceeded(false)
+	mouse_(),
+	mosueState_(),
+	preMosueState_(),
+	wheel_(0),
+	initalizeSucceeded_(false)
 {
 	assert(input);
-	HRESULT hr = input->CreateDevice(GUID_SysMouse, mouse.GetAddressOf(), NULL);
+	HRESULT hr = input->CreateDevice(GUID_SysMouse, mouse_.GetAddressOf(), NULL);
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("CreateDevice failed", "Constructor", "Mouse");
+		Lamb::ErrorLog("CreateDevice failed", "Constructor", "Mouse");
 		return;
 	}
 
-	hr = mouse->SetDataFormat(&c_dfDIMouse2);
+	hr = mouse_->SetDataFormat(&c_dfDIMouse2);
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("SetDataFormat failed", "Constructor", "Mouse");
+		Lamb::ErrorLog("SetDataFormat failed", "Constructor", "Mouse");
 		return;
 	}
 
-	hr = mouse->SetCooperativeLevel(WindowFactory::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	hr = mouse_->SetCooperativeLevel(WindowFactory::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("SetCooperativeLevel failed", "Constructor", "Mouse");
+		Lamb::ErrorLog("SetCooperativeLevel failed", "Constructor", "Mouse");
 		return;
 	}
 
-	initalizeSucceeded = true;
+	initalizeSucceeded_ = true;
 }
 
 Mouse::~Mouse() {
-	if (mouse) {
-		mouse->Unacquire();
+	if (mouse_) {
+		mouse_->Unacquire();
 	}
 }
 
 
 
 void Mouse::Input() {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return;
 	}
 
-	preMosueState = mosueState;
+	preMosueState_ = mosueState_;
 
-	mouse->Acquire();
+	mouse_->Acquire();
 
-	mosueState = {};
-	mouse->GetDeviceState(sizeof(DIMOUSESTATE2), &mosueState);
+	mosueState_ = {};
+	mouse_->GetDeviceState(sizeof(DIMOUSESTATE2), &mosueState_);
 
-	wheel += static_cast<size_t>(mosueState.lZ);
+	wheel_ += static_cast<size_t>(mosueState_.lZ);
 }
 
 bool Mouse::Pushed(Mouse::Button button) {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return false;
 	}
 
-	if ((mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
-		!(preMosueState.rgbButtons[uint8_t(button)] & 0x80))
+	if ((mosueState_.rgbButtons[uint8_t(button)] & 0x80) &&
+		!(preMosueState_.rgbButtons[uint8_t(button)] & 0x80))
 	{
 		return true;
 	}
@@ -91,12 +91,12 @@ bool Mouse::Pushed(Mouse::Button button) {
 }
 
 bool Mouse::LongPush(Mouse::Button button) {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return false;
 	}
 
-	if ((mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
-		(preMosueState.rgbButtons[uint8_t(button)] & 0x80))
+	if ((mosueState_.rgbButtons[uint8_t(button)] & 0x80) &&
+		(preMosueState_.rgbButtons[uint8_t(button)] & 0x80))
 	{
 		return true;
 	}
@@ -105,12 +105,12 @@ bool Mouse::LongPush(Mouse::Button button) {
 }
 
 bool Mouse::Releaed(Mouse::Button button) {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return false;
 	}
 
-	if (!(mosueState.rgbButtons[uint8_t(button)] & 0x80) &&
-		(preMosueState.rgbButtons[uint8_t(button)] & 0x80))
+	if (!(mosueState_.rgbButtons[uint8_t(button)] & 0x80) &&
+		(preMosueState_.rgbButtons[uint8_t(button)] & 0x80))
 	{
 		return true;
 	}
@@ -120,15 +120,15 @@ bool Mouse::Releaed(Mouse::Button button) {
 
 bool Mouse::PushAnyKey() {
 	for (size_t i = 0; i < 8; i++) {
-		if (mosueState.rgbButtons[i] != preMosueState.rgbButtons[i]) {
+		if (mosueState_.rgbButtons[i] != preMosueState_.rgbButtons[i]) {
 			return true;
 		}
 	}
 
 	if (
-		mosueState.lX != preMosueState.lX
-		|| mosueState.lY != preMosueState.lY
-		|| mosueState.lZ != preMosueState.lZ
+		mosueState_.lX != preMosueState_.lX
+		|| mosueState_.lY != preMosueState_.lY
+		|| mosueState_.lZ != preMosueState_.lZ
 		) {
 		return true;
 	}
@@ -137,28 +137,28 @@ bool Mouse::PushAnyKey() {
 }
 
 Vector2 Mouse::GetVelocity() {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return Vector2::zero;
 	}
-	return { static_cast<float>(mosueState.lX), -static_cast<float>(mosueState.lY) };
+	return { static_cast<float>(mosueState_.lX), -static_cast<float>(mosueState_.lY) };
 }
 
 float Mouse::GetWheel() {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return 0.0f;
 	}
-	return static_cast<float>(wheel);
+	return static_cast<float>(wheel_);
 }
 
 float Mouse::GetWheelVelocity() {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return 0.0f;
 	}
-	return static_cast<float>(mosueState.lZ);
+	return static_cast<float>(mosueState_.lZ);
 }
 
 Vector2 Mouse::GetPos() {
-	if (!initalizeSucceeded) {
+	if (!initalizeSucceeded_) {
 		return Vector2();
 	}
 

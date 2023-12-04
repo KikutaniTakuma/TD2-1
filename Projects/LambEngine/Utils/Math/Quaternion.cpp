@@ -6,8 +6,8 @@
 /// 静的メンバ定数
 /// ========================================================================
 #pragma region Constant Number
-const Quaternion Quaternion::identity = { 0.0f, 0.0f, 0.0f, 1.0f };
-const Quaternion Quaternion::zero = { 0.0f, 0.0f, 0.0f, 0.0f };
+const Quaternion Quaternion::kIdentity = { 0.0f, 0.0f, 0.0f, 1.0f };
+const Quaternion Quaternion::kZero = { 0.0f, 0.0f, 0.0f, 0.0f };
 #pragma endregion
 /// ========================================================================
 /// ========================================================================
@@ -18,7 +18,7 @@ const Quaternion Quaternion::zero = { 0.0f, 0.0f, 0.0f, 0.0f };
 /// ========================================================================
 #pragma region Constructor
 Quaternion::Quaternion():
-	m_{0.0f}
+	m{0.0f}
 {}
 
 Quaternion::Quaternion(const Quaternion& right):
@@ -39,16 +39,16 @@ Quaternion::Quaternion(const Vector4& right):
 }
 
 Quaternion::Quaternion(const Vector3& right, float w) {
-	vector_.vector3_ = right;
-	vector_.w_ = w;
+	vector.vector3 = right;
+	vector.w = w;
 }
 
 Quaternion::Quaternion(const std::array<float, 4>& right) {
-	m_ = right;
+	m = right;
 }
 
 Quaternion::Quaternion(float x, float y, float z, float w) {
-	m_ = { x,y,z,w };
+	m = { x,y,z,w };
 }
 #pragma endregion
 /// ========================================================================
@@ -60,18 +60,18 @@ Quaternion::Quaternion(float x, float y, float z, float w) {
 /// ========================================================================
 #pragma region Copy operator
 Quaternion& Quaternion::operator=(const Quaternion& right) {
-	m_ = right.m_;
+	m = right.m;
 
 	return *this;
 }
 Quaternion& Quaternion::operator=(Quaternion&& right)noexcept {
-	m_ = std::move(right.m_);
+	m = std::move(right.m);
 
 	return *this;
 }
 
 Quaternion& Quaternion::operator=(const Vector4& right) {
-	m_ = right.m;
+	m = right.m;
 
 	return *this;
 }
@@ -88,7 +88,7 @@ Quaternion Quaternion::operator+() const {
 	return *this;
 }
 Quaternion Quaternion::operator-() const {
-	return Quaternion{ -m_[0],-m_[1],-m_[2],-m_[3] };
+	return Quaternion{ -m[0],-m[1],-m[2],-m[3] };
 }
 #pragma endregion
 /// ========================================================================
@@ -103,8 +103,8 @@ Quaternion Quaternion::operator*(const Quaternion& right) const {
 	Quaternion result;
 
 	result = Quaternion{
-		vector_.vector3_.Cross(right.vector_.vector3_) + vector_.vector3_ * right.vector_.w_ + right.vector_.vector3_ * vector_.w_,
-		vector_.w_ * right.vector_.w_ - vector_.vector3_.Dot(right.vector_.vector3_)
+		vector.vector3.Cross(right.vector.vector3) + vector.vector3 * right.vector.w + right.vector.vector3 * vector.w,
+		vector.w * right.vector.w - vector.vector3.Dot(right.vector.vector3)
 	};
 
 	return result;
@@ -126,7 +126,7 @@ Quaternion& Quaternion::operator*=(const Quaternion& right) {
 Quaternion Quaternion::operator+(const Quaternion& right) const {
 	Quaternion result;
 
-	result = vector4_ + right.vector4_;
+	result = vector4 + right.vector4;
 
 	return result;
 }
@@ -147,7 +147,7 @@ Quaternion& Quaternion::operator+=(const Quaternion& right) {
 Quaternion Quaternion::operator-(const Quaternion& right) const {
 	Quaternion result;
 
-	result = vector4_ - right.vector4_;
+	result = vector4 - right.vector4;
 
 	return result;
 }
@@ -168,7 +168,7 @@ Quaternion& Quaternion::operator-=(const Quaternion& right) {
 Quaternion Quaternion::operator*(float right) const {
 	Quaternion result{ *this };
 
-	result.vector4_ *= right;
+	result.vector4 *= right;
 
 	return result;
 }
@@ -202,10 +202,10 @@ Quaternion& Quaternion::operator/=(float right) {
 /// ========================================================================
 #pragma region Equal operator
 bool Quaternion::operator==(const Quaternion& right) const {
-	return m_ == right.m_;
+	return m == right.m;
 }
 bool Quaternion::operator!=(const Quaternion& right) const {
-	return m_ != right.m_;
+	return m != right.m;
 }
 #pragma endregion
 /// ========================================================================
@@ -218,11 +218,11 @@ bool Quaternion::operator!=(const Quaternion& right) const {
 /// ========================================================================
 #pragma region Member function
 Quaternion Quaternion::Conjugate() const {
-	return Quaternion{ -vector_.vector3_, vector_.w_ };
+	return Quaternion{ -vector.vector3, vector.w };
 }
 
 float Quaternion::Dot(const Quaternion& other) const {
-	return _mm_cvtss_f32(_mm_dp_ps(m128_, other.m128_, 0xff));
+	return _mm_cvtss_f32(_mm_dp_ps(m128, other.m128, 0xff));
 }
 
 float Quaternion::Length() const {
@@ -230,7 +230,7 @@ float Quaternion::Length() const {
 }
 
 Quaternion Quaternion::Normalize() const {
-	if (*this == Quaternion::zero) {
+	if (*this == Quaternion::kZero) {
 		return *this;
 	}
 
@@ -247,24 +247,24 @@ Mat4x4 Quaternion::GetMatrix() const {
 	Mat4x4 result = Mat4x4{
 		std::array<Vector4, 4>{
 			Vector4{
-				std::pow(quaternion_.w_, 2.0f) + std::pow(quaternion_.x_, 2.0f) - std::pow(quaternion_.y_, 2.0f) - std::pow(quaternion_.z_, 2.0f),
-				2.0f * (quaternion_.x_ * quaternion_.y_ + quaternion_.w_ * quaternion_.z_),
-				2.0f * (quaternion_.x_ * quaternion_.z_ - quaternion_.w_ * quaternion_.y_),
+				std::pow(quaternion.w, 2.0f) + std::pow(quaternion.x, 2.0f) - std::pow(quaternion.y, 2.0f) - std::pow(quaternion.z, 2.0f),
+				2.0f * (quaternion.x * quaternion.y + quaternion.w * quaternion.z),
+				2.0f * (quaternion.x * quaternion.z - quaternion.w * quaternion.y),
 				0.0f
 			},
 			Vector4{
-				2.0f * (quaternion_.x_ * quaternion_.y_ - quaternion_.w_ * quaternion_.z_),
-				std::pow(quaternion_.w_, 2.0f) - std::pow(quaternion_.x_, 2.0f) + std::pow(quaternion_.y_, 2.0f) - std::pow(quaternion_.z_, 2.0f),
-				2.0f * (quaternion_.y_ * quaternion_.z_ + quaternion_.w_ * quaternion_.x_),
+				2.0f * (quaternion.x * quaternion.y - quaternion.w * quaternion.z),
+				std::pow(quaternion.w, 2.0f) - std::pow(quaternion.x, 2.0f) + std::pow(quaternion.y, 2.0f) - std::pow(quaternion.z, 2.0f),
+				2.0f * (quaternion.y * quaternion.z + quaternion.w * quaternion.x),
 				0.0f
 			},
 			Vector4{
-				2.0f * (quaternion_.x_ * quaternion_.z_ + quaternion_.w_ * quaternion_.y_),
-				2.0f * (quaternion_.y_ * quaternion_.z_ - quaternion_.w_ * quaternion_.x_),
-				std::pow(quaternion_.w_, 2.0f) - std::pow(quaternion_.x_, 2.0f) - std::pow(quaternion_.y_, 2.0f) + std::pow(quaternion_.z_, 2.0f),
+				2.0f * (quaternion.x * quaternion.z + quaternion.w * quaternion.y),
+				2.0f * (quaternion.y * quaternion.z - quaternion.w * quaternion.x),
+				std::pow(quaternion.w, 2.0f) - std::pow(quaternion.x, 2.0f) - std::pow(quaternion.y, 2.0f) + std::pow(quaternion.z, 2.0f),
 				0.0f
 			},
-			Vector4::wIdy
+			Vector4::kWIndentity
 		}
 	};
 
@@ -282,8 +282,8 @@ Mat4x4 Quaternion::GetMatrix() const {
 #pragma region Static member function
 Quaternion Quaternion::MakeRotateAxisAngle(const Vector3& axis, float angle) {
 	Quaternion result;
-	result.vector_.w_ = std::cos(angle * 0.5f);
-	result.vector_.vector3_ = axis * std::sin(angle * 0.5f);
+	result.vector.w = std::cos(angle * 0.5f);
+	result.vector.vector3 = axis * std::sin(angle * 0.5f);
 
 	return result;
 }

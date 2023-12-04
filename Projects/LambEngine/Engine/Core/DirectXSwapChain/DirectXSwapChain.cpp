@@ -45,7 +45,7 @@ DirectXSwapChain::DirectXSwapChain():
 	HRESULT hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, WindowFactory::GetInstance()->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("something error", "CreateSwapChainForHwnd()", "DirectXSwapChain");
+		Lamb::ErrorLog("something error", "CreateSwapChainForHwnd()", "DirectXSwapChain");
 		return;
 	}
 

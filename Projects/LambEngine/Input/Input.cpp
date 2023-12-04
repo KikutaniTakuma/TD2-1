@@ -26,10 +26,10 @@ Input::Input():
 	);
 	assert(SUCCEEDED(hr));
 	if (SUCCEEDED(hr)) {
-		Log::AddLog("DirectInput create succeeded\n");
+		Lamb::AddLog("DirectInput create succeeded\n");
 	}
 	else {
-		Log::ErrorLog("DirectInput8Create() Failed", "InitializeInput()", "Engine");
+		Lamb::ErrorLog("DirectInput8Create() Failed", "InitializeInput()", "Engine");
 		return;
 	}
 

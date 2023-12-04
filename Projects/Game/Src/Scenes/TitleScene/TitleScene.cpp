@@ -48,7 +48,7 @@ void TitleScene::Initialize() {
 
 	player_.LoadObj("./Resources/Player/player.obj");
 	player_.light.ligDirection = { 0.0f, 0.0f, 1.0f };
-	player_.light.ligColor = Vector3::identity;
+	player_.light.ligColor = Vector3::kIdentity;
 	player_.light.ptRange = std::numeric_limits<float>::max();
 	player_.scale *= 60.0f;
 	player_.pos.x = -400.0f;
@@ -213,8 +213,8 @@ void TitleScene::Update() {
 	
 	aButtonHud_.Update();
 	spaceHud_.Update();
-	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
-	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
+	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::kIdentity, Vector4{ Vector3::kIdentity, 0.2f }));
+	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::kIdentity, Vector4{ Vector3::kIdentity, 0.2f }));
 	startHud_.Update();
 
 	hudAlphaEase_.Update();

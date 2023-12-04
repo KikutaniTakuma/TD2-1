@@ -21,20 +21,20 @@ ShaderManager::ShaderManager() {
 	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(dxcUtils_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("dxcUtils failed", "DxcCreateInstance()","ShaderManager");
+		Lamb::ErrorLog("dxcUtils failed", "DxcCreateInstance()","ShaderManager");
 	}
 
 	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(dxcCompiler_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("dxcCompiler failed", "DxcCreateInstance() ", "ShaderManager");
+		Lamb::ErrorLog("dxcCompiler failed", "DxcCreateInstance() ", "ShaderManager");
 	}
 
 	includeHandler_ = nullptr;
 	hr = dxcUtils_->CreateDefaultIncludeHandler(includeHandler_.GetAddressOf());
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("IDxcUtils failed", "CreateDefaultIncludeHandler()" "ShaderManager");
+		Lamb::ErrorLog("IDxcUtils failed", "CreateDefaultIncludeHandler()" "ShaderManager");
 	}
 }
 
@@ -59,14 +59,14 @@ IDxcBlob* ShaderManager::CompilerShader(
 {
 	// 1. hlslファイルを読む
 	// これからシェーダーをコンパイルする旨をログに出す
-	Log::AddLog(ConvertString(std::format(L"Begin CompilerShader, path:{}, profile:{}\n", filePath, profile)));
+	Lamb::AddLog(ConvertString(std::format(L"Begin CompilerShader, path:{}, profile:{}\n", filePath, profile)));
 	// hlslファイルを読む
 	Microsoft::WRL::ComPtr<IDxcBlobEncoding> shaderSource;
 	HRESULT hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, shaderSource.GetAddressOf());
 	// 読めなかったら止める
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("Shader Load failed", "CompilerShader", "ShaderManager");
+		Lamb::ErrorLog("Shader Load failed", "CompilerShader", "ShaderManager");
 	}
 	// 読み込んだファイルの内容を設定する
 	DxcBuffer shaderSourceBuffer;
@@ -97,12 +97,12 @@ IDxcBlob* ShaderManager::CompilerShader(
 	// コンパイルエラーではなくdxcが起動できないなど致命的な状況
 	assert(SUCCEEDED(hr));
 	if (!SUCCEEDED(hr)) {
-		Log::ErrorLog("Danger!! Cannot use ""dxc""", "CompilerShader", "ShaderManager");
+		Lamb::ErrorLog("Danger!! Cannot use ""dxc""", "CompilerShader", "ShaderManager");
 		return nullptr;
 	}
 
 	if (!shaderResult) {
-		Log::ErrorLog("Create ShaderResult failed", "CompilerShader", "ShaderManager");
+		Lamb::ErrorLog("Create ShaderResult failed", "CompilerShader", "ShaderManager");
 		return nullptr;
 	}
 
@@ -111,7 +111,7 @@ IDxcBlob* ShaderManager::CompilerShader(
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(shaderError.GetAddressOf()), nullptr);
 	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
 		//Log::AddLog(shaderError->GetStringPointer());
-		Log::ErrorLog(shaderError->GetStringPointer(), "CompilerShader", "ShaderManager");
+		Lamb::ErrorLog(shaderError->GetStringPointer(), "CompilerShader", "ShaderManager");
 		// 警告・エラーダメゼッタイ
 		assert(false);
 		return nullptr;
@@ -122,7 +122,7 @@ IDxcBlob* ShaderManager::CompilerShader(
 	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
 	assert(SUCCEEDED(hr));
 	// 成功したログを出す
-	Log::AddLog(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
+	Lamb::AddLog(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
 
 	// 実行用バイナリをリターン
 	return shaderBlob;

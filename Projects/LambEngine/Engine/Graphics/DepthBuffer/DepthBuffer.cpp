@@ -22,7 +22,7 @@ DepthBuffer::DepthBuffer():
 	assert(depthStencilResource_);
 	if (!depthStencilResource_) {
 		assert(!"depthStencilResource failed");
-		Log::ErrorLog("something error","CreateDepthStencilTextureResource()", "DepthBuffer");
+		Lamb::ErrorLog("something error","CreateDepthStencilTextureResource()", "DepthBuffer");
 		return;
 	}
 
@@ -50,7 +50,7 @@ DepthBuffer::DepthBuffer(const Vector2& bufSize):
 	assert(depthStencilResource_);
 	if (!depthStencilResource_) {
 		assert(!"depthStencilResource failed");
-		Log::ErrorLog("something error", "CreateDepthStencilTextureResource()", "DepthBuffer");
+		Lamb::ErrorLog("something error", "CreateDepthStencilTextureResource()", "DepthBuffer");
 		return;
 	}
 

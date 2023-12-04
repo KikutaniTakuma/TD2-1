@@ -68,11 +68,11 @@ private:
 
 
 public:
-	Vector2 pos_;
-	float rotation_;
-	Vector2 scale_;
-	uint32_t color_;
-	bool isHorizontal_;
+	Vector2 pos;
+	float rotation;
+	Vector2 scale;
+	uint32_t color;
+	bool isHorizontal;
 
 public:
 	void SetFormat(const std::string& formatName);
