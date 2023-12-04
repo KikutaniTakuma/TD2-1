@@ -37,42 +37,42 @@ void StageSelect::Initialize() {
 	maxStage_ = static_cast<decltype(maxStage_)>(sceneManager_->isClearStage_.size());
 
 	moon_.LoadObj("./Resources/StageSelect/moon/moon.obj");
-	moon_.light_.ligDirection = { 0.0f, 0.0f, 1.0f };
-	moon_.light_.ligColor = Vector3::identity;
-	moon_.light_.ptRange = std::numeric_limits<float>::max();
-	moon_.rotate_.y = std::numbers::pi_v<float>;
-	moon_.scale_ *= 300.0f;
-	moon_.pos_.y = -360.0f;
-	moon_.rotate_.z = std::numbers::pi_v<float> / 10.0f * static_cast<float>(maxStage_ - currentStage_);
+	moon_.light.ligDirection = { 0.0f, 0.0f, 1.0f };
+	moon_.light.ligColor = Vector3::identity;
+	moon_.light.ptRange = std::numeric_limits<float>::max();
+	moon_.rotate.y = std::numbers::pi_v<float>;
+	moon_.scale *= 300.0f;
+	moon_.pos.y = -360.0f;
+	moon_.rotate.z = std::numbers::pi_v<float> / 10.0f * static_cast<float>(maxStage_ - currentStage_);
 
 	player_.LoadObj("./Resources/Player/player.obj");
-	player_.light_.ligDirection = { 0.0f, 0.0f, 1.0f };
-	player_.light_.ligColor = Vector3::identity;
-	player_.light_.ptRange = std::numeric_limits<float>::max();
-	player_.pos_.y = -63.0f;
-	player_.pos_.z = -800.0f;
-	player_.rotate_.y = std::numbers::pi_v<float>;
-	player_.rotate_.x = 0.19f;
-	player_.scale_ *= 40.0f;
+	player_.light.ligDirection = { 0.0f, 0.0f, 1.0f };
+	player_.light.ligColor = Vector3::identity;
+	player_.light.ptRange = std::numeric_limits<float>::max();
+	player_.pos.y = -63.0f;
+	player_.pos.z = -800.0f;
+	player_.rotate.y = std::numbers::pi_v<float>;
+	player_.rotate.x = 0.19f;
+	player_.scale *= 40.0f;
 
 	playerScaleEaseDuration_ = {
 		std::pair<Vector2, Vector2>{
-		Vector2{player_.scale_.x * 1.0f, player_.scale_.y * 1.0f},
-		Vector2{player_.scale_.x * 1.25f, player_.scale_.y * 0.75f}
+		Vector2{player_.scale.x * 1.0f, player_.scale.y * 1.0f},
+		Vector2{player_.scale.x * 1.25f, player_.scale.y * 0.75f}
 		},
 		std::pair<Vector2, Vector2>{
-		Vector2{player_.scale_.x * 1.25f, player_.scale_.y * 0.75f},
-		Vector2{player_.scale_.x * 0.75f, player_.scale_.y * 1.25f}
+		Vector2{player_.scale.x * 1.25f, player_.scale.y * 0.75f},
+		Vector2{player_.scale.x * 0.75f, player_.scale.y * 1.25f}
 		},
 		std::pair<Vector2, Vector2>{
-		Vector2{player_.scale_.x * 0.75f, player_.scale_.y * 1.25f},
-		Vector2{player_.scale_.x * 1.0f, player_.scale_.y * 1.0f}
+		Vector2{player_.scale.x * 0.75f, player_.scale.y * 1.25f},
+		Vector2{player_.scale.x * 1.0f, player_.scale.y * 1.0f}
 		}
 	};
 
 	currentPlayerEaseing_ = 0;
 
-	playerNormalMove_ = { player_.pos_.y - 5.0f,player_.pos_.y + 5.0f };
+	playerNormalMove_ = { player_.pos.y - 5.0f,player_.pos.y + 5.0f };
 
 	playerAnimationTex_.reserve(5);
 	playerAnimationTex_.push_back(textureManager_->LoadTexture("./Resources/Player/player_face.png"));
@@ -96,89 +96,89 @@ void StageSelect::Initialize() {
 
 	
 	bubble_.LoadTexture("./Resources/StageSelect/hukidasi_stageSelect.png");
-	bubble_.isSameTexSize_ = true;
-	bubble_.texScalar_ = 0.48f;
-	bubble_.pos_.y = 110.0f;
-	bubbleY_.first = bubble_.pos_.y - 10.0f;
-	bubbleY_.second = bubble_.pos_.y + 10.0f;
+	bubble_.isSameTexSize = true;
+	bubble_.texScalar = 0.48f;
+	bubble_.pos.y = 110.0f;
+	bubbleY_.first = bubble_.pos.y - 10.0f;
+	bubbleY_.second = bubble_.pos.y + 10.0f;
 	bubbleEase_.Start(true, 0.5f, Easing::OutQuad);
 
 
 	// 背景の設定
 	Vector2 windowSize = WindowFactory::GetInstance()->GetClientSize();
 	for (size_t i = 0; i < backGround_.size(); i++) {
-		backGround_[i].scale_ =
+		backGround_[i].scale =
 		{
 			windowSize.x,
 			windowSize.y / 3.0f
 		};
-		backGround_[i].pos_.y = -windowSize.y / 3.0f + ((windowSize.y / 3.0f) * i);
+		backGround_[i].pos.y = -windowSize.y / 3.0f + ((windowSize.y / 3.0f) * i);
 	}
 
 	// 背景の色設定
-	backGround_[0].color_ = 0x90f6eeff;
-	backGround_[1].color_ = 0x39f2e3ff;
-	backGround_[2].color_ = 0x0ff4daff;
+	backGround_[0].color = 0x90f6eeff;
+	backGround_[1].color = 0x39f2e3ff;
+	backGround_[2].color = 0x0ff4daff;
 
 	// 背景にブラーをかける
 	backGroundBlur_.Initialize(
 		"./Resources/Shaders/PostShader/Post.VS.hlsl",
 		"./Resources/Shaders/PostShader/PostHeightBlur.PS.hlsl"
 	);
-	backGroundBlur_.scale_ = WindowFactory::GetInstance()->GetClientSize();
+	backGroundBlur_.scale = WindowFactory::GetInstance()->GetClientSize();
 
 	stageNumberTex_.LoadTexture("./Resources/Result/number.png");
-	stageNumberTex_.uvSize_.x = 0.1f;
-	stageNumberTex_.color_ = 0xce591dff;
-	stageNumberTex_.scale_ *= 70.0f;
-	stageNumberTex_.pos_.x = 36.0f;
-	stageNumberTex_.pos_.y = 77.0f;
+	stageNumberTex_.uvSize.x = 0.1f;
+	stageNumberTex_.color = 0xce591dff;
+	stageNumberTex_.scale *= 70.0f;
+	stageNumberTex_.pos.x = 36.0f;
+	stageNumberTex_.pos.y = 77.0f;
 	stageTenNumberTex_.LoadTexture("./Resources/Result/number.png");
-	stageTenNumberTex_.uvSize_.x = 0.1f;
-	stageTenNumberTex_.color_ = 0xce591dff;
-	stageTenNumberTex_.scale_ *= 70.0f;
-	stageTenNumberTex_.pos_.x = -36.0f;
-	stageTenNumberTex_.pos_.y = stageNumberTex_.pos_.y;
-	stageNumberTexY_ = { stageNumberTex_.pos_.y - 10.0f, stageNumberTex_.pos_.y + 10.0f };
+	stageTenNumberTex_.uvSize.x = 0.1f;
+	stageTenNumberTex_.color = 0xce591dff;
+	stageTenNumberTex_.scale *= 70.0f;
+	stageTenNumberTex_.pos.x = -36.0f;
+	stageTenNumberTex_.pos.y = stageNumberTex_.pos.y;
+	stageNumberTexY_ = { stageNumberTex_.pos.y - 10.0f, stageNumberTex_.pos.y + 10.0f };
 
 	stageTex_.LoadTexture("./Resources/StageSelect/stageSelect_UI_stage.png");
-	stageTex_.isSameTexSize_ = true;
-	stageTex_.texScalar_ = 0.48f;
-	stageTex_.pos_.y = 130.0f;
-	stageTexY_.first = stageTex_.pos_.y - 10.0f;
-	stageTexY_.second = stageTex_.pos_.y + 10.0f;
+	stageTex_.isSameTexSize = true;
+	stageTex_.texScalar = 0.48f;
+	stageTex_.pos.y = 130.0f;
+	stageTexY_.first = stageTex_.pos.y - 10.0f;
+	stageTexY_.second = stageTex_.pos.y + 10.0f;
 
 	arrowRight_.LoadTexture("./Resources/StageSelect/arrow.png");
-	arrowRight_.pos_ = Vector2{ 282.0f, 34.0f };
-	arrowRight_.isSameTexSize_ = true;
-	arrowRight_.texScalar_ = 0.41f;
-	arrowRight_.rotate_.z = 0.28f;
+	arrowRight_.pos = Vector2{ 282.0f, 34.0f };
+	arrowRight_.isSameTexSize = true;
+	arrowRight_.texScalar = 0.41f;
+	arrowRight_.rotate.z = 0.28f;
 	arrowRightPos_ = 
 	{ 
-		Vector3{arrowRight_.pos_.x-5.0f, arrowRight_.pos_.y+5.0f, arrowRight_.pos_.z },
-		Vector3{arrowRight_.pos_.x + 10.0f, arrowRight_.pos_.y - 5.0f, arrowRight_.pos_.z }
+		Vector3{arrowRight_.pos.x-5.0f, arrowRight_.pos.y+5.0f, arrowRight_.pos.z },
+		Vector3{arrowRight_.pos.x + 10.0f, arrowRight_.pos.y - 5.0f, arrowRight_.pos.z }
 	};
 	arrowLeft_.LoadTexture("./Resources/StageSelect/arrow.png");
-	arrowLeft_.pos_ = Vector2{ -282.0f, 34.0f };
-	arrowLeft_.isSameTexSize_ = true;
-	arrowLeft_.texScalar_ = 0.41f;
-	arrowLeft_.rotate_.z = -0.28f - std::numbers::pi_v<float>;
+	arrowLeft_.pos = Vector2{ -282.0f, 34.0f };
+	arrowLeft_.isSameTexSize = true;
+	arrowLeft_.texScalar = 0.41f;
+	arrowLeft_.rotate.z = -0.28f - std::numbers::pi_v<float>;
 	arrowLeftPos_ =
 	{
-		Vector3{arrowLeft_.pos_.x + 5.0f, arrowLeft_.pos_.y + 5.0f, arrowLeft_.pos_.z },
-		Vector3{arrowLeft_.pos_.x - 10.0f, arrowLeft_.pos_.y - 5.0f, arrowLeft_.pos_.z }
+		Vector3{arrowLeft_.pos.x + 5.0f, arrowLeft_.pos.y + 5.0f, arrowLeft_.pos.z },
+		Vector3{arrowLeft_.pos.x - 10.0f, arrowLeft_.pos.y - 5.0f, arrowLeft_.pos.z }
 	};
 
 	arrowEase_.Start(true, 0.8f, Easing::InOutSine);
 
 	isClearTex_.LoadTexture("./Resources/StageSelect/stageSelect_UI_clear1.png");
-	isClearTex_.isSameTexSize_ = true;
-	isClearTex_.texScalar_ = 0.47f;
-	isClearTex_.pos_ = Vector2{ 169.0f, 230.0f };
-	isClearTex_.rotate_.z = 0.43f;
+	isClearTex_.isSameTexSize = true;
+	isClearTex_.texScalar = 0.47f;
+	isClearTex_.pos = Vector2{ 169.0f, 230.0f };
+	isClearTex_.rotate.z = 0.43f;
 	isClearTexY_ = {
-		isClearTex_.pos_.y - 10.0f,
-		isClearTex_.pos_.y + 10.0f
+		isClearTex_.pos.y - 10.0f,
+		isClearTex_.pos.y + 10.0f
 	};
 
 	backGroundParticle_.LoadSettingDirectory("backGroundParticle");
@@ -191,25 +191,25 @@ void StageSelect::Initialize() {
 	backSE_ = audioManager_->LoadWav("./Resources/Audio/kouka/kouka/UI_modoru.wav", false);
 
 	aButtonHud_.LoadTexture("./Resources/HUD/controler_UI_A.png");
-	aButtonHud_.uvSize_.x = 0.5f;
-	aButtonHud_.scale_ = { 81.0f, 81.0f };
-	aButtonHud_.pos_.y = -182.0f;
+	aButtonHud_.uvSize.x = 0.5f;
+	aButtonHud_.scale = { 81.0f, 81.0f };
+	aButtonHud_.pos.y = -182.0f;
 	spaceHud_.LoadTexture("./Resources/HUD/keys_UI_space.png");
-	spaceHud_.uvSize_.x = 0.5f;
-	spaceHud_.scale_ = { 122.0f, 171.0f };
-	spaceHud_.pos_.y = -182.0f;
+	spaceHud_.uvSize.x = 0.5f;
+	spaceHud_.scale = { 122.0f, 171.0f };
+	spaceHud_.pos.y = -182.0f;
 	keyEscHud_.LoadTexture("./Resources/HUD/keys_UI_esc.png");
-	keyEscHud_.uvSize_.x = 0.5f;
-	keyEscHud_.scale_ = Vector2{ 115.0f, 113.0f };
-	keyEscHud_.pos_ = Vector2{ -555.0f,291.0f };
+	keyEscHud_.uvSize.x = 0.5f;
+	keyEscHud_.scale = Vector2{ 115.0f, 113.0f };
+	keyEscHud_.pos = Vector2{ -555.0f,291.0f };
 	padStartHud_.LoadTexture("./Resources/HUD/controler_UI_pose.png");
-	padStartHud_.uvSize_.x = 0.5f;
-	padStartHud_.scale_ = Vector2{ 70.0f, 70.0f };
-	padStartHud_.pos_ = Vector2{ -555.0f,291.0f };
+	padStartHud_.uvSize.x = 0.5f;
+	padStartHud_.scale = Vector2{ 70.0f, 70.0f };
+	padStartHud_.pos = Vector2{ -555.0f,291.0f };
 	backToHud_.LoadTexture("./Resources/HUD/stageSelect_UI_titlehe.png");
-	backToHud_.isSameTexSize_ = true;
-	backToHud_.texScalar_ = 0.25f;
-	backToHud_.pos_ = Vector2{ -549.0f, 232.0f };
+	backToHud_.isSameTexSize = true;
+	backToHud_.texScalar = 0.25f;
+	backToHud_.pos = Vector2{ -549.0f, 232.0f };
 
 	hudAlphaEase_.Start(true, 1.0f, Easing::InOutQuad);
 }
@@ -236,7 +236,7 @@ void StageSelect::Update() {
 	{
 		currentStage_++;
 		rotateEase_.Start(false, 0.2f, Easing::OutElastic);
-		moonRotateY_.first = moon_.rotate_.z;
+		moonRotateY_.first = moon_.rotate.z;
 
 		choiceSE_->Start(0.25f);
 
@@ -260,7 +260,7 @@ void StageSelect::Update() {
 	{
 		currentStage_--;
 		rotateEase_.Start(false, 0.2f, Easing::OutElastic);
-		moonRotateY_.first = moon_.rotate_.z;
+		moonRotateY_.first = moon_.rotate.z;
 
 		choiceSE_->Start(0.25f);
 
@@ -282,23 +282,23 @@ void StageSelect::Update() {
 	moonRotateY_.second = std::numbers::pi_v<float> / 10.0f * static_cast<float>(maxStage_ - currentStage_);
 
 	
-	stageNumberTex_.uvPibot_.x = static_cast<float>(currentStage_) * 0.1f;
+	stageNumberTex_.uvPibot.x = static_cast<float>(currentStage_) * 0.1f;
 	if (maxStage_ == currentStage_) {
-		stageTenNumberTex_.uvPibot_.x = 0.1f;
+		stageTenNumberTex_.uvPibot.x = 0.1f;
 	}
 	else {
-		stageTenNumberTex_.uvPibot_.x = 0.0f;
+		stageTenNumberTex_.uvPibot.x = 0.0f;
 	}
 
 	if (rotateEase_.ActiveEnter() || rotateEase_.ActiveStay()) {
-		moon_.rotate_.z = rotateEase_.Get(moonRotateY_.first, moonRotateY_.second);
+		moon_.rotate.z = rotateEase_.Get(moonRotateY_.first, moonRotateY_.second);
 	}
 
 	for (auto& i : backGround_) {
 		i.Update();
 	}
 	
-	player_.scale_ = playerEase_[currentPlayerEaseing_].Get(playerScaleEaseDuration_[currentPlayerEaseing_].first, playerScaleEaseDuration_[currentPlayerEaseing_].second);
+	player_.scale = playerEase_[currentPlayerEaseing_].Get(playerScaleEaseDuration_[currentPlayerEaseing_].first, playerScaleEaseDuration_[currentPlayerEaseing_].second);
 	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
 		isPlayerAnimationCoolTime_ = false;
 	}
@@ -320,30 +320,30 @@ void StageSelect::Update() {
 		player_.ChangeTexture("face", playerAnimationTex_[currentPlayerAnimation_]);
 		playerAnimationStartTime_ = nowTime;
 	}
-	player_.pos_.y = bubbleEase_.Get(playerNormalMove_.first, playerNormalMove_.second);
+	player_.pos.y = bubbleEase_.Get(playerNormalMove_.first, playerNormalMove_.second);
 
 	player_.Update();
 
 	moon_.Update();
 	
-	bubble_.pos_.y = bubbleEase_.Get(bubbleY_.first, bubbleY_.second);
+	bubble_.pos.y = bubbleEase_.Get(bubbleY_.first, bubbleY_.second);
 	bubble_.Update();
 	
-	stageNumberTex_.pos_.y = bubbleEase_.Get(stageNumberTexY_.first, stageNumberTexY_.second);
+	stageNumberTex_.pos.y = bubbleEase_.Get(stageNumberTexY_.first, stageNumberTexY_.second);
 	stageNumberTex_.Update();
-	stageTenNumberTex_.pos_.y = bubbleEase_.Get(stageNumberTexY_.first, stageNumberTexY_.second);
+	stageTenNumberTex_.pos.y = bubbleEase_.Get(stageNumberTexY_.first, stageNumberTexY_.second);
 	stageTenNumberTex_.Update();
 	
-	stageTex_.pos_.y = bubbleEase_.Get(stageTexY_.first, stageTexY_.second);
+	stageTex_.pos.y = bubbleEase_.Get(stageTexY_.first, stageTexY_.second);
 	stageTex_.Update();
 
-	arrowRight_.pos_ = arrowEase_.Get(arrowRightPos_.first, arrowRightPos_.second);
+	arrowRight_.pos = arrowEase_.Get(arrowRightPos_.first, arrowRightPos_.second);
 	arrowRight_.Update();
-	arrowLeft_.pos_ = arrowEase_.Get(arrowLeftPos_.first, arrowLeftPos_.second);
+	arrowLeft_.pos = arrowEase_.Get(arrowLeftPos_.first, arrowLeftPos_.second);
 	arrowLeft_.Update();
 
 
-	isClearTex_.pos_.y = bubbleEase_.Get(isClearTexY_.first, isClearTexY_.second);
+	isClearTex_.pos.y = bubbleEase_.Get(isClearTexY_.first, isClearTexY_.second);
 	isClearTex_.Update();
 
 	rotateEase_.Update();
@@ -379,30 +379,30 @@ void StageSelect::Update() {
 
 	if (input_->GetKey()->GetKey(DIK_SPACE) ||
 		input_->GetGamepad()->GetButton(Gamepad::Button::A)) {
-		aButtonHud_.uvPibot_.x = 0.5f;
-		spaceHud_.uvPibot_.x = 0.5f;
+		aButtonHud_.uvPibot.x = 0.5f;
+		spaceHud_.uvPibot.x = 0.5f;
 	}
 	else {
-		aButtonHud_.uvPibot_.x = 0.0f;
-		spaceHud_.uvPibot_.x = 0.0f;
+		aButtonHud_.uvPibot.x = 0.0f;
+		spaceHud_.uvPibot.x = 0.0f;
 	}
 	aButtonHud_.Update();
 	spaceHud_.Update();
-	aButtonHud_.color_ = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
-	spaceHud_.color_ = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
+	aButtonHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
+	spaceHud_.color = Vector4ToUint(hudAlphaEase_.Get(Vector4::identity, Vector4{ Vector3::identity, 0.2f }));
 	hudAlphaEase_.Update();
 
 	if (input_->GetGamepad()->GetButton(Gamepad::Button::START)) {
-		padStartHud_.uvPibot_.x = 0.5f;
+		padStartHud_.uvPibot.x = 0.5f;
 	}
 	else {
-		padStartHud_.uvPibot_.x = 0.0f;
+		padStartHud_.uvPibot.x = 0.0f;
 	}
 	if (input_->GetKey()->GetKey(DIK_ESCAPE)) {
-		keyEscHud_.uvPibot_.x = 0.5f;
+		keyEscHud_.uvPibot.x = 0.5f;
 	}
 	else {
-		keyEscHud_.uvPibot_.x = 0.0f;
+		keyEscHud_.uvPibot.x = 0.0f;
 	}
 	padStartHud_.Update();
 	keyEscHud_.Update();

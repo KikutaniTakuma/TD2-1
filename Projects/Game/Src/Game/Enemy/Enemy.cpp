@@ -46,15 +46,15 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 		models_.push_back(std::make_unique<Model>());
 	}
 	models_[static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Enemy/enemy.obj");
-	models_[static_cast<uint16_t>(Parts::kMain)]->light_.ligDirection = { 0.0f,0.0f,1.0f };
-	models_[static_cast<uint16_t>(Parts::kMain)]->light_.ligColor = { 1.0f,1.0f,1.0f };
-	models_[static_cast<uint16_t>(Parts::kMain)]->light_.ptRange = 10000.0f;
-	models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.y = std::numbers::pi_v<float>;
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
+	models_[static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
 	models_[static_cast<uint16_t>(Parts::kDoukasen)]->LoadObj("./Resources/Enemy/enemy_doukasen.obj");
-	models_[static_cast<uint16_t>(Parts::kDoukasen)]->light_.ligDirection = { 0.0f,0.0f,1.0f };
-	models_[static_cast<uint16_t>(Parts::kDoukasen)]->light_.ligColor = { 1.0f,1.0f,1.0f };
-	models_[static_cast<uint16_t>(Parts::kDoukasen)]->light_.ptRange = 10000.0f;
-	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate_.y = std::numbers::pi_v<float>;
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->light.ligColor = { 1.0f,1.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->light.ptRange = 10000.0f;
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate.y = std::numbers::pi_v<float>;
 
 	models_[static_cast<uint16_t>(Parts::kDoukasen)]->SetParent(models_[static_cast<uint16_t>(Parts::kMain)].get());
 
@@ -86,19 +86,19 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 		
 		velocity_ = {};
 
-		tex_->pos_ = firstPos_;
-		tex_->scale_ *= enemyScale_;
+		tex_->pos = firstPos_;
+		tex_->scale *= enemyScale_;
 		break;
 	case Enemy::Type::kWalk:
 
-		tex_->scale_ *= enemyScale_;
+		tex_->scale *= enemyScale_;
 		firstPos_ = pos;
-		firstPos_.y = layerY + tex_->scale_.y / 2.0f;
+		firstPos_.y = layerY + tex_->scale.y / 2.0f;
 		velocity_ = {};
 
-		tex_->pos_ = firstPos_;
-		tex_->rotate_.z = std::numbers::pi_v<float>;
-		models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = std::numbers::pi_v<float>;
+		tex_->pos = firstPos_;
+		tex_->rotate.z = std::numbers::pi_v<float>;
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
 
 		break;
 	case Enemy::Type::kEnd:
@@ -107,9 +107,9 @@ Enemy::Enemy(int type, const Vector3& pos, const float& layerY, int firstMoveVec
 		break;
 	}
 
-	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate_.y =Lamb::Random(0.0f, std::numbers::pi_v<float>);
-	models_[static_cast<uint16_t>(Parts::kDoukasen)]->scale_.x *= 2.0f;
-	models_[static_cast<uint16_t>(Parts::kDoukasen)]->scale_.z *= 2.0f;
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate.y =Lamb::Random(0.0f, std::numbers::pi_v<float>);
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->scale.x *= 2.0f;
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->scale.z *= 2.0f;
 	randRotate_ =Lamb::Random(std::numbers::pi_v<float> * 3.0f, std::numbers::pi_v<float> * 4.0f);
 
 	tex_->Update();
@@ -235,8 +235,8 @@ void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int first
 		type_ = Type::kFly;
 
 		if (firstPos_ != pos) {
-			tex_->pos_ = pos;
-			models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = 0.0f;
+			tex_->pos = pos;
+			models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
 		}
 		firstPos_ = pos;
 		
@@ -248,17 +248,17 @@ void Enemy::SetParametar(int type, const Vector3& pos, const float& y, int first
 		type_ = Type::kWalk;
 		firstPos_ = pos;
 		firstPos_.y = y + enemyScale_ / 2.0f;
-		models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = std::numbers::pi_v<float>;
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
 		if (isChange_) {
-			tex_->pos_ = firstPos_;
+			tex_->pos = firstPos_;
 			isChange_ = false;
 		}
 	}
 	else {
 		type_ = Type::kFly;
 		if (firstPos_ != pos) {
-			tex_->pos_ = pos;
-			models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = 0.0f;
+			tex_->pos = pos;
+			models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
 		}
 		firstPos_ = pos;
 		
@@ -279,7 +279,7 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 			isCollisionEnemy_ = true;
 			if (isCollisionEnemy_.OnEnter()) {
 
-				Vector3 vector = tex_->pos_ - enemy->GetTex()->pos_;
+				Vector3 vector = tex_->pos - enemy->GetTex()->pos;
 
 				float speed = velocity_.Length() * kReboundCoefficient_;
 
@@ -343,7 +343,7 @@ void Enemy::CollisionPlayer(Player* player) {
 					StatusRequest(Enemy::Status::kFalling);
 					fallingSpeed_ = kFallingSpeed_ + player->GetVelocity().y;
 
-					Vector3 vector = player->GetTex()->pos_ - tex_->pos_;
+					Vector3 vector = player->GetTex()->pos - tex_->pos;
 
 					if (vector.x == 0) {
 
@@ -374,22 +374,22 @@ void Enemy::CollisionPlayer(Player* player) {
 
 					if (type_ == Type::kWalk || (type_ == Type::kFly && player->GetVelocity().y <= 0.0f)) {
 						moveVector_ *= -1;
-						player->KnockBack(tex_->pos_, tex_->scale_);
+						player->KnockBack(tex_->pos, tex_->scale);
 					}
 					else if (type_ == Type::kFly) {
 						if (status_ == Status::kNormal) {
 							player->EnemyStep(false);
-							player->Steped(tex_->pos_);
+							player->Steped(tex_->pos);
 						}
 					}
 				}
 			}
 			else {
-				if ((player->GetTex()->pos_.y >= tex_->pos_.y || player->GetVelocity().y < 0.0f) && player->GetIsFly()) {
+				if ((player->GetTex()->pos.y >= tex_->pos.y || player->GetVelocity().y < 0.0f) && player->GetIsFly()) {
 					StatusRequest(Enemy::Status::kFalling);
 					fallingSpeed_ = kFallingSpeed_ + player->GetVelocity().y;
 
-					Vector3 vector = player->GetTex()->pos_ - tex_->pos_;
+					Vector3 vector = player->GetTex()->pos - tex_->pos;
 
 					if (vector.x == 0) {
 
@@ -421,12 +421,12 @@ void Enemy::CollisionPlayer(Player* player) {
 					if (type_ == Type::kWalk || (type_ == Type::kFly && player->GetVelocity().y <= 0.0f)) {
 						moveVector_ *= -1;
 
-						player->KnockBack(tex_->pos_, tex_->scale_);
+						player->KnockBack(tex_->pos, tex_->scale);
 					}
 					else if (type_ == Type::kFly) {
 						if (status_ == Status::kNormal) {
 							player->EnemyStep(false);
-							player->Steped(tex_->pos_);
+							player->Steped(tex_->pos);
 						}
 					}
 				}
@@ -497,12 +497,12 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 	}
 
 
-	if (tex_->pos_.x - tex_->scale_.x < -640) {
-		tex_->pos_.x -= tex_->pos_.x - tex_->scale_.x + 640;
+	if (tex_->pos.x - tex_->scale.x < -640) {
+		tex_->pos.x -= tex_->pos.x - tex_->scale.x + 640;
 		velocity_.x *= -1;
 	}
-	else if (tex_->pos_.x + tex_->scale_.x > 640) {
-		tex_->pos_.x -= tex_->pos_.x + tex_->scale_.x - 640;
+	else if (tex_->pos.x + tex_->scale.x > 640) {
+		tex_->pos.x -= tex_->pos.x + tex_->scale.x - 640;
 		velocity_.x *= -1;
 	}
 
@@ -512,11 +512,11 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 	isCollisionEnemy_.Update();
 	isCollisionLayer_.Update();
 
-	enemyStepOnParticle_.emitterPos_ = tex_->pos_;
+	enemyStepOnParticle_.emitterPos = tex_->pos;
 	enemyStepOnParticle_.Update();
 	enemyDeathParticle_.Update();
 
-	generationDeleteParticle_.emitterPos_ = tex_->pos_;
+	generationDeleteParticle_.emitterPos = tex_->pos;
 	generationDeleteParticle_.Update();
 
 	if (isPlayerAnimationCoolTime_ && playerAnimationCoolTime_ < std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - playerAnimationCoolStartTime_)) {
@@ -600,10 +600,10 @@ void Enemy::Update(Layer* layer, const float& y, const Camera* camera) {
 }
 
 void Enemy::Collision(const float& y) {
-	float posY = tex_->pos_.y - tex_->scale_.y / 2.0f;
+	float posY = tex_->pos.y - tex_->scale.y / 2.0f;
 
 	if (y > posY) {
-		tex_->pos_.y += y - posY;
+		tex_->pos.y += y - posY;
 		if (type_ == Type::kWalk && status_ == Status::kNormal) {
 			normalFallingSpeed_ = 0.0f;
 		}
@@ -614,19 +614,19 @@ void Enemy::ModelUpdate(const Camera* camera)
 {
 
 	float ratio = WindowFactory::GetInstance()->GetClientSize().y /
-		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos_.z - camera->pos.z) * 2);
+		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
 
 	float indication = 90.0f;
 
 	//models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = tex_->rotate_.z;
 
-	models_[static_cast<uint16_t>(Parts::kMain)]->pos_.x = tex_->pos_.x / ratio + camera->pos.x - camera->pos.x / ratio;
-	models_[static_cast<uint16_t>(Parts::kMain)]->pos_.y = tex_->pos_.y / ratio + camera->pos.y - camera->pos.y / ratio;
-	models_[static_cast<uint16_t>(Parts::kMain)]->scale_.x = tex_->scale_.x / (indication * std::tanf(camera->fov / 2) * 2) *
-		(models_[static_cast<uint16_t>(Parts::kMain)]->pos_.z - camera->pos.z) / indication;
-	models_[static_cast<uint16_t>(Parts::kMain)]->scale_.y = tex_->scale_.y / (indication * std::tanf(camera->fov / 2) * 2) *
-		(models_[static_cast<uint16_t>(Parts::kMain)]->pos_.z - camera->pos.z) / indication;
-	models_[static_cast<uint16_t>(Parts::kMain)]->scale_.z = models_[static_cast<uint16_t>(Parts::kMain)]->scale_.y;
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.x = tex_->pos.x / ratio + camera->pos.x - camera->pos.x / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.y = tex_->pos.y / ratio + camera->pos.y - camera->pos.y / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.x = tex_->scale.x / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.y = tex_->scale.y / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[static_cast<uint16_t>(Parts::kMain)]->scale.y;
 	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
 	models_[static_cast<uint16_t>(Parts::kDoukasen)]->Update();
 
@@ -658,7 +658,7 @@ void Enemy::InitializeFirstMove(int move)
 			moveVector_ = { 0.0f,0.0f,0.0f };
 			break;
 		}
-		tex_->pos_ = firstPos_;
+		tex_->pos = firstPos_;
 	}
 }
 
@@ -705,23 +705,23 @@ void Enemy::InitializeMoveRadius(float radius)
 	else {
 		if (moveRadius_ != radius) {
 			moveRadius_ = radius;
-			tex_->pos_ = firstPos_;
+			tex_->pos = firstPos_;
 		}
 	}
 }
 
 void Enemy::GenerationInitialize(const float y) {
 
-	tex_->pos_ = firstPos_;
+	tex_->pos = firstPos_;
 	Collision(y);
 
 	switch (type_)
 	{
 	case Enemy::Type::kFly:
-		models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = 0.0f;
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
 		break;
 	case Enemy::Type::kWalk:
-		models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = std::numbers::pi_v<float>;
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
 		break;
 	case Enemy::Type::kEnd:
 		break;
@@ -742,12 +742,12 @@ void Enemy::GenerationUpdate() {
 
 	float t = timeCount_ / kGenerationTime_;
 
-	tex_->scale_ = Vector2(enemyScale_, enemyScale_) * t + Vector2(0.0f, 0.0f) * (1.0f - t);
+	tex_->scale = Vector2(enemyScale_, enemyScale_) * t + Vector2(0.0f, 0.0f) * (1.0f - t);
 
 	if (timeCount_ >= kGenerationTime_) {
 		statusRequest_ = Status::kNormal;
 		timeCount_ = 0;
-		tex_->scale_ = { enemyScale_, enemyScale_ };
+		tex_->scale = { enemyScale_, enemyScale_ };
 	}
 }
 
@@ -769,7 +769,7 @@ void Enemy::NormalUpdate(const float y, Layer* layer) {
 		velocity_.y = normalFallingSpeed_;
 	}
 
-	tex_->pos_ += velocity_ * FrameInfo::GetInstance()->GetDelta();
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 
 	Collision(y);
 
@@ -783,20 +783,20 @@ void Enemy::NormalUpdate(const float y, Layer* layer) {
 	}
 
 	if (firstMoveVector_ == 1 || firstMoveVector_ == 2) {
-		if (tex_->pos_.x <= firstPos_.x - moveRadius_ || tex_->pos_.x >= firstPos_.x + moveRadius_) {
+		if (tex_->pos.x <= firstPos_.x - moveRadius_ || tex_->pos.x >= firstPos_.x + moveRadius_) {
 			moveVector_ *= -1;
 		}
-		else if (tex_->pos_.x - tex_->scale_.x <= -640 || tex_->pos_.x + tex_->scale_.x >= 640) {
+		else if (tex_->pos.x - tex_->scale.x <= -640 || tex_->pos.x + tex_->scale.x >= 640) {
 			moveVector_ *= -1;
 		}
 	}
 	else if (firstMoveVector_ == 3 || firstMoveVector_ == 4) {
-		if (tex_->pos_.y <= firstPos_.y - moveRadius_ || tex_->pos_.y >= firstPos_.y + moveRadius_) {
+		if (tex_->pos.y <= firstPos_.y - moveRadius_ || tex_->pos.y >= firstPos_.y + moveRadius_) {
 			moveVector_ *= -1;
 		}
 	}
 
-	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate_.y += randRotate_ * FrameInfo::GetInstance()->GetDelta();
+	models_[static_cast<uint16_t>(Parts::kDoukasen)]->rotate.y += randRotate_ * FrameInfo::GetInstance()->GetDelta();
 
 }
 
@@ -808,7 +808,7 @@ void Enemy::FallingUpdate(const float& y) {
 	
 	velocity_.y += fallingSpeed_;
 
-	tex_->pos_ += velocity_ * FrameInfo::GetInstance()->GetDelta();
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 
 	if (isCollisionLayer_.OnStay()) {
 
@@ -816,14 +816,14 @@ void Enemy::FallingUpdate(const float& y) {
 
 		float t = std::clamp<float>(rotateTimeCount_, 0.0f, rotateTime_) / rotateTime_;
 
-		models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = std::lerp(startRotate_, endRotate_, t);
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::lerp(startRotate_, endRotate_, t);
 	}
 	else {
-		models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z += rotateAddAngle_ * FrameInfo::GetInstance()->GetDelta();
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z += rotateAddAngle_ * FrameInfo::GetInstance()->GetDelta();
 	}
 
 
-	if (tex_->pos_.y - tex_->scale_.y / 2.0f <= y) {
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
 
 		Collision(y);
 
@@ -832,7 +832,7 @@ void Enemy::FallingUpdate(const float& y) {
 			velocity_.x = 0.0f;
 			statusRequest_ = Status::kFaint;
 			isCollisionLayer_ = false;
-			models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = std::numbers::pi_v<float>;
+			models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::numbers::pi_v<float>;
 		}
 		else {
 			
@@ -843,7 +843,7 @@ void Enemy::FallingUpdate(const float& y) {
 			velocity_.y = std::fabsf(velocity_.y) * kLayerReboundCoefficient_;
 
 			rotateTime_ = 2.0f * velocity_.y / (-fallingSpeed_) * FrameInfo::GetInstance()->GetDelta();
-			startRotate_ = models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z;
+			startRotate_ = models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z;
 
 			float pi = std::numbers::pi_v<float>;
 			float memo = startRotate_ / 2.0f / pi;
@@ -889,9 +889,9 @@ void Enemy::FaintUpdate(const float& y) {
 
 	velocity_.y += kFallingSpeed_;
 
-	tex_->pos_ += velocity_ * FrameInfo::GetInstance()->GetDelta();
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 
-	if (tex_->pos_.y - tex_->scale_.y / 2.0f <= y) {
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
 		Collision(y);
 		velocity_.y = 0.0f;
 	}
@@ -917,9 +917,9 @@ void Enemy::LeaveInitialize() {
 void Enemy::LeaveUpdate(const float& y) {
 	velocity_.y += kFallingSpeed_;
 
-	tex_->pos_ += velocity_ * FrameInfo::GetInstance()->GetDelta();
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 
-	if (tex_->pos_.y - tex_->scale_.y / 2.0f <= y) {
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
 		Collision(y);
 		velocity_.y = 0.0f;
 	}
@@ -935,7 +935,7 @@ void Enemy::LeaveUpdate(const float& y) {
 void Enemy::DeathInitialize(Layer* layer) {
 	layer->AddDamage(1);
 	enemyDeathParticle_.ParticleStart();
-	enemyDeathParticle_.emitterPos_ = tex_->pos_;
+	enemyDeathParticle_.emitterPos = tex_->pos;
 	explorsionSE_->Start(0.2f);
 }
 
@@ -944,22 +944,22 @@ void Enemy::DeathUpdate() {
 	if (isHealer_) {
 		timeCount_ += FrameInfo::GetInstance()->GetDelta();
 
-		tex_->scale_ = Vector2::zero;
+		tex_->scale = Vector2::zero;
 
 		if (timeCount_ >= kHealerDeathTime_) {
 			statusRequest_ = Status::kGeneration;
-			tex_->scale_ = {};
+			tex_->scale = {};
 
 		}
 	}
 	else {
 		timeCount_ += FrameInfo::GetInstance()->GetDelta();
 
-		tex_->scale_ = Vector2::zero;
+		tex_->scale = Vector2::zero;
 
 		if (timeCount_ >= kDeathTime_) {
 			statusRequest_ = Status::kGeneration;
-			tex_->scale_ = {};
+			tex_->scale = {};
 
 		}
 	}

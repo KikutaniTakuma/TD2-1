@@ -94,10 +94,10 @@ void Model::CreateGraphicsPipeline() {
 }
 
 Model::Model() :
-	pos_(),
-	rotate_(),
-	scale_(Vector3::identity),
-	color_(std::numeric_limits<uint32_t>::max()),
+	pos(),
+	rotate(),
+	scale(Vector3::identity),
+	color(std::numeric_limits<uint32_t>::max()),
 	parent_(nullptr),
 	mesh_(nullptr),
 	data_(),
@@ -113,18 +113,18 @@ Model::Model() :
 
 
 	dirLig_.shaderRegister_ = 1;
-	light_.ligDirection = { 1.0f,-1.0f,-1.0f };
-	light_.ligDirection = light_.ligDirection.Normalize();
-	light_.ligColor = UintToVector4(0xffffadff).GetVector3();
+	light.ligDirection = { 1.0f,-1.0f,-1.0f };
+	light.ligDirection = light.ligDirection.Normalize();
+	light.ligColor = UintToVector4(0xffffadff).GetVector3();
 
-	light_.ptPos = Vector3::zero;
-	light_.ptColor = Vector3::zero;
-	light_.ptRange = std::numeric_limits<float>::max();
+	light.ptPos = Vector3::zero;
+	light.ptColor = Vector3::zero;
+	light.ptRange = std::numeric_limits<float>::max();
 
-	*dirLig_ = light_;
+	*dirLig_ = light;
 
 	colorBuf_.shaderRegister_ = 2;
-	*colorBuf_ = UintToVector4(color_);
+	*colorBuf_ = UintToVector4(color);
 
 	auto descriptorHeap = CbvSrvUavHeap::GetInstance();
 	descriptorHeap->BookingHeapPos(3u);
@@ -151,10 +151,10 @@ Model::Model(Model&& right) noexcept :
 }
 
 Model& Model::operator=(const Model& right) {
-	pos_ = right.pos_;
-	rotate_ = right.rotate_;
-	scale_ = right.scale_;
-	color_ = right.color_;
+	pos = right.pos;
+	rotate = right.rotate;
+	scale = right.scale;
+	color = right.color;
 	parent_ = right.parent_;
 
 	// 自身がロード済みだったらResourceを解放する
@@ -172,7 +172,7 @@ Model& Model::operator=(const Model& right) {
 		isLoadObj_ = !!mesh_;
 	}
 
-	light_ = right.light_;
+	light = right.light;
 
 	// 定数バッファの値をコピー
 	*wvpData_ = *right.wvpData_;
@@ -183,10 +183,10 @@ Model& Model::operator=(const Model& right) {
 }
 
 Model& Model::operator=(Model&& right) noexcept {
-	pos_ = std::move(right.pos_);
-	rotate_ = std::move(right.rotate_);
-	scale_ = std::move(right.scale_);
-	color_ = std::move(right.color_);
+	pos = std::move(right.pos);
+	rotate = std::move(right.rotate);
+	scale = std::move(right.scale);
+	color = std::move(right.color);
 	parent_ = std::move(right.parent_);
 
 	// 自身がロード済みだったらResourceを解放する
@@ -204,7 +204,7 @@ Model& Model::operator=(Model&& right) noexcept {
 		isLoadObj_ = !!mesh_;
 	}
 
-	light_ = std::move(right.light_);
+	light = std::move(right.light);
 
 	// 定数バッファの値をコピー
 	*wvpData_ = *right.wvpData_;
@@ -261,7 +261,7 @@ void Model::MeshChangeTexture(const std::string& useMtlName, Texture* tex) {
 }
 
 void Model::Update() {
-	*dirLig_ = light_;
+	*dirLig_ = light;
 
 	if (!isLoadObj_ && mesh_ && mesh_->GetIsLoad()) {
 		isLoadObj_ = true;
@@ -275,15 +275,15 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 			data_ = mesh_->CopyBuffer();
 		}
 
-		wvpData_->worldMat.Affin(scale_, rotate_, pos_);
+		wvpData_->worldMat.Affin(scale, rotate, pos);
 		if (parent_) {
 			wvpData_->worldMat *= parent_->wvpData_->worldMat;
 		}
 		wvpData_->viewProjectoionMat = viewProjectionMat;
 
-		*colorBuf_ = UintToVector4(color_);
+		*colorBuf_ = UintToVector4(color);
 
-		light_.eyePos = cameraPos;
+		light.eyePos = cameraPos;
 		dirLig_->eyePos = cameraPos;
 
 		auto commandlist = DirectXCommand::GetInstance()->GetCommandList();
@@ -307,13 +307,13 @@ void Model::Draw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 
 void Model::InstancingDraw(const Mat4x4& viewProjectionMat, const Vector3& cameraPos) {
 	if (isLoadObj_) {
-		light_.eyePos = cameraPos;
+		light.eyePos = cameraPos;
 
 		mesh_->Use(
-			MakeMatrixAffin(scale_, rotate_, pos_),
+			MakeMatrixAffin(scale, rotate, pos),
 			viewProjectionMat,
-			light_,
-			UintToVector4(color_)
+			light,
+			UintToVector4(color)
 			);
 	}
 }
@@ -321,9 +321,9 @@ void Model::InstancingDraw(const Mat4x4& viewProjectionMat, const Vector3& camer
 void Model::Debug([[maybe_unused]]const std::string& guiName) {
 #ifdef _DEBUG
 	ImGui::Begin(guiName.c_str());
-	ImGui::DragFloat3("pos", &pos_.x, 0.01f);
-	ImGui::DragFloat3("rotate", &rotate_.x, 0.01f);
-	ImGui::DragFloat3("scale", &scale_.x, 0.01f);
+	ImGui::DragFloat3("pos", &pos.x, 0.01f);
+	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
+	ImGui::DragFloat3("scale", &scale.x, 0.01f);
 	ImGui::ColorEdit4("SphereColor", &colorBuf_->color.r);
 	ImGui::DragFloat3("ligDirection", &dirLig_->ligDirection.x, 0.01f);
 	dirLig_->ligDirection = dirLig_->ligDirection.Normalize();

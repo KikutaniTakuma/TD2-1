@@ -94,36 +94,36 @@ void GameScene::Initialize() {
 
 	// コントローラーHUD
 	aButtonHud_.LoadTexture("./Resources/HUD/controler_UI_A.png");
-	aButtonHud_.scale_ = Vector2{ 70.0f, 70.0f };
-	aButtonHud_.pos_ = Vector2{ 544.0f,291.0f };
+	aButtonHud_.scale = Vector2{ 70.0f, 70.0f };
+	aButtonHud_.pos = Vector2{ 544.0f,291.0f };
 	stickHud_.LoadTexture("./Resources/HUD/UI_stick.png");
-	stickHud_.scale_ = Vector2{ 70.0f, 80.0f };
-	stickHud_.pos_ = Vector2{ 453.0f,291.0f };
+	stickHud_.scale = Vector2{ 70.0f, 80.0f };
+	stickHud_.pos = Vector2{ 453.0f,291.0f };
 	puaseHud_.LoadTexture("./Resources/HUD/controler_UI_pose.png");
-	puaseHud_.scale_ = Vector2{ 70.0f, 70.0f };
-	puaseHud_.pos_ = Vector2{ -555.0f,291.0f };
+	puaseHud_.scale = Vector2{ 70.0f, 70.0f };
+	puaseHud_.pos = Vector2{ -555.0f,291.0f };
 
 	// キーボードHUD
 	spaceHud_.LoadTexture("./Resources/HUD/keys_UI_space.png");
-	spaceHud_.scale_ = Vector2{ 92.0f, 124.0f };
-	spaceHud_.pos_ = Vector2{ 544.0f,298.0f };
+	spaceHud_.scale = Vector2{ 92.0f, 124.0f };
+	spaceHud_.pos = Vector2{ 544.0f,298.0f };
 	rightKeyHud_.LoadTexture("./Resources/HUD/keys_UI_right.png");
-	rightKeyHud_.scale_ = Vector2{ 93.0f, 69.0f };
-	rightKeyHud_.pos_ = Vector2{ 438.0f,291.0f };
+	rightKeyHud_.scale = Vector2{ 93.0f, 69.0f };
+	rightKeyHud_.pos = Vector2{ 438.0f,291.0f };
 	leftKeyHud_.LoadTexture("./Resources/HUD/keys_UI_left.png");
-	leftKeyHud_.scale_ = Vector2{ 93.0f, 69.0f };
-	leftKeyHud_.pos_ = Vector2{ 359.0f,291.0f };
+	leftKeyHud_.scale = Vector2{ 93.0f, 69.0f };
+	leftKeyHud_.pos = Vector2{ 359.0f,291.0f };
 	puaseKeyHud_.LoadTexture("./Resources/HUD/keys_UI_pose.png");
-	puaseKeyHud_.scale_ = Vector2{ 115.0f, 113.0f };
-	puaseKeyHud_.pos_ = Vector2{ -555.0f,291.0f };
+	puaseKeyHud_.scale = Vector2{ 115.0f, 113.0f };
+	puaseKeyHud_.pos = Vector2{ -555.0f,291.0f };
 
-	aButtonHud_.uvSize_.x = 0.5f;
-	spaceHud_.uvSize_.x = 0.5f;
-	stickHud_.uvSize_.x = 1.0f / 3.0f;
-	rightKeyHud_.uvSize_.x = 0.5f;
-	leftKeyHud_.uvSize_.x = 0.5f;
-	puaseHud_.uvSize_.x = 0.5f;
-	puaseKeyHud_.uvSize_.x = 0.5f;
+	aButtonHud_.uvSize.x = 0.5f;
+	spaceHud_.uvSize.x = 0.5f;
+	stickHud_.uvSize.x = 1.0f / 3.0f;
+	rightKeyHud_.uvSize.x = 0.5f;
+	leftKeyHud_.uvSize.x = 0.5f;
+	puaseHud_.uvSize.x = 0.5f;
+	puaseKeyHud_.uvSize.x = 0.5f;
 }
 
 void GameScene::Finalize() {
@@ -845,8 +845,8 @@ void GameScene::Update() {
 
 	if (!pause_.isActive_) {
 
-		if (cameraLocalPos_.y + layer_->GetHighestPosY() <= player_->GetTex()->pos_.y) {
-			camera2D_->pos.y = player_->GetTex()->pos_.y;
+		if (cameraLocalPos_.y + layer_->GetHighestPosY() <= player_->GetTex()->pos.y) {
+			camera2D_->pos.y = player_->GetTex()->pos.y;
 		}
 		else {
 			camera2D_->pos.y = cameraLocalPos_.y + layer_->GetHighestPosY();
@@ -938,56 +938,56 @@ void GameScene::Update() {
 	}
 
 	if (input_->GetGamepad()->GetButton(Gamepad::Button::A)) {
-		aButtonHud_.uvPibot_.x = 0.5f;
+		aButtonHud_.uvPibot.x = 0.5f;
 	}
 	else {
-		aButtonHud_.uvPibot_.x = 0.0f;
+		aButtonHud_.uvPibot.x = 0.0f;
 	}
 	if (input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) < -0.3f ||
 		input_->GetGamepad()->GetButton(Gamepad::Button::LEFT)) {
-		stickHud_.uvPibot_.x = 1.0f / 3.0f;
+		stickHud_.uvPibot.x = 1.0f / 3.0f;
 	}
 	else if (input_->GetGamepad()->GetStick(Gamepad::Stick::LEFT_X) > 0.3f||
 		input_->GetGamepad()->GetButton(Gamepad::Button::RIGHT)) {
-		stickHud_.uvPibot_.x = 2.0f / 3.0f;
+		stickHud_.uvPibot.x = 2.0f / 3.0f;
 	}
 	else {
-		stickHud_.uvPibot_.x = 0.0f;
+		stickHud_.uvPibot.x = 0.0f;
 	}
 
 	if (input_->GetGamepad()->GetButton(Gamepad::Button::START)) {
-		puaseHud_.uvPibot_.x = 0.5f;
+		puaseHud_.uvPibot.x = 0.5f;
 	}
 	else {
-		puaseHud_.uvPibot_.x = 0.0f;
+		puaseHud_.uvPibot.x = 0.0f;
 	}
 
 	if (input_->GetKey()->GetKey(DIK_SPACE)) {
-		spaceHud_.uvPibot_.x = 0.5f;
+		spaceHud_.uvPibot.x = 0.5f;
 	}
 	else {
-		spaceHud_.uvPibot_.x = 0.0f;
+		spaceHud_.uvPibot.x = 0.0f;
 	}
 	if (input_->GetKey()->GetKey(DIK_RIGHT)||
 		input_->GetKey()->GetKey(DIK_D)
 		) {
-		rightKeyHud_.uvPibot_.x = 0.5f;
+		rightKeyHud_.uvPibot.x = 0.5f;
 	}
 	else {
-		rightKeyHud_.uvPibot_.x = 0.0f;
+		rightKeyHud_.uvPibot.x = 0.0f;
 	}
 	if (input_->GetKey()->GetKey(DIK_LEFT)||
 		input_->GetKey()->GetKey(DIK_A)) {
-		leftKeyHud_.uvPibot_.x = 0.5f;
+		leftKeyHud_.uvPibot.x = 0.5f;
 	}
 	else {
-		leftKeyHud_.uvPibot_.x = 0.0f;
+		leftKeyHud_.uvPibot.x = 0.0f;
 	}
 	if (input_->GetKey()->GetKey(DIK_TAB)) {
-		puaseKeyHud_.uvPibot_.x = 0.5f;
+		puaseKeyHud_.uvPibot.x = 0.5f;
 	}
 	else {
-		puaseKeyHud_.uvPibot_.x = 0.0f;
+		puaseKeyHud_.uvPibot.x = 0.0f;
 	}
 
 	aButtonHud_.Update();

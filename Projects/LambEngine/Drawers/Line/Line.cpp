@@ -39,8 +39,8 @@ Line::Line() :
 	vertexMap_(nullptr),
 	heap_(),
 	wvpMat_(),
-	start_(),
-	end_()
+	start(),
+	end()
 {
 	vertexBuffer_ = DirectXDevice::GetInstance()->CreateBufferResuorce(sizeof(VertexData) * kVertexNum);
 	vertexView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
@@ -66,14 +66,14 @@ Line::Line(Line&& right) noexcept :
 }
 
 Line& Line::operator=(const Line& right) {
-	start_ = right.start_;
-	end_ = right.end_;
+	start = right.start;
+	end = right.end;
 
 	return *this;
 }
 Line& Line::operator=(Line&& right)noexcept {
-	start_ = std::move(right.start_);
-	end_ = std::move(right.end_);
+	start = std::move(right.start);
+	end = std::move(right.end);
 
 	return *this;
 }
@@ -88,8 +88,8 @@ Line::~Line() {
 
 void Line::Draw(const Mat4x4& viewProjection, uint32_t color) {
 	auto&& colorFloat = UintToVector4(color);
-	vertexMap_[0] = { Vector4(start_, 1.0f), colorFloat };
-	vertexMap_[1] = { Vector4(end_, 1.0f),   colorFloat };
+	vertexMap_[0] = { Vector4(start, 1.0f), colorFloat };
+	vertexMap_[1] = { Vector4(end, 1.0f),   colorFloat };
 
 	*wvpMat_ = viewProjection;
 

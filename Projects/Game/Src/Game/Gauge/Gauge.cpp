@@ -13,9 +13,9 @@ Gauge::Gauge() {
 
 	textures_[static_cast<int>(TextureNames::kMostBack)]->LoadTexture("./Resources/Gauge/gage_flame.png");
 
-	textures_[static_cast<int>(TextureNames::kMostBack)]->color_ = 0xFFFFFFFF;
-	textures_[static_cast<int>(TextureNames::kGaugeBack)]->color_ = 0x444444FF;
-	textures_[static_cast<int>(TextureNames::kGaugeMain)]->color_ = 0xFFFFFFFF;
+	textures_[static_cast<int>(TextureNames::kMostBack)]->color = 0xFFFFFFFF;
+	textures_[static_cast<int>(TextureNames::kGaugeBack)]->color = 0x444444FF;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->color = 0xFFFFFFFF;
 
 	num_ = 1;
 	kMax_ = 1;
@@ -27,9 +27,9 @@ void Gauge::SetGlobalVariable()
 {
 	globalVariables_->CreateGroup(groupName_);
 
-	globalVariables_->AddItem(groupName_, "kPos", textures_[static_cast<int>(TextureNames::kMostBack)]->pos_);
-	globalVariables_->AddItem(groupName_, "kAllScale", textures_[static_cast<int>(TextureNames::kMostBack)]->scale_);
-	globalVariables_->AddItem(groupName_, "kGaugeScale", textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_);
+	globalVariables_->AddItem(groupName_, "kPos", textures_[static_cast<int>(TextureNames::kMostBack)]->pos);
+	globalVariables_->AddItem(groupName_, "kAllScale", textures_[static_cast<int>(TextureNames::kMostBack)]->scale);
+	globalVariables_->AddItem(groupName_, "kGaugeScale", textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale);
 
 	globalVariables_->LoadFile(groupName_);
 	ApplyGlobalVariable();
@@ -37,13 +37,13 @@ void Gauge::SetGlobalVariable()
 
 void Gauge::ApplyGlobalVariable(const float& y)
 {
-	textures_[static_cast<int>(TextureNames::kMostBack)]->pos_ = globalVariables_->GetVector3Value(groupName_, "kPos");
-	textures_[static_cast<int>(TextureNames::kMostBack)]->pos_.y += y;
-	textures_[static_cast<int>(TextureNames::kMostBack)]->scale_ = globalVariables_->GetVector2Value(groupName_, "kAllScale");
-	textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_ = globalVariables_->GetVector2Value(groupName_, "kGaugeScale");
+	textures_[static_cast<int>(TextureNames::kMostBack)]->pos = globalVariables_->GetVector3Value(groupName_, "kPos");
+	textures_[static_cast<int>(TextureNames::kMostBack)]->pos.y += y;
+	textures_[static_cast<int>(TextureNames::kMostBack)]->scale = globalVariables_->GetVector2Value(groupName_, "kAllScale");
+	textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale = globalVariables_->GetVector2Value(groupName_, "kGaugeScale");
 
-	textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_ = textures_[static_cast<int>(TextureNames::kMostBack)]->pos_;
-	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos_.y = textures_[static_cast<int>(TextureNames::kMostBack)]->pos_.y;
+	textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos = textures_[static_cast<int>(TextureNames::kMostBack)]->pos;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos.y = textures_[static_cast<int>(TextureNames::kMostBack)]->pos.y;
 }
 
 void Gauge::DamageUpdate(const int& damage)
@@ -79,12 +79,12 @@ void Gauge::DamageUpdate(const int& damage)
 
 	t = float(num_) / kMax_;
 
-	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos_.x = t * textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_.x +
-		(1.0f - t) * (textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_.x + textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_.x / 2.0f);
-	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale_.x = t * textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_.x;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos.x = t * textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos.x +
+		(1.0f - t) * (textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos.x + textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale.x / 2.0f);
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale.x = t * textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale.x;
 
-	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos_.y = textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_.y;
-	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale_.y = textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_.y;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos.y = textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos.y;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale.y = textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale.y;
 }
 
 void Gauge::Initialize(const int& num, const int& Max)
@@ -92,9 +92,9 @@ void Gauge::Initialize(const int& num, const int& Max)
 	num_ = num;
 	kMax_ = Max;
 
-	textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_ = textures_[static_cast<int>(TextureNames::kMostBack)]->pos_;
-	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos_ = textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos_;
-	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale_ = textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale_;
+	textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos = textures_[static_cast<int>(TextureNames::kMostBack)]->pos;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->pos = textures_[static_cast<int>(TextureNames::kGaugeBack)]->pos;
+	textures_[static_cast<int>(TextureNames::kGaugeMain)]->scale = textures_[static_cast<int>(TextureNames::kGaugeBack)]->scale;
 
 }
 

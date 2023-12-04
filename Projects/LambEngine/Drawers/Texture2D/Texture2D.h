@@ -129,21 +129,21 @@ public:
 	}
 
 public:
-	Vector2 scale_;
-	Vector3 rotate_;
-	Vector3 pos_;
+	Vector2 scale;
+	Vector3 rotate;
+	Vector3 pos;
 
-	Vector2 uvPibot_;
-	Vector2 uvSize_;
+	Vector2 uvPibot;
+	Vector2 uvSize;
 
-	std::array<Vector3, 4> worldPos_;
+	std::array<Vector3, 4> worldPos;
 
-	uint32_t color_;
+	uint32_t color;
 
-	Lamb::Flg isSameTexSize_;
+	Lamb::Flg isSameTexSize;
 
 	// テクスチャと同じスケールにしたときのスケール倍率
-	float texScalar_;
+	float texScalar;
 
 private:
 	D3D12_VERTEX_BUFFER_VIEW vertexView_;

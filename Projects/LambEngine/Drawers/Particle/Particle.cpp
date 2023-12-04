@@ -111,8 +111,8 @@ void Particle::CreateGraphicsPipeline() {
 
 Particle::Particle() :
 	wtfs_(),
-	uvPibot_(),
-	uvSize_(Vector2::identity),
+	uvPibot(),
+	uvSize(Vector2::identity),
 	tex_(nullptr),
 	isLoad_(false),
 	isBillboard_(true),
@@ -186,8 +186,8 @@ Particle::Particle() :
 
 Particle::Particle(uint32_t indexNum) :
 	wtfs_(),
-	uvPibot_(),
-	uvSize_(Vector2::identity),
+	uvPibot(),
+	uvSize(Vector2::identity),
 	tex_(nullptr),
 	isLoad_(false),
 	isBillboard_(true),
@@ -275,8 +275,8 @@ Particle& Particle::operator=(const Particle& right) {
 
 	wtfs_ = right.wtfs_;
 
-	uvPibot_ = right.uvPibot_;
-	uvSize_ = right.uvSize_;
+	uvPibot = right.uvPibot;
+	uvSize = right.uvSize;
 
 	tex_ = right.tex_;
 	isLoad_ = right.isLoad_;
@@ -294,7 +294,7 @@ Particle& Particle::operator=(const Particle& right) {
 	isAnimation_ = right.isAnimation_;
 	uvPibotSpd_ = right.uvPibotSpd_;
 
-	emitterPos_ = right.emitterPos_;
+	emitterPos = right.emitterPos;
 
 	datas_ = right.datas_;
 	dataDirectoryName_ = right.dataDirectoryName_;
@@ -312,8 +312,8 @@ Particle& Particle::operator=(const Particle& right) {
 Particle& Particle::operator=(Particle&& right) noexcept {
 	wtfs_ = std::move(right.wtfs_);
 
-	uvPibot_ = std::move(right.uvPibot_);
-	uvSize_ = std::move(right.uvSize_);
+	uvPibot = std::move(right.uvPibot);
+	uvSize = std::move(right.uvSize);
 
 	tex_ = std::move(right.tex_);
 	isLoad_ = std::move(right.isLoad_);
@@ -331,7 +331,7 @@ Particle& Particle::operator=(Particle&& right) noexcept {
 	uvPibotSpd_ = std::move(right.uvPibotSpd_);
 
 
-	emitterPos_ = std::move(right.emitterPos_);
+	emitterPos = std::move(right.emitterPos);
 
 	datas_ = std::move(right.datas_);
 	dataDirectoryName_ = std::move(right.dataDirectoryName_);
@@ -738,17 +738,17 @@ void Particle::BackUpSettingFile(const std::string& groupName) {
 void Particle::ParticleStart() {
 	if (!settings_.empty()) {
 		currentParticleIndex_ = 0;
-		emitterPos_ = settings_[currentParticleIndex_].emitter_.pos_;
+		emitterPos = settings_[currentParticleIndex_].emitter_.pos_;
 		settings_[currentSettingIndex_].isValid_ = false;
 		settings_[currentSettingIndex_].isValid_.Update();
 		settings_[currentParticleIndex_].isValid_ = true;
 	}
 }
 
-void Particle::ParticleStart(const Vector3& emitterPos) {
+void Particle::ParticleStart(const Vector3& pos) {
 	if (!settings_.empty()) {
 		currentParticleIndex_ = 0;
-		emitterPos_ = emitterPos;
+		emitterPos = pos;
 		settings_[currentSettingIndex_].isValid_ = false;
 		settings_[currentSettingIndex_].isValid_.Update();
 		settings_[currentParticleIndex_].isValid_ = true;
@@ -770,7 +770,7 @@ void Particle::Update() {
 	auto nowTime = std::chrono::steady_clock::now();
 
 	if (settings_[currentSettingIndex_].isValid_) {
-		settings_[currentSettingIndex_].emitter_.pos_ = emitterPos_;
+		settings_[currentSettingIndex_].emitter_.pos_ = emitterPos;
 	}
 
 	// 有効になった瞬間始めた瞬間を保存
@@ -926,8 +926,8 @@ void Particle::Draw(
 	Pipeline::Blend blend
 ) {
 	if (tex_ && isLoad_ && !settings_.empty()) {
-		const Vector2& uv0 = { uvPibot_.x, uvPibot_.y + uvSize_.y }; const Vector2& uv1 = uvSize_ + uvPibot_;
-		const Vector2& uv2 = { uvPibot_.x + uvSize_.x, uvPibot_.y }; const Vector2& uv3 = uvPibot_;
+		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
+		const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
 
 		std::array<VertexData, 4> pv = {
 			Vector3{ -0.5f,  0.5f, 0.1f }, uv3,
@@ -1034,7 +1034,7 @@ void Particle::Debug(const std::string& guiName) {
 		// エミッターの設定
 		if (ImGui::TreeNode("Emitter")) {
 			ImGui::DragFloat3("pos", &settings_[i].emitter_.pos_.x, 0.01f);
-			emitterPos_ = settings_[i].emitter_.pos_;
+			emitterPos = settings_[i].emitter_.pos_;
 			ImGui::DragFloat3("size", &settings_[i].emitter_.size_.x, 0.01f);
 			int32_t type = static_cast<int32_t>(settings_[i].emitter_.type_);
 			ImGui::SliderInt("type", &type, 0, 1);
@@ -1328,7 +1328,7 @@ void Particle::AnimationStart(float aniUvPibot) {
 		aniStartTime_ = std::chrono::steady_clock::now();
 		isAnimation_ = true;
 		aniCount_ = 0.0f;
-		uvPibot_.x = aniUvPibot;
+		uvPibot.x = aniUvPibot;
 	}
 }
 
@@ -1357,8 +1357,8 @@ void Particle::Animation(size_t aniSpd, bool isLoop, float aniUvStart, float ani
 				}
 			}
 
-			uvPibot_.x = aniUvStart;
-			uvPibot_.x += uvPibotSpd_ * aniCount_;
+			uvPibot.x = aniUvStart;
+			uvPibot.x += uvPibotSpd_ * aniCount_;
 		}
 	}
 }

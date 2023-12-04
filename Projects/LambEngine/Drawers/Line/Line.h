@@ -38,8 +38,8 @@ public:
 	void Draw(const Mat4x4& viewProjection, uint32_t color);
 
 public:
-	Vector3 start_;
-	Vector3 end_;
+	Vector3 start;
+	Vector3 end;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexBuffer_;

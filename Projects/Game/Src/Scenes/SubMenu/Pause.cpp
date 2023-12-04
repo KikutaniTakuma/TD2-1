@@ -7,45 +7,45 @@
 #include "AudioManager/AudioManager.h"
 
 void Pause::Initialize() {
-	backGround_.scale_ = WindowFactory::GetInstance()->GetClientSize();
-	backGround_.color_ = 220u;
-	backGround2_.scale_ = { 1272.0f, 481.0f };
-	backGround2_.pos_ = { 524.0f, -263.0f };
-	backGround2_.color_ = 98u;
-	backGround2_.rotate_.z = -1.17f;
-	backGround3_.scale_ = Vector2{ 1111.0f, 688.0f };
-	backGround3_.rotate_.z = -1.17f;
-	backGround3_.color_ = 0xFFFFFF72;
+	backGround_.scale = WindowFactory::GetInstance()->GetClientSize();
+	backGround_.color = 220u;
+	backGround2_.scale = { 1272.0f, 481.0f };
+	backGround2_.pos = { 524.0f, -263.0f };
+	backGround2_.color = 98u;
+	backGround2_.rotate.z = -1.17f;
+	backGround3_.scale = Vector2{ 1111.0f, 688.0f };
+	backGround3_.rotate.z = -1.17f;
+	backGround3_.color = 0xFFFFFF72;
 
 
 	goToGame_.LoadTexture("./Resources/Pause/ingame_UI_modoru.png");
-	goToGame_.isSameTexSize_ = true;
-	goToGame_.texScalar_ = 0.66f;
-	goToGame_.pos_.y = 38.0f;
+	goToGame_.isSameTexSize = true;
+	goToGame_.texScalar = 0.66f;
+	goToGame_.pos.y = 38.0f;
 	goToStageSelect_.LoadTexture("./Resources/Pause/result_UI_stageSele.png");
-	goToStageSelect_.isSameTexSize_ = true;
-	goToStageSelect_.texScalar_ = 0.59f;
-	goToStageSelect_.pos_ = Vector2{ 38.0f, -66.0f };
+	goToStageSelect_.isSameTexSize = true;
+	goToStageSelect_.texScalar = 0.59f;
+	goToStageSelect_.pos = Vector2{ 38.0f, -66.0f };
 	goToTitle_.LoadTexture("./Resources/Pause/stageSelect_UI_titlehe.png");
-	goToTitle_.isSameTexSize_ = true;
-	goToTitle_.texScalar_ = 0.61f;
-	goToTitle_.pos_ = Vector2{ -80.0f, -170.0f };
+	goToTitle_.isSameTexSize = true;
+	goToTitle_.texScalar = 0.61f;
+	goToTitle_.pos = Vector2{ -80.0f, -170.0f };
 
 	pauseTex_.LoadTexture("./Resources/Pause/ingame_UI_pose.png");
-	pauseTex_.isSameTexSize_ = true;
-	pauseTex_.pos_.y = 194.0f;
-	pauseTex_.color_ = 0xACACACFF;
+	pauseTex_.isSameTexSize = true;
+	pauseTex_.pos.y = 194.0f;
+	pauseTex_.color = 0xACACACFF;
 
 	arrow_.LoadTexture("./Resources/Pause/arrow.png");
-	arrow_.isSameTexSize_ = true;
-	arrow_.texScalar_ = 0.31f;
-	arrow_.pos_ = Vector2{ -310.0f, 27.0f };
+	arrow_.isSameTexSize = true;
+	arrow_.texScalar = 0.31f;
+	arrow_.pos = Vector2{ -310.0f, 27.0f };
 
-	arrowPosY_[0] = goToGame_.pos_.y;
-	arrowPosY_[1] = goToStageSelect_.pos_.y;
-	arrowPosY_[2] = goToTitle_.pos_.y;
+	arrowPosY_[0] = goToGame_.pos.y;
+	arrowPosY_[1] = goToStageSelect_.pos.y;
+	arrowPosY_[2] = goToTitle_.pos.y;
 
-	arrowPosX_ = { arrow_.pos_.x - 10.0f, arrow_.pos_.x + 10.0f };
+	arrowPosX_ = { arrow_.pos.x - 10.0f, arrow_.pos.x + 10.0f };
 
 	arrowEase_.Start(true, 0.5f, Easing::InOutQuad);
 
@@ -112,9 +112,9 @@ void Pause::Update() {
 	}
 
 	currentChoose_ = std::clamp(currentChoose_, 0, static_cast<int32_t>(arrowPosY_.size())-1);
-	arrow_.pos_.y = arrowPosY_[currentChoose_];
+	arrow_.pos.y = arrowPosY_[currentChoose_];
 
-	arrow_.pos_.x = arrowEase_.Get(arrowPosX_.first, arrowPosX_.second);
+	arrow_.pos.x = arrowEase_.Get(arrowPosX_.first, arrowPosX_.second);
 	arrow_.Update();
 
 	/*for (size_t i = 0; i < audios_.size();i++) {

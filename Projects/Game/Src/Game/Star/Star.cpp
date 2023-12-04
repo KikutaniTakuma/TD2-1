@@ -36,7 +36,7 @@ void Star::NormalStart() {
 void Star::SetDefaultScale(float magnification) {
 	scale_ = scaleDuration_.second;
 	scale_*= magnification;
-	tex_.scale_ = scale_;
+	tex_.scale = scale_;
 }
 
 void Star::Debug([[maybe_unused]]const std::string& guiName) {
@@ -82,7 +82,7 @@ void Star::Update() {
 		// 特別演出
 		if (isSpecial_) {
 			// 回転
-			tex_.rotate_ = rotate_ + rotateEase_.Get(rotateDuration_.first, rotateDuration_.second);
+			tex_.rotate = rotate_ + rotateEase_.Get(rotateDuration_.first, rotateDuration_.second);
 		}
 		scale_ = ease_.Get(scaleDuration_.first, scaleDuration_.second);
 	}
@@ -90,7 +90,7 @@ void Star::Update() {
 	// 3.スターの演出終了
 	if (ease_.ActiveExit()) {
 		isStart_ = false;
-		tex_.rotate_ = rotate_;
+		tex_.rotate = rotate_;
 		isEnd_ = true;
 	}
 
@@ -101,8 +101,8 @@ void Star::Update() {
 		scale_ = scaleEase_.Get(scaleNormalDuration_.first, scaleNormalDuration_.second);
 	}
 
-	tex_.scale_ = scale_;
-	tex_.pos_ = pos_;
+	tex_.scale = scale_;
+	tex_.pos = pos_;
 	
 	// 板ポリアップデート
 	tex_.Update();

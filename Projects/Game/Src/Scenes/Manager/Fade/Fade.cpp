@@ -8,7 +8,7 @@ Fade::Fade():
 	tex_(),
 	fadeTime_(0.75f)
 {
-	tex_.scale_ = WindowFactory::GetInstance()->GetWindowSize();
+	tex_.scale = WindowFactory::GetInstance()->GetWindowSize();
 }
 
 void Fade::OutStart() {
@@ -53,10 +53,10 @@ void Fade::Update() {
 	}
 	
 	if (isInStart_) {
-		tex_.color_ = ColorLerp(0xff, 0x00, ease_.GetT());
+		tex_.color = ColorLerp(0xff, 0x00, ease_.GetT());
 	}
 	else if (isOutStart_) {
-		tex_.color_ = ColorLerp(0x00, 0xff, ease_.GetT());
+		tex_.color = ColorLerp(0x00, 0xff, ease_.GetT());
 	}
 
 	tex_.Update();

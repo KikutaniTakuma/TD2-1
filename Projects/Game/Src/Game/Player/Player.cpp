@@ -20,16 +20,16 @@ Player::Player() {
 
 	models_.push_back(std::make_unique<Model>());
 	models_[static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Player/Player.obj");
-	models_[static_cast<uint16_t>(Parts::kMain)]->light_.ligDirection = { 0.0f,0.0f,1.0f };
-	models_[static_cast<uint16_t>(Parts::kMain)]->light_.ligColor = { 1.0f,1.0f,1.0f };
-	models_[static_cast<uint16_t>(Parts::kMain)]->light_.ptRange = 10000.0f;
-	models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.y = std::numbers::pi_v<float>;
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = { 0.0f,0.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
+	models_[static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
+	models_[static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
 
 	globalVariables_ = std::make_unique<GlobalVariables>();
 
-	tex_->pos_ = {};
+	tex_->pos = {};
 
-	tex_->scale_ = scale_;
+	tex_->scale = scale_;
 
 	// ジャンプ時の初速
 	kJampInitialVelocity_ = 10.0f;
@@ -205,28 +205,28 @@ void Player::Update(const float& y, const Camera* camera) {
 
 
 	if (status_ != Status::kLanding) {
-		if (tex_->pos_.x - tex_->scale_.x < -640) {
-			tex_->pos_.x -= tex_->pos_.x - tex_->scale_.x + 640;
+		if (tex_->pos.x - tex_->scale.x < -640) {
+			tex_->pos.x -= tex_->pos.x - tex_->scale.x + 640;
 			velocity_.x *= -1;
 		}
-		else if (tex_->pos_.x + tex_->scale_.x > 640) {
-			tex_->pos_.x -= tex_->pos_.x + tex_->scale_.x - 640;
+		else if (tex_->pos.x + tex_->scale.x > 640) {
+			tex_->pos.x -= tex_->pos.x + tex_->scale.x - 640;
 			velocity_.x *= -1;
 		}
 	}
 
 	float ratio = WindowFactory::GetInstance()->GetClientSize().y /
-		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos_.z - camera->pos.z) * 2);
+		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
 
 	float indication = 90.0f;
 
-	models_[static_cast<uint16_t>(Parts::kMain)]->pos_.x = tex_->pos_.x / ratio + camera->pos.x - camera->pos.x / ratio;
-	models_[static_cast<uint16_t>(Parts::kMain)]->pos_.y = tex_->pos_.y / ratio + camera->pos.y- camera->pos.y / ratio;
-	models_[static_cast<uint16_t>(Parts::kMain)]->scale_.x = tex_->scale_.x / (indication * std::tanf(camera->fov / 2) * 2) *
-		(models_[static_cast<uint16_t>(Parts::kMain)]->pos_.z - camera->pos.z) / indication;
-	models_[static_cast<uint16_t>(Parts::kMain)]->scale_.y = tex_->scale_.y / (indication * std::tanf(camera->fov / 2) * 2) *
-		(models_[static_cast<uint16_t>(Parts::kMain)]->pos_.z - camera->pos.z) / indication;
-	models_[static_cast<uint16_t>(Parts::kMain)]->scale_.z = models_[static_cast<uint16_t>(Parts::kMain)]->scale_.y;
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.x = tex_->pos.x / ratio + camera->pos.x - camera->pos.x / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.y = tex_->pos.y / ratio + camera->pos.y- camera->pos.y / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.x = tex_->scale.x / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.y = tex_->scale.y / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[static_cast<uint16_t>(Parts::kMain)]->scale.y;
 	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
 	tex_->Update();
 
@@ -309,7 +309,7 @@ void Player::NormalUpdate(const float& y) {
 			easeCount_ = easeTime_;
 		}
 
-		tex_->scale_ = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_);
+		tex_->scale = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_);
 	}
 
 	// ジャンプ入力
@@ -349,12 +349,12 @@ void Player::NormalUpdate(const float& y) {
 	// 横の移動距離
 	velocity_.x = move.x * kMoveSpeed_ * deletaTime;
 
-	tex_->pos_ += velocity_;
+	tex_->pos += velocity_;
 
 	MemoHighest();
 
 	// 地面との当たり判定。
-	if (tex_->pos_.y - tex_->scale_.y / 2.0f <= y && isFly_) {
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y && isFly_) {
 
 		Collision(y);
 		velocity_.y = 0.0f;
@@ -374,7 +374,7 @@ void Player::HipDropInitialize() {
 void Player::HipDropUpdate(const float& y) {
 
 	velocity_.y += kHipDropSpeed_ * FrameInfo::GetInstance()->GetDelta();
-	tex_->pos_ += velocity_;
+	tex_->pos += velocity_;
 
 	if (isHipdropJamp_) {
 		if (isStep_) {
@@ -386,7 +386,7 @@ void Player::HipDropUpdate(const float& y) {
 		}
 	}
 
-	if (tex_->pos_.y - tex_->scale_.y / 2.0f <= y && isFly_) {
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y && isFly_) {
 
 		Collision(y);
 		velocity_.y = 0.0f;
@@ -438,7 +438,7 @@ void Player::OnScaffoldingUpdate()
 	// 横の移動距離
 	velocity_.x = move.x * kMoveSpeed_;
 
-	tex_->pos_ += velocity_ * deletaTime;
+	tex_->pos += velocity_ * deletaTime;
 
 	MemoHighest();
 
@@ -450,9 +450,9 @@ void Player::LandingInitialize(const float& y) {
 
 	Collision(y);
 
-	play_->CreatShockWave(tex_->pos_, highest_, y);
+	play_->CreatShockWave(tex_->pos, highest_, y);
 
-	scaleStart_ = tex_->scale_;
+	scaleStart_ = tex_->scale;
 
 	if (highest_ >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMiddle))) {
 		scaleEnd_ = { scale_.x * 10.0f,scale_.y * 0.3f };
@@ -477,7 +477,7 @@ void Player::LandingInitialize(const float& y) {
 void Player::LandingUpdate(const float& y) {
 
 	velocity_.y += kFallingGravity_;
-	tex_->pos_ += velocity_ * FrameInfo::GetInstance()->GetDelta();
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 	Collision(y);
 
 	easeCount_ += FrameInfo::GetInstance()->GetDelta();
@@ -485,15 +485,15 @@ void Player::LandingUpdate(const float& y) {
 	if (easeCount_ >= easeTime_ / 2 && !isEaseReturn_) {
 		isEaseReturn_ = true;
 		easeCount_ -= easeTime_ / 2;
-		scaleStart_ = tex_->scale_;
+		scaleStart_ = tex_->scale;
 		scaleEnd_ = scale_;
 	}
 
-	tex_->scale_ = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_ * 2.0f);
+	tex_->scale = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_ * 2.0f);
 
 	if (easeCount_ >= easeTime_ / 2 && isEaseReturn_) {
 		statusRequest_ = Status::kNormal;
-		tex_->scale_ = scale_;
+		tex_->scale = scale_;
 		isEaseReturn_ = false;
 		highest_ = 0.0f;
 	}
@@ -505,7 +505,7 @@ void Player::FallingInitialize(const float& y) {
 	Collision(y);
 	//velocity_ = {};
 
-	scaleStart_ = tex_->scale_;
+	scaleStart_ = tex_->scale;
 
 	scaleEnd_ = scale_;
 
@@ -532,9 +532,9 @@ void Player::FallingUpdate(const float& y) {
 		easeCount_ = easeTime_;
 	}
 
-	tex_->scale_ = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_);
+	tex_->scale = Vector2::Lerp(scaleStart_, scaleEnd_, easeCount_ / easeTime_);
 
-	tex_->pos_ += velocity_ * deletaTime;
+	tex_->pos += velocity_ * deletaTime;
 
 	if (isCollisionLayer_.OnStay()) {
 
@@ -542,14 +542,14 @@ void Player::FallingUpdate(const float& y) {
 
 		float t = std::clamp<float>(rotateTimeCount_, 0.0f, rotateTime_) / rotateTime_;
 
-		models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = std::lerp(startRotate_, endRotate_, t);
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::lerp(startRotate_, endRotate_, t);
 	}
 	else {
-		models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z += rotateAddAngle_ * FrameInfo::GetInstance()->GetDelta();
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z += rotateAddAngle_ * FrameInfo::GetInstance()->GetDelta();
 	}
 
 
-	if (tex_->pos_.y - tex_->scale_.y / 2.0f <= y) {
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
 
 		Vector3 vect = velocity_;
 
@@ -562,7 +562,7 @@ void Player::FallingUpdate(const float& y) {
 			velocity_.y = 0.0f;
 			isFly_ = false;
 			statusRequest_ = Status::kNormal;
-			models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = 0.0f;
+			models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
 			highest_ = 0.0f;
 		}
 		else {
@@ -572,7 +572,7 @@ void Player::FallingUpdate(const float& y) {
 			velocity_.y = std::fabsf(vect.y) * kLayerReboundCoefficient_;
 
 			rotateTime_ = 2.0f * velocity_.y / std::fabsf(kFallingGravity_) * FrameInfo::GetInstance()->GetDelta();
-			startRotate_ = models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z;
+			startRotate_ = models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z;
 
 			float pi = std::numbers::pi_v<float>;
 			float memo = startRotate_ / 2.0f / pi;
@@ -618,21 +618,21 @@ void Player::KnockBackUpdate(const float& y)
 {
 	velocity_.y += kGravity_;
 
-	tex_->pos_ += velocity_ * FrameInfo::GetInstance()->GetDelta();
+	tex_->pos += velocity_ * FrameInfo::GetInstance()->GetDelta();
 
 	rotateTimeCount_ += FrameInfo::GetInstance()->GetDelta();
 
 	float t = std::clamp<float>(rotateTimeCount_, 0.0f, rotateTime_) / rotateTime_;
 
-	models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = std::lerp(0.0f, endRotate_, t);
+	models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = std::lerp(0.0f, endRotate_, t);
 
-	if (tex_->pos_.y - tex_->scale_.y / 2.0f <= y) {
+	if (tex_->pos.y - tex_->scale.y / 2.0f <= y) {
 		Collision(y);
 
 		velocity_.y = 0.0f;
 		velocity_.x = 0.0f;
 		statusRequest_ = Status::kNormal;
-		models_[static_cast<uint16_t>(Parts::kMain)]->rotate_.z = 0.0f;
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.z = 0.0f;
 	}
 }
 
@@ -640,17 +640,17 @@ void Player::CollisionScaffolding(const Texture2D* tex)
 {
 
 	if (velocity_.y < 0 &&
-		tex_->pos_.y - velocity_.y - tex_->scale_.y/2.0f >= tex->pos_.y + tex->scale_.y / 2.0f &&
-		tex->pos_.x - tex->scale_.x / 2.0f <= tex_->pos_.x + tex_->scale_.x / 2.0f &&
-		tex->pos_.x + tex->scale_.x / 2.0f >= tex_->pos_.x - tex_->scale_.x / 2.0f &&
-		tex->pos_.y + tex->scale_.y / 2.0f >= tex_->pos_.y - tex_->scale_.y / 2.0f) {
+		tex_->pos.y - velocity_.y - tex_->scale.y/2.0f >= tex->pos.y + tex->scale.y / 2.0f &&
+		tex->pos.x - tex->scale.x / 2.0f <= tex_->pos.x + tex_->scale.x / 2.0f &&
+		tex->pos.x + tex->scale.x / 2.0f >= tex_->pos.x - tex_->scale.x / 2.0f &&
+		tex->pos.y + tex->scale.y / 2.0f >= tex_->pos.y - tex_->scale.y / 2.0f) {
 
-		tex_->pos_.y = tex->pos_.y + tex->scale_.y / 2.0f + tex_->scale_.y / 2.0f + 0.1f;
+		tex_->pos.y = tex->pos.y + tex->scale.y / 2.0f + tex_->scale.y / 2.0f + 0.1f;
 		velocity_.y = 0.0f;
 
 		tex_->Update();
 		
-		highest_ = tex_->pos_.y;
+		highest_ = tex_->pos.y;
 
 		statusRequest_ = Status::kOnScaffolding;
 	}
@@ -665,7 +665,7 @@ void Player::CollisionScaffolding(const Texture2D* tex)
 void Player::KnockBack(const Vector3& pos, const Vector3& scale)
 {
 	damageSE_->Start(0.1f);
-	Vector3 vector = tex_->pos_ - pos;
+	Vector3 vector = tex_->pos - pos;
 	vector.y = 0.0f;
 
 	Vector3 normal = vector.Normalize();
@@ -674,10 +674,10 @@ void Player::KnockBack(const Vector3& pos, const Vector3& scale)
 
 	if (vector.x < 0) {
 		theta *= -1;
-		tex_->pos_.x = pos.x - scale.x / 2 - tex_->scale_.x / 2;
+		tex_->pos.x = pos.x - scale.x / 2 - tex_->scale.x / 2;
 	}
 	else {
-		tex_->pos_.x = pos.x + scale.x / 2 + tex_->scale_.x / 2;
+		tex_->pos.x = pos.x + scale.x / 2 + tex_->scale.x / 2;
 	}
 
 	float speed = 200.0f;
@@ -711,7 +711,7 @@ void Player::Steped(const Vector3& pos)
 	damageSE_->Start(0.1f);
 	float speed = velocity_.Length() * kReboundCoefficient_;
 
-	Vector3 vector = pos - tex_->pos_;
+	Vector3 vector = pos - tex_->pos;
 
 	if (vector.x == 0) {
 
@@ -747,7 +747,7 @@ void Player::FallingCollision(Enemy* enemy)
 				isCollisionEnemy_ = true;
 				if (isCollisionEnemy_.OnEnter()) {
 
-					Vector3 vector = tex_->pos_ - enemy->GetTex()->pos_;
+					Vector3 vector = tex_->pos - enemy->GetTex()->pos;
 
 					float speed = velocity_.Length() * kReboundCoefficient_;
 
@@ -794,10 +794,10 @@ void Player::FallingCollision(Enemy* enemy)
 
 void Player::Collision(const float& y) {
 
-	float posY = tex_->pos_.y - tex_->scale_.y / 2.0f;
+	float posY = tex_->pos.y - tex_->scale.y / 2.0f;
 
 	if (y > posY) {
-		tex_->pos_.y += y - posY;
+		tex_->pos.y += y - posY;
 		velocity_.y = 0;
 	}
 
@@ -805,8 +805,8 @@ void Player::Collision(const float& y) {
 
 void Player::MemoHighest() {
 
-	if (highest_ < tex_->pos_.y) {
-		highest_ = tex_->pos_.y;
+	if (highest_ < tex_->pos.y) {
+		highest_ = tex_->pos.y;
 	}
 }
 

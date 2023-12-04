@@ -309,10 +309,10 @@ public:
 	}
 
 public:
-	Vector2 uvPibot_;
-	Vector2 uvSize_;
+	Vector2 uvPibot;
+	Vector2 uvSize;
 
-	Vector3 emitterPos_;
+	Vector3 emitterPos;
 
 private:
 	std::deque<Setting> settings_;

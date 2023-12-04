@@ -92,13 +92,13 @@ public:
 	}
 
 public:
-	Vector3 pos_;
-	Vector3 rotate_;
-	Vector3 scale_;
+	Vector3 pos;
+	Vector3 rotate;
+	Vector3 scale;
 
-	uint32_t color_;
+	uint32_t color;
 
-	Mesh::DirectionLight light_;
+	Mesh::DirectionLight light;
 
 private:
 	Model* parent_;

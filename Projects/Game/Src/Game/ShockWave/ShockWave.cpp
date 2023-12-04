@@ -42,17 +42,17 @@ ShockWave::ShockWave(const Vector3& pos, float highest, float layerY) {
 	int i = 0;
 
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
-		tex->scale_ = kSize_[static_cast<uint16_t>(type_)];
-		tex->pos_ = pos;
+		tex->scale = kSize_[static_cast<uint16_t>(type_)];
+		tex->pos = pos;
 		if (i % 2 == 1) {
 			tex->LoadTexture("./Resources/ShockWave/player_wave_gyaku.png");
-			tex->pos_.x -= tex->scale_.x / 4;
+			tex->pos.x -= tex->scale.x / 4;
 		}
 		else {
 			tex->LoadTexture("./Resources/ShockWave/player_wave.png");
-			tex->pos_.x += tex->scale_.x / 4;
+			tex->pos.x += tex->scale.x / 4;
 		}
-		tex->uvSize_.x = 1.0f / 7;
+		tex->uvSize.x = 1.0f / 7;
 		tex->uvPibotSpd_ = 1.0f / 7;
 		tex->AnimationStart(0.0f);
 		tex->Update();
@@ -78,9 +78,9 @@ void ShockWave::Finalize() {
 void ShockWave::Collision(const float& y) {
 
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
-		float posY = tex->pos_.y - tex->scale_.y / 2.0f;
+		float posY = tex->pos.y - tex->scale.y / 2.0f;
 
-		tex->pos_.y += y - posY;
+		tex->pos.y += y - posY;
 	}
 }
 
@@ -175,10 +175,10 @@ void ShockWave::Update() {
 	int i = 0;
 	for (std::unique_ptr<Texture2D>& tex : textures_) {
 		if (i == 0) {
-			tex->pos_.x += kSpeed_[static_cast<uint16_t>(type_)] * FrameInfo::GetInstance()->GetDelta();
+			tex->pos.x += kSpeed_[static_cast<uint16_t>(type_)] * FrameInfo::GetInstance()->GetDelta();
 		}
 		else {
-			tex->pos_.x -= kSpeed_[static_cast<uint16_t>(type_)] * FrameInfo::GetInstance()->GetDelta();
+			tex->pos.x -= kSpeed_[static_cast<uint16_t>(type_)] * FrameInfo::GetInstance()->GetDelta();
 		}
 		i++;
 	}

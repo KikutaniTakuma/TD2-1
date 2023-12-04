@@ -18,22 +18,22 @@ D3D12_INDEX_BUFFER_VIEW Texture2D::indexView_ = {};
 Microsoft::WRL::ComPtr<ID3D12Resource> Texture2D::indexResource_ = nullptr;
 
 Texture2D::Texture2D() :
-	scale_(Vector2::identity),
-	rotate_(),
-	pos_({ 0.0f,0.0f,0.01f }),
-	uvPibot_(),
-	uvSize_(Vector2::identity),
+	scale(Vector2::identity),
+	rotate(),
+	pos({ 0.0f,0.0f,0.01f }),
+	uvPibot(),
+	uvSize(Vector2::identity),
 	tex_(nullptr),
 	isLoad_(false),
-	color_(std::numeric_limits<uint32_t>::max()),
+	color(std::numeric_limits<uint32_t>::max()),
 	wvpMat_(),
 	colorBuf_(),
 	aniStartTime_(),
 	aniCount_(0.0f),
 	uvPibotSpd_(0.0f),
 	isAnimation_(0.0f),
-	isSameTexSize_(),
-	texScalar_(1.0f)
+	isSameTexSize(),
+	texScalar(1.0f)
 {
 	*wvpMat_ = Mat4x4::kIdentity_;
 	*colorBuf_ = Vector4::identity;
@@ -80,16 +80,16 @@ Texture2D::Texture2D(Texture2D&& right) noexcept :
 }
 
 Texture2D& Texture2D::operator=(const Texture2D& right) {
-	scale_ = right.scale_;
-	rotate_ = right.rotate_;
-	pos_ = right.pos_;
+	scale = right.scale;
+	rotate = right.rotate;
+	pos = right.pos;
 
-	uvPibot_ = right.uvPibot_;
-	uvSize_ = right.uvSize_;
+	uvPibot = right.uvPibot;
+	uvSize = right.uvSize;
 
-	color_ = right.color_;
+	color = right.color;
 
-	worldPos_ = right.worldPos_;
+	worldPos = right.worldPos;
 
 	tex_ = right.tex_;
 	isLoad_ = right.isLoad_;
@@ -103,24 +103,24 @@ Texture2D& Texture2D::operator=(const Texture2D& right) {
 	isAnimation_ = right.isAnimation_;
 	uvPibotSpd_ = right.uvPibotSpd_;
 
-	isSameTexSize_ = right.isSameTexSize_;
+	isSameTexSize = right.isSameTexSize;
 
-	texScalar_ = right.texScalar_;
+	texScalar = right.texScalar;
 
 	return *this;
 }
 
 Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
-	scale_ = std::move(right.scale_);
-	rotate_ = std::move(right.rotate_);
-	pos_ = std::move(right.pos_);
+	scale = std::move(right.scale);
+	rotate = std::move(right.rotate);
+	pos = std::move(right.pos);
 
-	uvPibot_ = std::move(right.uvPibot_);
-	uvSize_ = std::move(right.uvSize_);
+	uvPibot = std::move(right.uvPibot);
+	uvSize = std::move(right.uvSize);
 
-	color_ = std::move(right.color_);
+	color = std::move(right.color);
 
-	worldPos_ = std::move(right.worldPos_);
+	worldPos = std::move(right.worldPos);
 
 	tex_ = std::move(right.tex_);
 	isLoad_ = std::move(right.isLoad_);
@@ -133,8 +133,8 @@ Texture2D& Texture2D::operator=(Texture2D&& right) noexcept {
 	isAnimation_ = std::move(right.isAnimation_);
 	uvPibotSpd_ = std::move(right.uvPibotSpd_);
 
-	isSameTexSize_ = std::move(right.isSameTexSize_);
-	texScalar_ = std::move(right.texScalar_);
+	isSameTexSize = std::move(right.isSameTexSize);
+	texScalar = std::move(right.texScalar);
 
 	return *this;
 }
@@ -272,12 +272,12 @@ void Texture2D::Update() {
 	}
 
 	if (tex_ && isLoad_) {
-		if (isSameTexSize_) {
-			scale_ = tex_->getSize() * texScalar_;
+		if (isSameTexSize) {
+			scale = tex_->getSize() * texScalar;
 		}
-		else if(isSameTexSize_.OnExit()) {
-			scale_.x /= tex_->getSize().x;
-			scale_.y /= tex_->getSize().y;
+		else if(isSameTexSize.OnExit()) {
+			scale.x /= tex_->getSize().x;
+			scale.y /= tex_->getSize().y;
 		}
 
 		static const std::array<Vector3, 4> pv{
@@ -287,20 +287,20 @@ void Texture2D::Update() {
 			Vector3{ -0.5f, -0.5f, 0.1f },
 		};
 
-		std::copy(pv.begin(), pv.end(), worldPos_.begin());
+		std::copy(pv.begin(), pv.end(), worldPos.begin());
 		auto&& worldMat =
 			MakeMatrixAffin(
-				Vector3(scale_.x, scale_.y, 1.0f),
-				rotate_,
-				pos_
+				Vector3(scale.x, scale.y, 1.0f),
+				rotate,
+				pos
 			);
-		for (auto& i : worldPos_) {
+		for (auto& i : worldPos) {
 			i *= worldMat;
 		}
 
-		*colorBuf_ = UintToVector4(color_);
+		*colorBuf_ = UintToVector4(color);
 	}
-	isSameTexSize_.Update();
+	isSameTexSize.Update();
 }
 
 void Texture2D::Draw(
@@ -309,14 +309,14 @@ void Texture2D::Draw(
 	bool isDepth
 ) {
 	if (tex_ && isLoad_) {
-		const Vector2& uv0 = { uvPibot_.x, uvPibot_.y + uvSize_.y }; const Vector2& uv1 = uvSize_ + uvPibot_;
-		const Vector2& uv2 = { uvPibot_.x + uvSize_.x, uvPibot_.y }; const Vector2& uv3 = uvPibot_;
+		const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
+		const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
 
 		std::array<VertexData, 4> pv = {
-			worldPos_[0], uv3,
-			worldPos_[1], uv2,
-			worldPos_[2], uv1,
-			worldPos_[3], uv0,
+			worldPos[0], uv3,
+			worldPos[1], uv2,
+			worldPos[2], uv1,
+			worldPos[3], uv0,
 		};
 
 		VertexData* mappedData = nullptr;
@@ -347,19 +347,19 @@ void Texture2D::Draw(
 
 void Texture2D::Debug([[maybe_unused]]const std::string& guiName) {
 #ifdef _DEBUG
-	*colorBuf_ = UintToVector4(color_);
+	*colorBuf_ = UintToVector4(color);
 	ImGui::Begin(guiName.c_str());
-	ImGui::Checkbox("is same scale and Texture", isSameTexSize_.Data());
-	if (isSameTexSize_) {
-		ImGui::DragFloat("tex scalar", &texScalar_, 0.01f);
+	ImGui::Checkbox("is same scale and Texture", isSameTexSize.Data());
+	if (isSameTexSize) {
+		ImGui::DragFloat("tex scalar", &texScalar, 0.01f);
 	}
-	ImGui::DragFloat2("scale", &scale_.x, 1.0f);
-	ImGui::DragFloat3("rotate", &rotate_.x, 0.01f);
-	ImGui::DragFloat3("pos", &pos_.x, 1.0f);
-	ImGui::DragFloat2("uvPibot", &uvPibot_.x, 0.01f);
-	ImGui::DragFloat2("uvSize", &uvSize_.x, 0.01f);
+	ImGui::DragFloat2("scale", &scale.x, 1.0f);
+	ImGui::DragFloat3("rotate", &rotate.x, 0.01f);
+	ImGui::DragFloat3("pos", &pos.x, 1.0f);
+	ImGui::DragFloat2("uvPibot", &uvPibot.x, 0.01f);
+	ImGui::DragFloat2("uvSize", &uvSize.x, 0.01f);
 	ImGui::ColorEdit4("SphereColor", &colorBuf_->color.r);
-	color_ = Vector4ToUint(*colorBuf_);
+	color = Vector4ToUint(*colorBuf_);
 
 	if (ImGui::TreeNode("tex load")) {
 		if (isLoad_) {
@@ -383,19 +383,19 @@ void Texture2D::Debug([[maybe_unused]]const std::string& guiName) {
 bool Texture2D::Collision(const Vector2& pos2D) const {
 	Vector2 max;
 	Vector2 min;
-	max.x = std::max_element(worldPos_.begin(), worldPos_.end(),
+	max.x = std::max_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	max.y = std::max_element(worldPos_.begin(), worldPos_.end(),
+	max.y = std::max_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	min.x = std::min_element(worldPos_.begin(), worldPos_.end(),
+	min.x = std::min_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	min.y = std::min_element(worldPos_.begin(), worldPos_.end(),
+	min.y = std::min_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
@@ -412,27 +412,27 @@ bool Texture2D::Collision(const Vector2& pos2D) const {
 bool Texture2D::Collision(const Texture2D& tex2D) const {
 	Vector3 max;
 	Vector3 min;
-	max.x = std::max_element(worldPos_.begin(), worldPos_.end(),
+	max.x = std::max_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	max.y = std::max_element(worldPos_.begin(), worldPos_.end(),
+	max.y = std::max_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	max.z = std::max_element(worldPos_.begin(), worldPos_.end(),
+	max.z = std::max_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.z < right.z;
 		})->z;
-	min.x = std::min_element(worldPos_.begin(), worldPos_.end(),
+	min.x = std::min_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	min.y = std::min_element(worldPos_.begin(), worldPos_.end(),
+	min.y = std::min_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	min.z = std::min_element(worldPos_.begin(), worldPos_.end(),
+	min.z = std::min_element(worldPos.begin(), worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.z < right.z;
 		})->z;
@@ -440,27 +440,27 @@ bool Texture2D::Collision(const Texture2D& tex2D) const {
 	// 追加変更。by Korone
 	Vector3 max2;
 	Vector3 min2;
-	max2.x = std::max_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
+	max2.x = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	max2.y = std::max_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
+	max2.y = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	max2.z = std::max_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
+	max2.z = std::max_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.z < right.z;
 		})->z;
-	min2.x = std::min_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
+	min2.x = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.x < right.x;
 		})->x;
-	min2.y = std::min_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
+	min2.y = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.y < right.y;
 		})->y;
-	min2.z = std::min_element(tex2D.worldPos_.begin(), tex2D.worldPos_.end(),
+	min2.z = std::min_element(tex2D.worldPos.begin(), tex2D.worldPos.end(),
 		[](const Vector3& left, const Vector3& right) {
 			return left.z < right.z;
 		})->z;
@@ -491,7 +491,7 @@ void Texture2D::AnimationStart(float aniUvPibot) {
 		aniStartTime_ = std::chrono::steady_clock::now();
 		isAnimation_ = true;
 		aniCount_ = 0.0f;
-		uvPibot_.x = aniUvPibot;
+		uvPibot.x = aniUvPibot;
 	}
 }
 
@@ -520,8 +520,8 @@ void Texture2D::Animation(size_t aniSpd, bool isLoop, float aniUvStart, float an
 				}
 			}
 
-			uvPibot_.x = aniUvStart;
-			uvPibot_.x += uvPibotSpd_ * aniCount_;
+			uvPibot.x = aniUvStart;
+			uvPibot.x += uvPibotSpd_ * aniCount_;
 		}
 	}
 }

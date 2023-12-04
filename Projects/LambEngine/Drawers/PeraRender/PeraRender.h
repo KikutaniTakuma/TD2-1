@@ -64,16 +64,16 @@ public:
 	}
 
 public:
-	Vector3 pos_;
-	Vector3 rotate_;
-	Vector3 scale_;
+	Vector3 pos;
+	Vector3 rotate;
+	Vector3 scale;
 
-	Vector2 uvPibot_;
-	Vector2 uvSize_;
+	Vector2 uvPibot;
+	Vector2 uvSize;
 
-	std::array<Vector3, 4> worldPos_;
+	std::array<Vector3, 4> worldPos;
 
-	uint32_t color_;
+	uint32_t color;
 
 private:
 	RenderTarget render_;

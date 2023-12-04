@@ -14,16 +14,16 @@ PeraRender::PeraRender():
 	indexResource_{nullptr},
 	shader_{},
 	piplines_{nullptr},
-	pos_{},
-	rotate_{},
-	scale_{Vector3::identity},
+	pos{},
+	rotate{},
+	scale{Vector3::identity},
 	wvpMat_{},
 	colorBuf_{},
 	isPreDraw_(false),
-	uvPibot_(),
-	uvSize_(Vector2::identity),
-	worldPos_{},
-	color_(std::numeric_limits<uint32_t>::max())
+	uvPibot(),
+	uvSize(Vector2::identity),
+	worldPos{},
+	color(std::numeric_limits<uint32_t>::max())
 {}
 
 PeraRender::PeraRender(uint32_t width, uint32_t height):
@@ -34,16 +34,16 @@ PeraRender::PeraRender(uint32_t width, uint32_t height):
 	indexResource_{ nullptr },
 	shader_{},
 	piplines_{ nullptr },
-	pos_{},
-	rotate_{},
-	scale_{ Vector3::identity },
+	pos{},
+	rotate{},
+	scale{ Vector3::identity },
 	wvpMat_{},
 	colorBuf_{},
 	isPreDraw_(false),
-	uvPibot_(),
-	uvSize_(Vector2::identity),
-	worldPos_{},
-	color_(std::numeric_limits<uint32_t>::max())
+	uvPibot(),
+	uvSize(Vector2::identity),
+	worldPos{},
+	color(std::numeric_limits<uint32_t>::max())
 {}
 
 PeraRender::~PeraRender() {
@@ -161,18 +161,18 @@ void PeraRender::Update() {
 			Vector3{ -0.5f, -0.5f, 0.1f },
 	};
 
-	std::copy(pv.begin(), pv.end(), worldPos_.begin());
+	std::copy(pv.begin(), pv.end(), worldPos.begin());
 	auto&& worldMat =
 		MakeMatrixAffin(
-			Vector3(scale_.x, scale_.y, 1.0f),
-			rotate_,
-			pos_
+			Vector3(scale.x, scale.y, 1.0f),
+			rotate,
+			pos
 		);
-	for (auto& i : worldPos_) {
+	for (auto& i : worldPos) {
 		i *= worldMat;
 	}
 
-	*colorBuf_ = UintToVector4(color_);
+	*colorBuf_ = UintToVector4(color);
 }
 
 void PeraRender::PreDraw() {
@@ -194,14 +194,14 @@ void PeraRender::Draw(
 		render_.SetMainRenderTarget();
 	}
 
-	const Vector2& uv0 = { uvPibot_.x, uvPibot_.y + uvSize_.y }; const Vector2& uv1 = uvSize_ + uvPibot_;
-	const Vector2& uv2 = { uvPibot_.x + uvSize_.x, uvPibot_.y }; const Vector2& uv3 = uvPibot_;
+	const Vector2& uv0 = { uvPibot.x, uvPibot.y + uvSize.y }; const Vector2& uv1 = uvSize + uvPibot;
+	const Vector2& uv2 = { uvPibot.x + uvSize.x, uvPibot.y }; const Vector2& uv3 = uvPibot;
 
 	std::array<PeraVertexData, 4> pv = {
-		worldPos_[0], uv3,
-		worldPos_[1], uv2,
-		worldPos_[2], uv1,
-		worldPos_[3], uv0,
+		worldPos[0], uv3,
+		worldPos[1], uv2,
+		worldPos[2], uv1,
+		worldPos[3], uv0,
 	};
 
 	PeraVertexData* mappedData = nullptr;

@@ -38,7 +38,7 @@ public:
 
 	const Texture2D* GetTex() { return tex_.get(); }
 
-	const float GetHighestPosY() { return (tex_->pos_.y + tex_->scale_.y / 2.0f); }
+	const float GetHighestPosY() { return (tex_->pos.y + tex_->scale.y / 2.0f); }
 
 	const Vector3 GetVelocity() { return velocity; }
 
