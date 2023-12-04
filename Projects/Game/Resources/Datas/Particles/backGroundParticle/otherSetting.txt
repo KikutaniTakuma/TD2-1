@@ -1,0 +1,2 @@
+1
+./Resources\back_star.png

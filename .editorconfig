@@ -1,2 +1,2 @@
-[*.{c,cpp,h,hpp,hlsl,hlsli}]
+[*.{c,h,cpp,hpp,hlsl,hlsli}]
 charset = utf-8

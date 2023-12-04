@@ -1,2 +1,0 @@
-0
-./Resources\heal_effect.png
