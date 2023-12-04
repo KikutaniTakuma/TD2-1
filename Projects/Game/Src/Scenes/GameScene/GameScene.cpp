@@ -69,6 +69,9 @@ void GameScene::Initialize() {
 	leftKeyHud_.reset(new Texture2D);
 	puaseKeyHud_.reset(new Texture2D);
 
+	startMessage_.reset(new Texture2D);
+	startMessageBubble_.reset(new Texture2D);
+
 	backGroundParticle_.reset(new Particle{});
 
 
@@ -137,6 +140,18 @@ void GameScene::Initialize() {
 	leftKeyHud_->uvSize.x = 0.5f;
 	puaseHud_->uvSize.x = 0.5f;
 	puaseKeyHud_->uvSize.x = 0.5f;
+
+	startMessage_->LoadTexture("./Resources/StartMessage/inGame_startUI.png");
+	startMessage_->isSameTexSize = true;
+	startMessage_->texScalar = 0.44f;
+	startMessage_->pos.y = 192.0f;
+	startMessageBubble_->LoadTexture("./Resources/StartMessage/inGame_startFlame.png");
+	startMessageBubble_->isSameTexSize = true;
+	startMessageBubble_->texScalar = 0.67f;
+	startMessageBubble_->pos.y = 194.0f;
+
+	startMessageEasing_.reset(new Easing{});
+	startMessageEasingDuration_ = { 0.3f, 0.58f };
 }
 
 void GameScene::Finalize() {
@@ -854,7 +869,12 @@ void GameScene::ShackUpdate()
 }
 
 void GameScene::Update() {
-	auto nowTime = std::chrono::steady_clock::now();
+	auto nowTime = frameInfo_->GetThisFrameTime();
+
+	startMessage_->Debug("startMessage_");
+	startMessageBubble_->Debug("startMessageBubble_");
+	startMessage_->Update();
+	startMessageBubble_->Update();
 
 	if (!pause_->isActive_) {
 
@@ -1093,5 +1113,9 @@ void GameScene::Draw() {
 		leftKeyHud_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 		puaseKeyHud_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	}
+
+	startMessageBubble_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	startMessage_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+
 	pause_->Draw();
 }

@@ -274,6 +274,10 @@ private:
 	std::unique_ptr<Texture2D> leftKeyHud_;
 	std::unique_ptr<Texture2D> puaseKeyHud_;
 
+	std::unique_ptr<Texture2D> startMessage_;
+	std::unique_ptr<Texture2D> startMessageBubble_;
+	std::unique_ptr<Easing> startMessageEasing_;
+	std::pair<float, float> startMessageEasingDuration_;
 
 	///
 	/// =============================================
