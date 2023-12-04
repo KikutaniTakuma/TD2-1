@@ -46,17 +46,17 @@ public:
 	
 private:
 	// 背景
-	std::array<Texture2D, 3> backGround_;
+	std::array<std::unique_ptr<Texture2D>, 3> backGround_;
 	// 背景に軽く縦平均化ブラー
-	PeraRender backGroundBlur_;
+	std::unique_ptr<PeraRender> backGroundBlur_;
 
-	Model moon_;
+	std::unique_ptr<Model> moon_;
 	std::pair<float, float> moonRotateY_;
-	Easing rotateEase_;
+	std::unique_ptr<Easing> rotateEase_;
 
-	Model player_;
+	std::unique_ptr<Model> player_;
 	std::array<std::pair<Vector2, Vector2>, 3> playerScaleEaseDuration_;
-	std::array<Easing, 3> playerEase_;
+	std::array<std::unique_ptr<Easing>, 3> playerEase_;
 	int32_t currentPlayerEaseing_;
 	std::pair<float, float> playerNormalMove_;
 	
@@ -74,33 +74,33 @@ private:
 
 	bool isStick_;
 
-	Texture2D bubble_;
+	std::unique_ptr<Texture2D> bubble_;
 	std::pair<float, float> bubbleY_;
-	Easing bubbleEase_;
+	std::unique_ptr<Easing> bubbleEase_;
 
 	int32_t currentStage_;
 
 	int32_t maxStage_;
 
-	Texture2D stageNumberTex_;
-	Texture2D stageTenNumberTex_;
+	std::unique_ptr<Texture2D> stageNumberTex_;
+	std::unique_ptr<Texture2D> stageTenNumberTex_;
 	std::pair<float, float> stageNumberTexY_;
 
-	Texture2D stageTex_;
+	std::unique_ptr<Texture2D> stageTex_;
 	std::pair<float, float> stageTexY_;
 
 
-	Texture2D arrowRight_;
+	std::unique_ptr<Texture2D> arrowRight_;
 	std::pair<Vector3, Vector3> arrowRightPos_;
-	Texture2D arrowLeft_;
+	std::unique_ptr<Texture2D> arrowLeft_;
 	std::pair<Vector3, Vector3> arrowLeftPos_;
-	Easing arrowEase_;
+	std::unique_ptr<Easing> arrowEase_;
 
-	Texture2D isClearTex_;
+	std::unique_ptr<Texture2D> isClearTex_;
 	std::pair<float, float> isClearTexY_;
 
 	// 背景パーティクル
-	Particle backGroundParticle_;
+	std::unique_ptr<Particle> backGroundParticle_;
 
 	class Audio* bgm_;
 	class Audio* choiceSE_;
@@ -108,12 +108,12 @@ private:
 	class Audio* backSE_;
 
 	// Hud
-	Texture2D aButtonHud_;
-	Texture2D spaceHud_;
-	Easing hudAlphaEase_;
-	Texture2D keyEscHud_;
-	Texture2D padStartHud_;
-	Texture2D backToHud_;
+	std::unique_ptr<Texture2D> aButtonHud_;
+	std::unique_ptr<Texture2D> spaceHud_;
+	std::unique_ptr<Easing> hudAlphaEase_;
+	std::unique_ptr<Texture2D> keyEscHud_;
+	std::unique_ptr<Texture2D> padStartHud_;
+	std::unique_ptr<Texture2D> backToHud_;
 
-	Camera staticCamera_;
+	std::unique_ptr<Camera> staticCamera_;
 };
