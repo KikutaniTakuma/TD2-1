@@ -52,7 +52,7 @@ void ResultScene::Initialize() {
 		i.reset(new Texture2D{});
 	}
 	timer_.reset(new Texture2D{});
-	timer_.reset(new Texture2D{});
+	timerUI_.reset(new Texture2D{});
 	nextStageMassage_.reset(new Texture2D{});
 	stageSelectMassage_.reset(new Texture2D{});
 	arrow_.reset(new Texture2D{});
@@ -219,10 +219,10 @@ void ResultScene::Initialize() {
 	timer_->texScalar = 0.59f;
 	timer_->isSameTexSize = true;
 	timer_->pos = { 49.0f, 141.0f, 0.01f };
-	timer_->LoadTexture("./Resources/Result/result_UI_scoreLine.png");
-	timer_->texScalar = 0.58f;
-	timer_->isSameTexSize = true;
-	timer_->pos = { 243.0f, 107.0f, 0.01f };
+	timerUI_->LoadTexture("./Resources/Result/result_UI_scoreLine.png");
+	timerUI_->texScalar = 0.58f;
+	timerUI_->isSameTexSize = true;
+	timerUI_->pos = { 243.0f, 107.0f, 0.01f };
 
 	// ステージセレクトUI
 	nextStageMassage_->LoadTexture("./Resources/Result/result_UI_next.png");
@@ -577,7 +577,7 @@ void ResultScene::Update() {
 	playerScaleEase_->Update();
 
 	timer_->Update();
-	timer_->Update();
+	timerUI_->Update();
 
 	playerScaleGetStarEase_->Update();
 	playerScaleGetStarEase2_->Update();
@@ -669,7 +669,7 @@ void ResultScene::Draw() {
 	}
 
 	timer_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
-	timer_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	timerUI_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 
 	if (isCanSelect_) {
 		stageSelectMassage_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
