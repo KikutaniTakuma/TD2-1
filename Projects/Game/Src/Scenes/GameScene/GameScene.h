@@ -139,6 +139,8 @@ private:
 	/// </summary>
 	void Collision();
 
+	void StartMessageUpdate();
+
 public:
 	// ステージ番号のセッター
 	void SetStageNumber(int32_t stage) {
@@ -281,6 +283,8 @@ private:
 	std::unique_ptr<Easing> startMessageEasingRotate_;
 	std::unique_ptr<Easing> startMessageEasingEnd_;
 	std::pair<float, float> startMessageEasingDuration_;
+	std::pair<float, float> startBubbleEasingDuration_;
+	std::pair<float, float> rotateMessageEasingDuration_;
 	std::chrono::milliseconds startMessageTime_;
 
 	///

@@ -144,19 +144,31 @@ void GameScene::Initialize() {
 	startMessage_->LoadTexture("./Resources/StartMessage/inGame_startUI.png");
 	startMessage_->isSameTexSize = true;
 	startMessage_->texScalar = 0.44f;
+	startMessageEasingDuration_ = { 0.0f, 0.44f };
 	startMessage_->pos.y = 192.0f;
 	startMessageBubble_->LoadTexture("./Resources/StartMessage/inGame_startFlame.png");
 	startMessageBubble_->isSameTexSize = true;
 	startMessageBubble_->texScalar = 0.67f;
+	startBubbleEasingDuration_ = {0.0f, 0.67f};
 	startMessageBubble_->pos.y = 194.0f;
 
-	//startMessageEasing_.reset(new Easing{});
+	startMessageEasingStart_.reset(new Easing{});
+	startMessageEasingRotate_.reset(new Easing{});
+	startMessageEasingEnd_.reset(new Easing{});
 	startMessageEasingDuration_ = { 0.3f, 0.58f };
 	startMessageTime_ = std::chrono::milliseconds{ 3000 };
 }
 
 void GameScene::Finalize() {
 	bgm_->Stop();
+}
+
+void GameScene::StartMessageUpdate() {
+	// 最初の大きさを0から一定の大きさまで持っていく
+	if (startMessageEasingStart_->GetIsActive()) {
+		startMessage_->texScalar = startMessageEasingStart_->Get(startMessageEasingDuration_.first, startMessageEasingDuration_.second);
+
+	}
 }
 
 void GameScene::InitializeGlobalVariable() {
