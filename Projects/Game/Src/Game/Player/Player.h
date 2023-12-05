@@ -109,6 +109,8 @@ public:
 
 	bool GetIsFly() { return isFly_; }
 
+	void ModelUpdate(const Camera* camera);
+
 private:
 
 	/// <summary>
@@ -183,6 +185,8 @@ private:
 	float easeTime_;
 	float easeCount_;
 	bool isEaseReturn_;
+
+	float hipdropCount_;
 
 	Vector2 scaleStart_;
 	Vector2 scaleEnd_;
