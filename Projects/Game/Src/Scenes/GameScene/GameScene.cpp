@@ -150,8 +150,9 @@ void GameScene::Initialize() {
 	startMessageBubble_->texScalar = 0.67f;
 	startMessageBubble_->pos.y = 194.0f;
 
-	startMessageEasing_.reset(new Easing{});
+	//startMessageEasing_.reset(new Easing{});
 	startMessageEasingDuration_ = { 0.3f, 0.58f };
+	startMessageTime_ = std::chrono::milliseconds{ 3000 };
 }
 
 void GameScene::Finalize() {

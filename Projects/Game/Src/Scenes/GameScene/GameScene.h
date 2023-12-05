@@ -276,8 +276,12 @@ private:
 
 	std::unique_ptr<Texture2D> startMessage_;
 	std::unique_ptr<Texture2D> startMessageBubble_;
-	std::unique_ptr<Easing> startMessageEasing_;
+	// 目的表示のメッセージを
+	std::unique_ptr<Easing> startMessageEasingStart_;
+	std::unique_ptr<Easing> startMessageEasingRotate_;
+	std::unique_ptr<Easing> startMessageEasingEnd_;
 	std::pair<float, float> startMessageEasingDuration_;
+	std::chrono::milliseconds startMessageTime_;
 
 	///
 	/// =============================================
