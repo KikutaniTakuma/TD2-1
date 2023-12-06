@@ -438,7 +438,7 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 
 					}
 				}
-
+				tex_->Update();
 
 				Vector3 vector = tex_->pos - enemy->GetTex()->pos;
 

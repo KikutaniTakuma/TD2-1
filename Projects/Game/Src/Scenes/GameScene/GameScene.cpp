@@ -955,6 +955,12 @@ void GameScene::Update() {
 
 		Collision();
 
+		player_->ModelUpdate(camera2D_.get());
+
+		for (std::unique_ptr<Enemy>& enemy : enemies_) {
+			enemy->ModelUpdate(camera2D_.get());
+		}
+
 		ShackUpdate();
 
 		layer_->Update(camera2D_.get());
