@@ -42,7 +42,7 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 			models_[i].push_back(std::make_unique<Model>());
 		}
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
-		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.5f,1.0f }.Normalize();
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
@@ -110,7 +110,7 @@ void Layer::ApplyGlobalVariable() {
 				models_[i].push_back(std::make_unique<Model>());
 			}
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
-			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();;
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.5f,1.0f }.Normalize();
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
@@ -250,7 +250,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 			models_[i].push_back(std::make_unique<Model>());
 		}
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
-		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.5f,1.0f }.Normalize();;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
