@@ -269,10 +269,10 @@ void Player::NormalInitialize(const float& y) {
 	//velocity_ = {};
 	//highest_ = 0.0f;
 	Collision(y);
-	
+
 	isStep_ = false;
 	isSteped_ = false;
-	
+	models_[static_cast<uint16_t>(Parts::kMain)]->rotate.y = -std::numbers::pi_v<float>;
 }
 
 void Player::NormalUpdate(const float& y) {
@@ -369,31 +369,42 @@ void Player::NormalUpdate(const float& y) {
 void Player::HipDropInitialize() {
 
 	velocity_ = {};
+	hipdropCount_ = 0;
 }
 
 void Player::HipDropUpdate(const float& y) {
 
-	velocity_.y += kHipDropSpeed_ * FrameInfo::GetInstance()->GetDelta();
-	tex_->pos += velocity_;
+	float time = 0.3f;
 
-	if (isHipdropJamp_) {
-		if (isStep_) {
-			isFly_ = true;
-			isStep_ = false;
-			// 初速を与える
-			velocity_.y = kJampInitialVelocity_;
-			statusRequest_ = Status::kNormal;
+	if (hipdropCount_ < time) {
+		hipdropCount_ = std::clamp<float>(hipdropCount_ + FrameInfo::GetInstance()->GetDelta(), 0.0f, time);
+
+		float t = hipdropCount_ / time;
+
+		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.y = (1.0f - t) * (-std::numbers::pi_v<float>) + t * std::numbers::pi_v<float>;
+	}
+	else {
+		velocity_.y += kHipDropSpeed_ * FrameInfo::GetInstance()->GetDelta();
+		tex_->pos += velocity_;
+
+		if (isHipdropJamp_) {
+			if (isStep_) {
+				isFly_ = true;
+				isStep_ = false;
+				// 初速を与える
+				velocity_.y = kJampInitialVelocity_;
+				statusRequest_ = Status::kNormal;
+			}
+		}
+
+		if (tex_->pos.y - tex_->scale.y / 2.0f <= y && isFly_) {
+
+			Collision(y);
+			velocity_.y = 0.0f;
+			isFly_ = false;
+			statusRequest_ = Status::kLanding;
 		}
 	}
-
-	if (tex_->pos.y - tex_->scale.y / 2.0f <= y && isFly_) {
-
-		Collision(y);
-		velocity_.y = 0.0f;
-		isFly_ = false;
-		statusRequest_ = Status::kLanding;
-	}
-
 }
 
 void Player::OnScaffoldingInitialize()
@@ -790,6 +801,24 @@ void Player::FallingCollision(Enemy* enemy)
 			isCollisionEnemy_ = false;
 		}
 	}
+}
+
+void Player::ModelUpdate(const Camera* camera)
+{
+	float ratio = WindowFactory::GetInstance()->GetClientSize().y /
+		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
+
+	float indication = 90.0f;
+
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.x = tex_->pos.x / ratio + camera->pos.x - camera->pos.x / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.y = tex_->pos.y / ratio + camera->pos.y - camera->pos.y / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.x = tex_->scale.x / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.y = tex_->scale.y / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[static_cast<uint16_t>(Parts::kMain)]->scale.y;
+	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
+	tex_->Update();
 }
 
 void Player::Collision(const float& y) {
