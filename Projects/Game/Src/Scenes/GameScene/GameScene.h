@@ -280,11 +280,9 @@ private:
 	std::unique_ptr<Texture2D> startMessageBubble_;
 	// 目的表示のメッセージを
 	std::unique_ptr<Easing> startMessageEasingStart_;
-	std::unique_ptr<Easing> startMessageEasingRotate_;
 	std::unique_ptr<Easing> startMessageEasingEnd_;
 	std::pair<float, float> startMessageEasingDuration_;
-	std::pair<float, float> startBubbleEasingDuration_;
-	std::pair<float, float> rotateMessageEasingDuration_;
+	std::pair<float, float> startMessageEasingDurationEnd_;
 	std::chrono::milliseconds startMessageTime_;
 
 	///
