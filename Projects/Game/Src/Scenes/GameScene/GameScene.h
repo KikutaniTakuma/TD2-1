@@ -139,6 +139,10 @@ private:
 	/// </summary>
 	void Collision();
 
+	void CameraInit();
+
+	void CameraUpdate();
+
 public:
 	// ステージ番号のセッター
 	void SetStageNumber(int32_t stage) {

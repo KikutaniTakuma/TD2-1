@@ -8,6 +8,7 @@
 #include "Drawers/Model/Model.h"
 
 #include "Drawers/Particle/Particle.h"
+#include <algorithm>
 
 class Camera;
 
@@ -78,6 +79,8 @@ public:
 	const Texture2D* GetHighestTex() { return tex_[nowLayer_].get(); }
 
 	const float GetHighestPosY() { return (tex_[nowLayer_]->pos.y + tex_[nowLayer_]->scale.y / 2.0f); }
+
+	const float GetLastLayerPosY() { return (tex_[std::clamp<int>(kMaxLayerNum_ - 1,0, kMaxLayerNum_)]->pos.y + tex_[std::clamp<int>(kMaxLayerNum_ - 1, 0, kMaxLayerNum_)]->scale.y / 2.0f); }
 
 	const int GetNowLayer() { return nowLayer_; }
 
