@@ -143,6 +143,10 @@ private:
 
 	void CameraUpdate();
 
+	void StartMessageUpdate();
+
+	void GameUpdate();
+
 public:
 	// ステージ番号のセッター
 	void SetStageNumber(int32_t stage) {
@@ -266,7 +270,7 @@ private:
 	// ポーズ画面
 	std::unique_ptr<Pause> pause_;
 
-	Audio* bgm_;
+	class Audio* bgm_;
 
 	// hud
 	std::unique_ptr<Texture2D> aButtonHud_;
@@ -278,6 +282,16 @@ private:
 	std::unique_ptr<Texture2D> leftKeyHud_;
 	std::unique_ptr<Texture2D> puaseKeyHud_;
 
+	std::unique_ptr<Texture2D> startMessage_;
+	std::unique_ptr<Texture2D> startMessageBubble_;
+	// 目的表示のメッセージを
+	std::unique_ptr<Easing> startMessageEasingStart_;
+	std::unique_ptr<Easing> startMessageEasingEnd_;
+	std::pair<float, float> startMessageEasingDuration_;
+	std::pair<float, float> startMessageEasingDurationEnd_;
+	std::chrono::milliseconds startMessageDrawTime_;
+	std::chrono::steady_clock::time_point leftEasingCoolTimeStart_;
+	bool isUpdate_;
 
 	///
 	/// =============================================

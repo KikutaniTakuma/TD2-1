@@ -103,6 +103,10 @@ public:
 		return isActive_.OnExit();
 	}
 
+	const Lamb::Flg& GetIsActive() const {
+		return isActive_;
+	}
+
 private:
 #ifdef _DEBUG
 	int32_t easeType_;
