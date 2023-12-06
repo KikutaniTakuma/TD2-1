@@ -803,6 +803,24 @@ void Player::FallingCollision(Enemy* enemy)
 	}
 }
 
+void Player::ModelUpdate(const Camera* camera)
+{
+	float ratio = WindowFactory::GetInstance()->GetClientSize().y /
+		(std::tanf(camera->fov / 2) * (models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) * 2);
+
+	float indication = 90.0f;
+
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.x = tex_->pos.x / ratio + camera->pos.x - camera->pos.x / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->pos.y = tex_->pos.y / ratio + camera->pos.y - camera->pos.y / ratio;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.x = tex_->scale.x / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.y = tex_->scale.y / (indication * std::tanf(camera->fov / 2) * 2) *
+		(models_[static_cast<uint16_t>(Parts::kMain)]->pos.z - camera->pos.z) / indication;
+	models_[static_cast<uint16_t>(Parts::kMain)]->scale.z = models_[static_cast<uint16_t>(Parts::kMain)]->scale.y;
+	models_[static_cast<uint16_t>(Parts::kMain)]->Update();
+	tex_->Update();
+}
+
 void Player::Collision(const float& y) {
 
 	float posY = tex_->pos.y - tex_->scale.y / 2.0f;
