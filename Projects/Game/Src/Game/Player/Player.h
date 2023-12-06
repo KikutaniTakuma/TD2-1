@@ -103,7 +103,7 @@ public:
 
 	void KnockBack(const Vector3& pos, const Vector3& scale);
 
-	void Steped(const Vector3& pos);
+	void Steped(Enemy* enemy);
 
 	void FallingCollision(Enemy* enemy);
 
