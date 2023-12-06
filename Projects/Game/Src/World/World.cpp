@@ -61,9 +61,12 @@ void World::Draw() {
 	if (sceneManager_) {
 		sceneManager_->Draw();
 		particleEditor_->Draw();
+#ifndef _DEBUG
 		if (!WindowFactory::GetInstance()->IsThisWindowaActive()) {
 			inactiveSprite_->Draw(*staticCameraMatrix_, Pipeline::Normal, false);
 		}
+#endif // !_DEBUG
+
 	}
 	else {
 		isEnd_ = true;

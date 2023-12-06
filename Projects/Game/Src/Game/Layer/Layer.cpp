@@ -55,6 +55,12 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 	gauge_->Initialize(nowLayer_, kMaxHitPoints_[nowLayer_]);
 
 	SetGlobalVariable();
+
+	colorSet_ = {
+		std::numeric_limits<uint32_t>::max(),
+		Vector4ToUint(Vector4{0.75f,0.75f,0.75f,1.0f }),
+		Vector4ToUint(Vector4{0.5f,0.5f,0.5f,1.0f })
+	};
 }
 
 void Layer::SetParametar(std::vector<int> kMaxHitPoints) {
@@ -88,7 +94,7 @@ void Layer::ApplyGlobalVariable() {
 			tex_[i]->scale = kLayer2DScale_;
 			tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
 			tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
-			if (i % 3 == 0) {
+			/*if (i % 3 == 0) {
 				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else if (i % 3 == 1) {
@@ -96,7 +102,7 @@ void Layer::ApplyGlobalVariable() {
 			}
 			else {
 				tex_[i]->color = 0xFFFFFFFF;
-			}
+			}*/
 
 			models_.push_back(std::vector<std::unique_ptr<Model>>());
 
@@ -110,6 +116,25 @@ void Layer::ApplyGlobalVariable() {
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
 
 			tex_[i]->Update();
+		}
+
+		auto colorSetItr = colorSet_.begin();
+
+		for (auto& i : tex_) {
+			i->color = *colorSetItr;
+			colorSetItr++;
+			if (colorSetItr == colorSet_.end()) {
+				colorSetItr = colorSet_.begin();
+			}
+		}
+
+		colorSetItr = colorSet_.begin();
+		for (auto& i : models_) {
+			i[static_cast<uint16_t>(Parts::kMain)]->color = *colorSetItr;
+			colorSetItr++;
+			if (colorSetItr == colorSet_.end()) {
+				colorSetItr = colorSet_.begin();
+			}
 		}
 	}
 	else {
@@ -130,6 +155,25 @@ void Layer::ApplyGlobalVariable() {
 
 			tex_[i]->Update();
 		}
+
+		auto colorSetItr = colorSet_.begin();
+
+		for (auto& i : tex_) {
+			i->color = *colorSetItr;
+			colorSetItr++;
+			if (colorSetItr == colorSet_.end()) {
+				colorSetItr = colorSet_.begin();
+			}
+		}
+
+		colorSetItr = colorSet_.begin();
+		for (auto& i : models_) {
+			i[static_cast<uint16_t>(Parts::kMain)]->color = *colorSetItr;
+			colorSetItr++;
+			if (colorSetItr == colorSet_.end()) {
+				colorSetItr = colorSet_.begin();
+			}
+		}
 	}
 }
 
@@ -138,9 +182,27 @@ void Layer::Reset() {
 	hitPoints_ = kMaxHitPoints_;
 	nowLayer_ = 0;
 
+	auto colorSetItr = colorSet_.begin();
+
+	for (auto& i : tex_) {
+		i->color = *colorSetItr;
+		colorSetItr++;
+		if (colorSetItr == colorSet_.end()) {
+			colorSetItr = colorSet_.begin();
+		}
+	}
+
+	colorSetItr = colorSet_.begin();
+	for (auto& i : models_) {
+		i[static_cast<uint16_t>(Parts::kMain)]->color = *colorSetItr;
+		colorSetItr++;
+		if (colorSetItr == colorSet_.end()) {
+			colorSetItr = colorSet_.begin();
+		}
+	}
 	for (int i = 0; i < kMaxLayerNum_; i++) {
 
-		if (i % 3 == 0) {
+		/*if (i % 3 == 0) {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else if (i % 3 == 1) {
@@ -148,11 +210,12 @@ void Layer::Reset() {
 		}
 		else {
 			tex_[i]->color = 0xFFFFFFFF;
-		}
+		}*/
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
 		tex_[i]->Update();
 	}
+
 }
 
 void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
@@ -170,7 +233,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 		tex_.push_back(std::make_unique<Texture2D>());
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
-		if (i % 3 == 0) {
+		/*if (i % 3 == 0) {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else if (i % 3 == 1) {
@@ -178,7 +241,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 		}
 		else {
 			tex_[i]->color = 0xFFFF00FF;
-		}
+		}*/
 		tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
 
 		models_.push_back(std::vector<std::unique_ptr<Model>>());
@@ -193,6 +256,25 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
 
 		tex_[i]->Update();
+	}
+
+	auto colorSetItr = colorSet_.begin();
+
+	for (auto& i : tex_) {
+		i->color = *colorSetItr;
+		colorSetItr++;
+		if (colorSetItr == colorSet_.end()) {
+			colorSetItr = colorSet_.begin();
+		}
+	}
+
+	colorSetItr = colorSet_.begin();
+	for (auto& i : models_) {
+		i[static_cast<uint16_t>(Parts::kMain)]->color = *colorSetItr;
+		colorSetItr++;
+		if (colorSetItr == colorSet_.end()) {
+			colorSetItr = colorSet_.begin();
+		}
 	}
 
 	gauge_->Initialize(hitPoints_[nowLayer_], kMaxHitPoints_[nowLayer_]);

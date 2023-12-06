@@ -150,6 +150,8 @@ private:
 	// 層の数
 	int kMaxLayerNum_;
 
+	std::array<uint32_t, 3> colorSet_;
+
 	// 今の層
 	int nowLayer_;
 

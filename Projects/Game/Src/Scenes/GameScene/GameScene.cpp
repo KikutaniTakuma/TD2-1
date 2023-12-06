@@ -1116,10 +1116,12 @@ void GameScene::Update() {
 	puaseKeyHud_->Update();
 
 
-
+#ifndef _DEBUG
 	if (!WindowFactory::GetInstance()->IsThisWindowaActive()) {
 		pause_->isActive_ = true;
 	}
+#endif // _DEBUG
+
 
 	pause_->ActiveUpdate();
 	pause_->SceneChange(stage_ + 1);

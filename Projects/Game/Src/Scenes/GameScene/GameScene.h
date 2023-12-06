@@ -220,7 +220,7 @@ private:
 	// 複数ステージのある層の数
 	std::vector<int> kLayerNums_;
 
-	// 今のステージ。０が1ステージ目
+	// 今のステージ。0が1ステージ目
 	int stage_;
 
 	int preStage_;
