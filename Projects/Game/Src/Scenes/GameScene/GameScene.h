@@ -194,8 +194,6 @@ private:
 
 	Vector3 cameraLocalPos_;
 
-	Vector3 firstCameraPos_;
-
 	std::unique_ptr<Player> player_;
 
 	std::unique_ptr<Background> background_;

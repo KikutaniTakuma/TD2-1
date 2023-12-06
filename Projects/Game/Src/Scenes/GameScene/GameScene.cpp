@@ -148,8 +148,6 @@ void GameScene::InitializeGlobalVariable() {
 
 	camera2D_->pos = globalVariables_->GetVector3Value("Game", "Camera2DPos");
 
-	firstCameraPos_ = globalVariables_->GetVector3Value("Game", "Camera2DPos");
-
 	kMaxStageNum_ = globalVariables_->GetIntValue("Game", "kMaxStageNum");
 
 	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
