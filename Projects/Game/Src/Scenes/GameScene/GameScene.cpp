@@ -148,6 +148,8 @@ void GameScene::InitializeGlobalVariable() {
 
 	camera2D_->pos = globalVariables_->GetVector3Value("Game", "Camera2DPos");
 
+	firstCameraPos_ = globalVariables_->GetVector3Value("Game", "Camera2DPos");
+
 	kMaxStageNum_ = globalVariables_->GetIntValue("Game", "kMaxStageNum");
 
 	for (int stageNum = 0; stageNum < kMaxStageNum_; stageNum++) {
@@ -832,6 +834,41 @@ void GameScene::Collision() {
 	}
 }
 
+void GameScene::CameraInit()
+{
+
+	
+
+}
+
+void GameScene::CameraUpdate()
+{
+	/*float y = player_->GetTex()->pos.y;
+		if (cameraLocalPos_.y + layer_->GetHighestPosY() > player_->GetTex()->pos.y) {
+			y = cameraLocalPos_.y + layer_->GetHighestPosY();
+		}
+		if (player_->GetVelocity().y < 0) {
+			camera2D_->pos.y = camera2D_->pos.y + (y - camera2D_->pos.y) * 0.1f;
+		}
+		else {
+			camera2D_->pos.y = camera2D_->pos.y + (y - camera2D_->pos.y) * 0.05f;
+		}*/
+	if (cameraLocalPos_.y + layer_->GetLastLayerPosY() <= player_->GetTex()->pos.y) {
+		camera2D_->pos.y = player_->GetTex()->pos.y;
+	}
+	else {
+		camera2D_->pos.y = cameraLocalPos_.y + layer_->GetLastLayerPosY();
+	}
+	if (isShack_) {
+		camera2D_->pos += shackPos_;
+	}
+	else {
+		camera2D_->pos.x = 0.0f;
+	}
+
+	camera2D_->Update();
+}
+
 void GameScene::ShackUpdate()
 {
 	if (isShack_) {
@@ -856,30 +893,8 @@ void GameScene::Update() {
 	auto nowTime = std::chrono::steady_clock::now();
 
 	if (!pause_->isActive_) {
-		/*float y = player_->GetTex()->pos.y;
-		if (cameraLocalPos_.y + layer_->GetHighestPosY() > player_->GetTex()->pos.y) {
-			y = cameraLocalPos_.y + layer_->GetHighestPosY();
-		}
-		if (player_->GetVelocity().y < 0) {
-			camera2D_->pos.y = camera2D_->pos.y + (y - camera2D_->pos.y) * 0.1f;
-		}
-		else {
-			camera2D_->pos.y = camera2D_->pos.y + (y - camera2D_->pos.y) * 0.05f;
-		}*/
-		if (cameraLocalPos_.y + layer_->GetHighestPosY() <= player_->GetTex()->pos.y) {
-			camera2D_->pos.y = player_->GetTex()->pos.y;
-		}
-		else {
-			camera2D_->pos.y = cameraLocalPos_.y + layer_->GetHighestPosY();
-		}
-		if (isShack_) {
-			camera2D_->pos += shackPos_;
-		}
-		else {
-			camera2D_->pos.x = 0.0f;
-		}
-
-		camera2D_->Update();
+		
+		CameraUpdate();
 
 #ifdef _DEBUG
 

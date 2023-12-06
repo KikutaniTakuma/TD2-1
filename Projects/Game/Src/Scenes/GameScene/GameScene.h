@@ -139,6 +139,10 @@ private:
 	/// </summary>
 	void Collision();
 
+	void CameraInit();
+
+	void CameraUpdate();
+
 public:
 	// ステージ番号のセッター
 	void SetStageNumber(int32_t stage) {
@@ -189,6 +193,8 @@ private:
 	float shackCount_;
 
 	Vector3 cameraLocalPos_;
+
+	Vector3 firstCameraPos_;
 
 	std::unique_ptr<Player> player_;
 
