@@ -141,6 +141,8 @@ private:
 
 	void StartMessageUpdate();
 
+	void GameUpdate();
+
 public:
 	// ステージ番号のセッター
 	void SetStageNumber(int32_t stage) {
@@ -264,7 +266,7 @@ private:
 	// ポーズ画面
 	std::unique_ptr<Pause> pause_;
 
-	Audio* bgm_;
+	class Audio* bgm_;
 
 	// hud
 	std::unique_ptr<Texture2D> aButtonHud_;
@@ -283,7 +285,9 @@ private:
 	std::unique_ptr<Easing> startMessageEasingEnd_;
 	std::pair<float, float> startMessageEasingDuration_;
 	std::pair<float, float> startMessageEasingDurationEnd_;
-	std::chrono::milliseconds startMessageTime_;
+	std::chrono::milliseconds startMessageDrawTime_;
+	std::chrono::steady_clock::time_point leftEasingCoolTimeStart_;
+	bool isUpdate_;
 
 	///
 	/// =============================================
