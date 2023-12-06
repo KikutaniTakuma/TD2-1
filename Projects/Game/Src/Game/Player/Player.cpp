@@ -300,7 +300,7 @@ void Player::NormalUpdate(const float& y) {
 			statusRequest_ = Status::kHipDrop;
 
 			// 音を出す
-			fallSE_->Start(0.3f);
+			//fallSE_->Start(0.3f);
 		}
 
 		easeCount_ += deletaTime;
@@ -382,6 +382,12 @@ void Player::HipDropUpdate(const float& y) {
 		float t = hipdropCount_ / time;
 
 		models_[static_cast<uint16_t>(Parts::kMain)]->rotate.y = (1.0f - t) * (-std::numbers::pi_v<float>) + t * std::numbers::pi_v<float>;
+
+		if (hipdropCount_ >= time) {
+			// 音を出す
+			fallSE_->Start(0.3f);
+		}
+
 	}
 	else {
 		velocity_.y += kHipDropSpeed_ * FrameInfo::GetInstance()->GetDelta();
