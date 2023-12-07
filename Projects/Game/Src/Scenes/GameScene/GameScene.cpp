@@ -837,6 +837,7 @@ void GameScene::CreatShockWave(const Vector3& pos, float highest, float y) {
 		shakeMax_ = 30.0f;
 		shakeCount_ = 0.0f;
 		shakePos_ = { 0.0f,0.0f,0.0f };
+		Gamepad::GetInstance()->Vibration(0.4f, 0.4f, 150);
 	}
 	else if (highest >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kSmall))) {
 		isShake_ = true;
@@ -844,6 +845,7 @@ void GameScene::CreatShockWave(const Vector3& pos, float highest, float y) {
 		shakeMax_ = 18.0f;
 		shakeCount_ = 0.0f;
 		shakePos_ = { 0.0f,0.0f,0.0f };
+		Gamepad::GetInstance()->Vibration(0.3f, 0.3f, 150);
 	}
 	else {
 		isShake_ = true;
@@ -851,6 +853,7 @@ void GameScene::CreatShockWave(const Vector3& pos, float highest, float y) {
 		shakeMax_ = 9.0f;
 		shakeCount_ = 0.0f;
 		shakePos_ = { 0.0f,0.0f,0.0f };
+		Gamepad::GetInstance()->Vibration(0.2f, 0.2f, 150);
 	}
 }
 
