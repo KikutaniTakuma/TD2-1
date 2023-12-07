@@ -76,8 +76,8 @@ FrameInfo::~FrameInfo() {
 	auto playtime =
 		std::chrono::duration_cast<std::chrono::seconds>(end - gameStartTime_);
 
-	maxFps_ = std::clamp(maxFps_, 0.0, kMaxMonitorFps_);
-	minFps_ = std::clamp(minFps_, 0.0, kMaxMonitorFps_);
+	maxFps_ = std::clamp(maxFps_, 0.0, fpsLimit_);
+	minFps_ = std::clamp(minFps_, 0.0, fpsLimit_);
 
 	double avgFps = 0.0;
 	double size = static_cast<double>(frameDatas_.size());
