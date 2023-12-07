@@ -1107,7 +1107,7 @@ void Enemy::DeathInitialize(Layer* layer) {
 	enemyDeathParticle_.emitterPos = tex_->pos;
 	explorsionSE_->Start(0.2f);
 	FrameInfo::GetInstance()->HitStop(150);
-	Gamepad::GetInstance()->Vibration(0.3f, 0.3f);
+	Gamepad::GetInstance()->Vibration(0.3f, 0.3f, 150);
 }
 
 void Enemy::DeathUpdate() {
@@ -1115,10 +1115,6 @@ void Enemy::DeathUpdate() {
 		timeCount_ += FrameInfo::GetInstance()->GetDelta();
 
 		tex_->scale = Vector2::zero;
-
-		if (timeCount_ >= 1.0f) {
-			Gamepad::GetInstance()->Vibration(0.0f, 0.0f);
-		}
 
 		if (timeCount_ >= kHealerDeathTime_) {
 			statusRequest_ = Status::kGeneration;
@@ -1129,10 +1125,6 @@ void Enemy::DeathUpdate() {
 		timeCount_ += FrameInfo::GetInstance()->GetDelta();
 
 		tex_->scale = Vector2::zero;
-
-		if (timeCount_ >= 1.0f) {
-			Gamepad::GetInstance()->Vibration(0.0f, 0.0f);
-		}
 
 		if (timeCount_ >= kDeathTime_) {
 			statusRequest_ = Status::kGeneration;
