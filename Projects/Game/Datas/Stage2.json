@@ -9,18 +9,18 @@
             0.0
         ],
         "Enemy0Type": 0,
-        "Enemy10IsHealer": 1,
-        "Enemy10MoveRadius": 0.0,
-        "Enemy10MoveVector": 0,
+        "Enemy10IsHealer": 0,
+        "Enemy10MoveRadius": 60.0,
+        "Enemy10MoveVector": 1,
         "Enemy10Pos": [
             -525.0,
             0.0,
             0.0
         ],
         "Enemy10Type": 1,
-        "Enemy11IsHealer": 1,
-        "Enemy11MoveRadius": 0.0,
-        "Enemy11MoveVector": 0,
+        "Enemy11IsHealer": 0,
+        "Enemy11MoveRadius": 60.0,
+        "Enemy11MoveVector": 2,
         "Enemy11Pos": [
             525.0,
             0.0,

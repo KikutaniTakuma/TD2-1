@@ -108,7 +108,7 @@
             0.0
         ],
         "Enemy1Type": 0,
-        "Enemy20IsHealer": 1,
+        "Enemy20IsHealer": 0,
         "Enemy20MoveRadius": 120.0,
         "Enemy20MoveVector": 1,
         "Enemy20Pos": [
@@ -117,7 +117,7 @@
             0.0
         ],
         "Enemy20Type": 1,
-        "Enemy21IsHealer": 1,
+        "Enemy21IsHealer": 0,
         "Enemy21MoveRadius": 120.0,
         "Enemy21MoveVector": 1,
         "Enemy21Pos": [
