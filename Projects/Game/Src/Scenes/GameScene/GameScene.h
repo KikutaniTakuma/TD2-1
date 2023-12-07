@@ -13,6 +13,7 @@
 #include "Game/Scaffolding/Scaffolding.h"
 #include "Game/Background/Background.h"
 #include "Scenes/SubMenu/Pause.h"
+#include "Game/StageTimer/StageTimer.h"
 
 class GameScene : public BaseScene {
 public:
@@ -213,6 +214,8 @@ private:
 	std::list<std::unique_ptr<ShockWave>> shockWaves_;
 
 	std::unique_ptr<Layer> layer_;
+
+	std::unique_ptr<StageTimer> stageTimer_;
 
 	// 複数ステージの複数ある層のHP１つ１つが保存される配列
 	std::vector<std::vector<int>> kLayerHitPoints_;

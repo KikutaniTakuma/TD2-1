@@ -7,10 +7,10 @@
 #include <array>
 #include <string>
 
-class Timer
+class StageTimer
 {
 public:
-	Timer();
+	StageTimer();
 
 	void Init();
 
@@ -29,6 +29,8 @@ private:
 	void SetNumTeces();
 
 	void SetSpriteSize();
+
+	void SetSpritePos();
 
 	void TecesUpdate();
 
@@ -65,6 +67,8 @@ private:
 		kMinutesPosX,
 		kSecondPosX,
 		kSecondInterval,
+		kTexScale,
+		kNumScale,
 		kFInfoCount,
 	};
 
@@ -74,6 +78,8 @@ private:
 		"分のx座標",
 		"秒のx座標",
 		"秒の間隔",
+		"点々のスケール",
+		"数字のスケール",
 	};
 
 	std::array<float, FInfoNames::kFInfoCount> fInfo_;
