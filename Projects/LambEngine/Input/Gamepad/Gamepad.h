@@ -7,6 +7,7 @@
 #include <Xinput.h>
 #pragma comment (lib, "xinput.lib")
 #include <stdint.h>
+#include <chrono>
 
 // Xボックスコントローラーでやったのでコメントアウトの説明はそれ
 // ほかのコントローラーは分からないので検証必須
@@ -57,10 +58,6 @@ private:
 	Gamepad& operator=(const Gamepad&) = delete;
 	Gamepad& operator=(Gamepad&&) = delete;
 
-private:
-	WORD preButton_;
-	XINPUT_STATE state_;
-	XINPUT_VIBRATION vibration_;
 
 public:
 	static Gamepad*const GetInstance();
@@ -138,6 +135,17 @@ public:
 	/// <param name="rightVibIntensity">右側のバイブレーション 0.0f ～ 1.0f で強さを指定</param>
 	void Vibration(float leftVibIntensity, float rightVibIntensity);
 
+	void Vibration(float leftVibIntensity, float rightVibIntensity, uint32_t vibrationMilliSecond);
+
 	// デバッグ用
 	void Debug();
+
+private:
+	WORD preButton_;
+	XINPUT_STATE state_;
+	XINPUT_VIBRATION vibration_;
+
+	std::chrono::steady_clock::time_point vibrationStartTime_;
+	std::chrono::milliseconds vibraiotnTime_;
+	bool isVibration_;
 };

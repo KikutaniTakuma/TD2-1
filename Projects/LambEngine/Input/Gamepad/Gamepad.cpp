@@ -5,9 +5,12 @@
 #include "Utils/Math/Vector2.h"
 
 Gamepad::Gamepad() :
-	preButton_(0),
-	state_({0}),
-	vibration_({0})
+	preButton_(),
+	state_{},
+	vibration_{},
+	vibrationStartTime_{},
+	vibraiotnTime_{},
+	isVibration_(false)
 {}
 
 Gamepad* const Gamepad::GetInstance() {
@@ -18,6 +21,14 @@ Gamepad* const Gamepad::GetInstance() {
 void Gamepad::Input() {
 	preButton_ = state_.Gamepad.wButtons;
     XInputGetState(0, &state_);
+
+	if (isVibration_) {
+		auto duration = std::chrono::duration_cast<decltype(vibraiotnTime_)>(std::chrono::steady_clock::now() - vibrationStartTime_);
+		if (vibraiotnTime_ < duration) {
+			isVibration_ = false;
+			Vibration(0.0f, 0.0f);
+		}
+	}
 }
 
 void Gamepad::InputReset() {
@@ -124,6 +135,21 @@ void Gamepad::Vibration(float leftVibIntensity, float rightVibIntensity) {
 	vibration_.wLeftMotorSpeed = static_cast<WORD>(static_cast<float>(USHRT_MAX) * leftVibIntensity);
 	vibration_.wRightMotorSpeed = static_cast<WORD>(static_cast<float>(USHRT_MAX) * rightVibIntensity);
 	XInputSetState(0, &vibration_);
+}
+
+void Gamepad::Vibration(float leftVibIntensity, float rightVibIntensity, uint32_t vibrationMilliSecond) {
+	/*if (!isVibration_) {*/
+		leftVibIntensity = std::clamp(leftVibIntensity, 0.0f, 1.0f);
+		rightVibIntensity = std::clamp(rightVibIntensity, 0.0f, 1.0f);
+
+		vibration_.wLeftMotorSpeed = static_cast<WORD>(static_cast<float>(USHRT_MAX) * leftVibIntensity);
+		vibration_.wRightMotorSpeed = static_cast<WORD>(static_cast<float>(USHRT_MAX) * rightVibIntensity);
+		XInputSetState(0, &vibration_);
+
+		isVibration_ = true;
+		vibrationStartTime_ = std::chrono::steady_clock::now();
+		vibraiotnTime_ = decltype(vibraiotnTime_){vibrationMilliSecond};
+	//}
 }
 
 void Gamepad::Debug() {
