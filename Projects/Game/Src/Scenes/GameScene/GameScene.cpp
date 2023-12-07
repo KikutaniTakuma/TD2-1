@@ -56,7 +56,7 @@ GameScene::GameScene() :
 
 	layer_ = std::make_unique<Layer>(kLayerNums_[stage_], kLayerHitPoints_[stage_]);
 
-	playTime_ = std::chrono::milliseconds{ 0 };
+	playTime_ = 0.0f;
 }
 
 void GameScene::Initialize() {
@@ -283,11 +283,10 @@ void GameScene::GameUpdate() {
 
 	if (layer_->GetClearFlag().OnEnter()) {
 		bgm_->Stop();
-		playTime_ += std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
-
+		
 		auto result = new ResultScene{};
 		assert(result);
-		result->SetClearTime(playTime_);
+		result->SetClearTime(std::chrono::milliseconds{ static_cast<uint32_t>(playTime_ * 1000.0f) });
 		result->SetStageNumber(stage_ + 1);
 		sceneManager_->SceneChange(result);
 	}
@@ -1047,6 +1046,7 @@ void GameScene::ShackUpdate()
 
 void GameScene::Update() {
 	auto nowTime = frameInfo_->GetThisFrameTime();
+	auto deltaTime = frameInfo_->GetDelta();
 
 	StartMessageUpdate();
 
@@ -1056,6 +1056,7 @@ void GameScene::Update() {
 	startMessageBubble_->Update();*/
 
 	if (!pause_->isActive_ && isUpdate_) {
+		playTime_ += deltaTime;
 		GameUpdate();
 	}
 
@@ -1138,7 +1139,6 @@ void GameScene::Update() {
 		pause_->isActive_ = !pause_->isActive_;
 		if (pause_->isActive_) {
 			bgm_->SetAudio(0.025f);
-			playTime_ += std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
 		}
 		else {
 			bgm_->SetAudio(0.1f);
