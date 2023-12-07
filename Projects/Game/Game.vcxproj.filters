@@ -68,6 +68,9 @@
     <ClCompile Include="Src\Game\Star\Star.cpp">
       <Filter>Game\Star</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Game\StageTimer\StageTimer.cpp">
+      <Filter>Game\StageTimer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GlobalVariables">
@@ -142,6 +145,9 @@
     <Filter Include="Game\Star">
       <UniqueIdentifier>{f1378c18-4285-4a1d-b75d-00509efac3b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\StageTimer">
+      <UniqueIdentifier>{a142e9ce-d0d4-4f55-b8cf-10fe6cc5c22f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\GlobalVariables\GlobalVariables.h">
@@ -209,6 +215,9 @@
     </ClInclude>
     <ClInclude Include="Src\Game\Star\Star.h">
       <Filter>Game\Star</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Game\StageTimer\StageTimer.h">
+      <Filter>Game\StageTimer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
