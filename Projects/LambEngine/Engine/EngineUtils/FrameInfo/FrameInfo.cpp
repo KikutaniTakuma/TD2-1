@@ -41,7 +41,10 @@ FrameInfo::FrameInfo() :
 	frameDataDurationStartTime_{},
 	avgProcDuration_{600llu},
 	fpsStringOutPut_{},
-	isDrawFps_(false)
+	isDrawFps_(false),
+	hitStopStartTime_{},
+	hitStopTime_{},
+	isHitStop_(false)
 {
 	// リフレッシュレート取得
 	fps_ = kMaxMonitorFps_;
@@ -71,7 +74,7 @@ FrameInfo::~FrameInfo() {
 	EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &mode);
 
 	auto playtime =
-		std::chrono::duration_cast<std::chrono::milliseconds>(end - gameStartTime_);
+		std::chrono::duration_cast<std::chrono::seconds>(end - gameStartTime_);
 
 	maxFps_ = std::clamp(maxFps_, 0.0, kMaxMonitorFps_);
 	minFps_ = std::clamp(minFps_, 0.0, kMaxMonitorFps_);
@@ -86,6 +89,7 @@ FrameInfo::~FrameInfo() {
 
 	avgFps /= size;
 
+	Lamb::AddLog(std::format("Play Time : {}\n", playtime));
 	Lamb::AddLog(std::format("Average Fps : {:.2f}\n", avgFps));
 	if (std::chrono::duration_cast<std::chrono::seconds>(end - gameStartTime_) > std::chrono::seconds(1)) {
 		Lamb::AddLog(std::format("Max Fps : {:.2f}\n", maxFps_));
@@ -135,7 +139,7 @@ void FrameInfo::End() {
 	auto nowTime = std::chrono::steady_clock::now();
 	reference_ = nowTime;
 
-	if (std::chrono::duration_cast<std::chrono::seconds>(frameDataDurationStartTime_ - nowTime) < frameDataDuration_) {
+	if (frameDataDuration_ < std::chrono::duration_cast<std::chrono::seconds>(nowTime - frameDataDurationStartTime_)) {
 		frameDataDurationStartTime_ = nowTime;
 		frameDatas_.push(fps_);
 
@@ -152,6 +156,17 @@ void FrameInfo::End() {
 			frameDatas_.push(avgFps);
 		}
 	}
+
+	if (isHitStop_) {
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime- hitStopStartTime_);
+		if (hitStopTime_ < duration) {
+			isHitStop_ = false;
+			gameSpeedSccale_ = 1.0;
+		}
+	}
+	else if(gameSpeedSccale_ == 0.0){
+		gameSpeedSccale_ = 1.0;
+	}
 }
 
 void FrameInfo::DrawFps() {
@@ -166,13 +181,6 @@ void FrameInfo::SwitchDarwFlg() {
 	if (KeyInput::GetInstance()->Pushed(DIK_F3)) {
 		isDrawFps_ = !isDrawFps_;
 	}
-}
-
-void FrameInfo::SetFpsLimit(double fpsLimit) {
-	fpsLimit_ = std::clamp(fpsLimit, 10.0, maxFpsLimit_);
-	           
-	minTime_ = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_));
-	minCheckTime_ = std::chrono::microseconds(uint64_t(1000000.0 / (fpsLimit_ + (5.0f * (fpsLimit_ / 60.0f)))));
 }
 
 void FrameInfo::Debug() {
@@ -217,11 +225,6 @@ void FrameInfo::Debug() {
 #endif // _DEBUG
 }
 
-void FrameInfo::SetGameSpeedScale(float gameSpeedSccale) {
-	gameSpeedSccale = std::clamp(gameSpeedSccale, 0.0f, 10.0f);
-	gameSpeedSccale_ = static_cast<double>(gameSpeedSccale);
-}
-
 double FrameInfo::GetMainMonitorFramerate() const {
 	//画面情報構造体
 	DEVMODE mode{};
@@ -231,4 +234,11 @@ double FrameInfo::GetMainMonitorFramerate() const {
 
 	// リフレッシュレート取得
 	return static_cast<double>(mode.dmDisplayFrequency);
+}
+
+void FrameInfo::HitStop(uint32_t hitStopMilliSecond) {
+	hitStopTime_ = std::chrono::milliseconds{ hitStopMilliSecond };
+	hitStopStartTime_ = std::chrono::steady_clock::now();
+	isHitStop_ = true;
+	gameSpeedSccale_ = 0.0;
 }

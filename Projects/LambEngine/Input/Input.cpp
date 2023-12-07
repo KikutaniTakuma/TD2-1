@@ -38,7 +38,7 @@ Input::Input():
 
 	gamepad_ = Gamepad::GetInstance();
 	key_ = KeyInput::GetInstance();
-	mouse_ = Mouse::GetInstance();
+	mouse_ = Mouse::GetInstance();        
 }
 
 Input::~Input() {
@@ -48,7 +48,14 @@ Input::~Input() {
 }
 
 void Input::InputStart() {
-	gamepad_->Input();
-	key_->Input();
-	mouse_->Input();
+	if (WindowFactory::GetInstance()->IsThisWindowaActive()) {
+		gamepad_->Input();
+		key_->Input();
+		mouse_->Input();
+	}
+	else {
+		gamepad_->InputReset();
+		key_->InputReset();
+		mouse_->InputReset();
+	}
 }

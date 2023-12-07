@@ -33,15 +33,15 @@ public:
 /// </summary>
 private:
 	// 背景
-	std::array<Texture2D, 3> backGround_;
+	std::array<std::unique_ptr<Texture2D>, 3> backGround_;
 	// 背景に軽く縦平均化ブラー
-	PeraRender backGroundBlur_;
+	std::unique_ptr<PeraRender> backGroundBlur_;
 
-	Model player_;
+	std::unique_ptr<Model> player_;
 	std::pair<Vector3, Vector3> playerScale_;
 	std::pair<Vector3, Vector3> playerPos_;
-	Easing playerScaleEaseing_;
-	Easing playerPosEaseing_;
+	std::unique_ptr<Easing> playerScaleEaseing_;
+	std::unique_ptr<Easing> playerPosEaseing_;
 
 	// プレイヤーアニメーション
 	std::vector<Texture*> playerAnimationTex_;
@@ -55,31 +55,31 @@ private:
 	bool isPlayerAnimationCoolTime_;
 
 	// パーティクル
-	Particle smoke_;
+	std::unique_ptr<Particle> smoke_;
 
 	// タイトル
-	Texture2D titleTex_;
+	std::unique_ptr<Texture2D> titleTex_;
 	std::pair<float, float> titleScaleDuration_;
-	Easing titleEase_;
+	std::unique_ptr<Easing> titleEase_;
 
 	// hud
-	Texture2D aButtonHud_;
-	Texture2D spaceHud_;
-	Texture2D startHud_;
-	Easing hudAlphaEase_;
+	std::unique_ptr<Texture2D> aButtonHud_;
+	std::unique_ptr<Texture2D> spaceHud_;
+	std::unique_ptr<Texture2D> startHud_;
+	std::unique_ptr<Easing> hudAlphaEase_;
 
 	// 床
-	Texture2D floor_;
+	std::unique_ptr<Texture2D> floor_;
 
 	// 背景パーティクル
-	Particle backGroundParticle_;
+	std::unique_ptr<Particle> backGroundParticle_;
 
-	Audio* bgm_;
-	Audio* decideSE_;
+	class Audio* bgm_;
+	class Audio* decideSE_;
 
-	Texture2D keyEscHud_;
-	Texture2D padStartHud_;
-	Texture2D backToHud_;
+	std::unique_ptr<Texture2D> keyEscHud_;
+	std::unique_ptr<Texture2D> padStartHud_;
+	std::unique_ptr<Texture2D> backToHud_;
 
-	Camera staticCamera_;
+	std::unique_ptr<Camera> staticCamera_;
 };

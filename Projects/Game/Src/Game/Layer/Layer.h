@@ -150,12 +150,17 @@ private:
 	// 層の数
 	int kMaxLayerNum_;
 
+	std::array<uint32_t, 3> colorSet_;
+
 	// 今の層
 	int nowLayer_;
 
 	bool isChangeLayer_;
 
 	Lamb::Flg isClear_;
+	Lamb::Flg isClearStop_;
+	std::chrono::milliseconds clearUnitlTime_;
+	std::chrono::steady_clock::time_point startClearUnitlTime_;
 
 	std::chrono::milliseconds gamePlayTime_;
 	std::chrono::steady_clock::time_point playStartTime_;

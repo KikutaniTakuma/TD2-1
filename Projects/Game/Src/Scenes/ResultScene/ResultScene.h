@@ -79,23 +79,20 @@ public:
 /// メンバ変数
 /// </summary>
 private:
-	std::vector<Model> models_;
-	std::vector<Texture2D> texs_;
-	std::vector<Particle> particles_;
-	GlobalVariables globalVariables_;
+	std::unique_ptr<GlobalVariables> globalVariables_;
 
 	///
 	/// ここに必要なメンバ変数を追加
 	/// 
 	
 	// 星
-	std::array<Star,3> stars_;
+	std::array<std::unique_ptr<Star>,3> stars_;
 
 	// 背景の型
-	std::array<Star,3> starsGray_;
+	std::array<std::unique_ptr<Star>,3> starsGray_;
 
 	// グレースケール化
-	PeraRender grayPera_;
+	std::unique_ptr<PeraRender> grayPera_;
 
 	// 星のアニメーション間隔
 	std::chrono::milliseconds starEffectDuration_;
@@ -103,12 +100,12 @@ private:
 	size_t currentStar_;
 
 	// 吹き出し
-	Texture2D speechBubble_;
+	std::unique_ptr<Texture2D> speechBubble_;
 
 	// 背景
-	std::array<Texture2D, 3> backGround_;
+	std::array<std::unique_ptr<Texture2D>, 3> backGround_;
 	// 背景に軽く縦平均化ブラー
-	PeraRender backGroundBlur_;
+	std::unique_ptr<PeraRender> backGroundBlur_;
 
 	// クリア時間
 	std::chrono::milliseconds clearTime_;
@@ -122,19 +119,19 @@ private:
 	bool isUpdate_;
 
 	// プレイヤーのモデル
-	Model player_;
+	std::unique_ptr<Model> player_;
 	std::pair<Vector3, Vector3> playerScale_;
-	Easing playerScaleEase_;
+	std::unique_ptr<Easing> playerScaleEase_;
 
 	// 星獲得時のアニメーション
 	std::pair<Vector3, Vector3> playerScaleGetStar_;
 	std::pair<Vector3, Vector3> playerScaleGetStar2_;
-	Easing playerScaleGetStarEase_;
-	Easing playerScaleGetStarEase2_;
+	std::unique_ptr<Easing> playerScaleGetStarEase_;
+	std::unique_ptr<Easing> playerScaleGetStarEase2_;
 
 	// 星3つの時のモデルアニメーション
 	std::pair<float, float> playerRotateSpecial_;
-	Easing playerSpecialEase_;
+	std::unique_ptr<Easing> playerSpecialEase_;
 
 	Texture* speciaclPlayerTex_;
 
@@ -151,39 +148,39 @@ private:
 
 
 	// タイマー
-	Texture2D timer_;
-	Texture2D timerUI_;
+	std::unique_ptr<Texture2D> timer_;
+	std::unique_ptr<Texture2D> timerUI_;
 
 	// ステージセレクトUI
-	Texture2D nextStageMassage_;
-	Texture2D stageSelectMassage_;
-	Texture2D arrow_;
+	std::unique_ptr<Texture2D> nextStageMassage_;
+	std::unique_ptr<Texture2D> stageSelectMassage_;
+	std::unique_ptr<Texture2D> arrow_;
 	// 今選択しているところ(0:nextStage, 1:stageSelect)
 	int32_t nowChoose_;
 	std::pair<float, float> arrowPosY_;
 	// 矢印のイージング
 	std::pair<float, float> arrowPosX_;
-	Easing arrowEase_;
+	std::unique_ptr<Easing> arrowEase_;
 
 	// 次のステージかステージセレクトを選択できるか
 	Lamb::Flg isCanSelect_;
 
 	// 時間表示
-	Texture2D tenMinutes_;
-	Texture2D minutes_;
-	Texture2D tenSeconds_;
-	Texture2D seconds_;
-	Texture2D colon1_;
-	Texture2D colon2_;
+	std::unique_ptr<Texture2D> tenMinutes_;
+	std::unique_ptr<Texture2D> minutes_;
+	std::unique_ptr<Texture2D> tenSeconds_;
+	std::unique_ptr<Texture2D> seconds_;
+	std::unique_ptr<Texture2D> colon1_;
+	std::unique_ptr<Texture2D> colon2_;
 
 	// resultUI
-	Texture2D resultUI_;
-	Texture2D stageNumberTex_;
-	Texture2D stageTenNumberTex_;
+	std::unique_ptr<Texture2D> resultUI_;
+	std::unique_ptr<Texture2D> stageNumberTex_;
+	std::unique_ptr<Texture2D> stageTenNumberTex_;
 	int32_t stageNumber_;
 
 	// 背景パーティクル
-	Particle backGroundParticle_;
+	std::unique_ptr<Particle> backGroundParticle_;
 
 
 	// BGM

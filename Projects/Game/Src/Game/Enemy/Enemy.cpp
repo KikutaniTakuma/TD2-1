@@ -1105,6 +1105,7 @@ void Enemy::DeathInitialize(Layer* layer) {
 	enemyDeathParticle_.ParticleStart();
 	enemyDeathParticle_.emitterPos = tex_->pos;
 	explorsionSE_->Start(0.2f);
+	FrameInfo::GetInstance()->HitStop(150);
 }
 
 void Enemy::DeathUpdate() {

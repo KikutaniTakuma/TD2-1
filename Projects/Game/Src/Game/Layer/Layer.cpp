@@ -4,6 +4,7 @@
 #include "Utils/Camera/Camera.h"
 
 #include "Engine/Core/WindowFactory/WindowFactory.h"
+#include "Engine/EngineUtils/FrameInfo/FrameInfo.h"
 
 std::unique_ptr<GlobalVariables> Layer::globalVariables_ = std::make_unique<GlobalVariables>();
 
@@ -42,7 +43,7 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 			models_[i].push_back(std::make_unique<Model>());
 		}
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
-		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.5f,1.0f }.Normalize();
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
@@ -55,6 +56,14 @@ Layer::Layer(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
 	gauge_->Initialize(nowLayer_, kMaxHitPoints_[nowLayer_]);
 
 	SetGlobalVariable();
+
+	colorSet_ = {
+		std::numeric_limits<uint32_t>::max(),
+		Vector4ToUint(Vector4{0.75f,0.75f,0.75f,1.0f }),
+		Vector4ToUint(Vector4{0.5f,0.5f,0.5f,1.0f })
+	};
+
+	clearUnitlTime_ = std::chrono::milliseconds{ 500 };
 }
 
 void Layer::SetParametar(std::vector<int> kMaxHitPoints) {
@@ -88,7 +97,7 @@ void Layer::ApplyGlobalVariable() {
 			tex_[i]->scale = kLayer2DScale_;
 			tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
 			tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
-			if (i % 3 == 0) {
+			/*if (i % 3 == 0) {
 				tex_[i]->color = 0xFFFFFFFF;
 			}
 			else if (i % 3 == 1) {
@@ -96,7 +105,7 @@ void Layer::ApplyGlobalVariable() {
 			}
 			else {
 				tex_[i]->color = 0xFFFFFFFF;
-			}
+			}*/
 
 			models_.push_back(std::vector<std::unique_ptr<Model>>());
 
@@ -104,12 +113,31 @@ void Layer::ApplyGlobalVariable() {
 				models_[i].push_back(std::make_unique<Model>());
 			}
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
-			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();;
+			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.5f,1.0f }.Normalize();
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
 			models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
 
 			tex_[i]->Update();
+		}
+
+		auto colorSetItr = colorSet_.begin();
+
+		for (auto& i : tex_) {
+			i->color = *colorSetItr;
+			colorSetItr++;
+			if (colorSetItr == colorSet_.end()) {
+				colorSetItr = colorSet_.begin();
+			}
+		}
+
+		colorSetItr = colorSet_.begin();
+		for (auto& i : models_) {
+			i[static_cast<uint16_t>(Parts::kMain)]->color = *colorSetItr;
+			colorSetItr++;
+			if (colorSetItr == colorSet_.end()) {
+				colorSetItr = colorSet_.begin();
+			}
 		}
 	}
 	else {
@@ -130,6 +158,25 @@ void Layer::ApplyGlobalVariable() {
 
 			tex_[i]->Update();
 		}
+
+		auto colorSetItr = colorSet_.begin();
+
+		for (auto& i : tex_) {
+			i->color = *colorSetItr;
+			colorSetItr++;
+			if (colorSetItr == colorSet_.end()) {
+				colorSetItr = colorSet_.begin();
+			}
+		}
+
+		colorSetItr = colorSet_.begin();
+		for (auto& i : models_) {
+			i[static_cast<uint16_t>(Parts::kMain)]->color = *colorSetItr;
+			colorSetItr++;
+			if (colorSetItr == colorSet_.end()) {
+				colorSetItr = colorSet_.begin();
+			}
+		}
 	}
 }
 
@@ -138,9 +185,27 @@ void Layer::Reset() {
 	hitPoints_ = kMaxHitPoints_;
 	nowLayer_ = 0;
 
+	auto colorSetItr = colorSet_.begin();
+
+	for (auto& i : tex_) {
+		i->color = *colorSetItr;
+		colorSetItr++;
+		if (colorSetItr == colorSet_.end()) {
+			colorSetItr = colorSet_.begin();
+		}
+	}
+
+	colorSetItr = colorSet_.begin();
+	for (auto& i : models_) {
+		i[static_cast<uint16_t>(Parts::kMain)]->color = *colorSetItr;
+		colorSetItr++;
+		if (colorSetItr == colorSet_.end()) {
+			colorSetItr = colorSet_.begin();
+		}
+	}
 	for (int i = 0; i < kMaxLayerNum_; i++) {
 
-		if (i % 3 == 0) {
+		/*if (i % 3 == 0) {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else if (i % 3 == 1) {
@@ -148,11 +213,12 @@ void Layer::Reset() {
 		}
 		else {
 			tex_[i]->color = 0xFFFFFFFF;
-		}
+		}*/
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
 		tex_[i]->Update();
 	}
+
 }
 
 void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) {
@@ -170,7 +236,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 		tex_.push_back(std::make_unique<Texture2D>());
 		tex_[i]->scale = kLayer2DScale_;
 		tex_[i]->pos = { 0.0f, kFirstLayerCenterPosY_ + (i * (-kLayer2DScale_.y)) };
-		if (i % 3 == 0) {
+		/*if (i % 3 == 0) {
 			tex_[i]->color = 0xFFFFFFFF;
 		}
 		else if (i % 3 == 1) {
@@ -178,7 +244,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 		}
 		else {
 			tex_[i]->color = 0xFFFF00FF;
-		}
+		}*/
 		tex_[i]->LoadTexture("./Resources/Layer/layer_front0.png");
 
 		models_.push_back(std::vector<std::unique_ptr<Model>>());
@@ -187,12 +253,31 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 			models_[i].push_back(std::make_unique<Model>());
 		}
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->LoadObj("./Resources/Layer/layer.obj");
-		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.3f,1.0f }.Normalize();;
+		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligDirection = Vector3{ 0.0f,-0.5f,1.0f }.Normalize();;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ligColor = { 1.0f,1.0f,1.0f };
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->light.ptRange = 10000.0f;
 		models_[i][static_cast<uint16_t>(Parts::kMain)]->rotate.y = std::numbers::pi_v<float>;
 
 		tex_[i]->Update();
+	}
+
+	auto colorSetItr = colorSet_.begin();
+
+	for (auto& i : tex_) {
+		i->color = *colorSetItr;
+		colorSetItr++;
+		if (colorSetItr == colorSet_.end()) {
+			colorSetItr = colorSet_.begin();
+		}
+	}
+
+	colorSetItr = colorSet_.begin();
+	for (auto& i : models_) {
+		i[static_cast<uint16_t>(Parts::kMain)]->color = *colorSetItr;
+		colorSetItr++;
+		if (colorSetItr == colorSet_.end()) {
+			colorSetItr = colorSet_.begin();
+		}
 	}
 
 	gauge_->Initialize(hitPoints_[nowLayer_], kMaxHitPoints_[nowLayer_]);
@@ -207,6 +292,7 @@ void Layer::Initialize(int kMaxLayerNum, const std::vector<int>& kMaxHitPoints) 
 
 void Layer::Update(const Camera* camera) {
 	isClear_.Update();
+	isClearStop_.Update();
 
 	[[maybe_unused]]auto nowTime = std::chrono::steady_clock::now();
 
@@ -220,8 +306,11 @@ void Layer::Update(const Camera* camera) {
 		hitPoints_[nowLayer_] = 0;
 
 		if (nowLayer_ == kMaxLayerNum_ - 1) {
-			if (!breakEffect_.GetIsParticleStart() && !breakEffect_.GetIsParticleStart().OnExit()) {
-				breakEffect_.ParticleStart();
+		    // ここ
+			if (!isClearStop_ && !breakEffect_.GetIsParticleStart()) {
+				isClearStop_ = true;
+				startClearUnitlTime_ = FrameInfo::GetInstance()->GetThisFrameTime();
+				FrameInfo::GetInstance()->HitStop(500);
 			}
 
 			if (breakEffect_.GetIsParticleStart().OnExit()) {
@@ -241,8 +330,19 @@ void Layer::Update(const Camera* camera) {
 			nowLayer_++;
 			hitPoints_[nowLayer_] = kMaxHitPoints_[nowLayer_];
 			// ここ
+			if (!isClearStop_ && !breakEffect_.GetIsParticleStart()) {
+				isClearStop_ = true;
+				startClearUnitlTime_ = FrameInfo::GetInstance()->GetThisFrameTime();
+				FrameInfo::GetInstance()->HitStop(500);
+			}
+		}
+	}
 
+	if (isClearStop_) {
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startClearUnitlTime_);
+		if (clearUnitlTime_ < duration) {
 			breakEffect_.ParticleStart();
+			isClearStop_ = false;
 		}
 	}
 

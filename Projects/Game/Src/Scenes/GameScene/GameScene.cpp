@@ -6,6 +6,7 @@
 #include "imgui.h"
 #include "Scenes/ResultScene/ResultScene.h"
 #include "Utils/Random/Random.h"
+#include "Engine/Core/WindowFactory/WindowFactory.h"
 
 GameScene::GameScene() :
 	BaseScene(BaseScene::ID::Game)
@@ -55,7 +56,7 @@ GameScene::GameScene() :
 
 	layer_ = std::make_unique<Layer>(kLayerNums_[stage_], kLayerHitPoints_[stage_]);
 
-	playTime_ = std::chrono::milliseconds{ 0 };
+	playTime_ = 0.0f;
 }
 
 void GameScene::Initialize() {
@@ -67,6 +68,9 @@ void GameScene::Initialize() {
 	rightKeyHud_.reset(new Texture2D);
 	leftKeyHud_.reset(new Texture2D);
 	puaseKeyHud_.reset(new Texture2D);
+
+	startMessage_.reset(new Texture2D);
+	startMessageBubble_.reset(new Texture2D);
 
 	backGroundParticle_.reset(new Particle{});
 
@@ -92,8 +96,6 @@ void GameScene::Initialize() {
 	scaffoldings_.clear();
 
 	ScaffoldingGeneration();
-
-	startTime_ = std::chrono::steady_clock::now();
 
 	backGroundParticle_->LoadSettingDirectory("backGroundParticle");
 	backGroundParticle_->ParticleStart();
@@ -136,10 +138,159 @@ void GameScene::Initialize() {
 	leftKeyHud_->uvSize.x = 0.5f;
 	puaseHud_->uvSize.x = 0.5f;
 	puaseKeyHud_->uvSize.x = 0.5f;
+
+	startMessage_->LoadTexture("./Resources/StartMessage/inGame_startUI.png");
+	startMessage_->isSameTexSize = true;
+	startMessage_->texScalar = 0.44f;
+	startMessage_->pos.y = 192.0f;
+	startMessageBubble_->LoadTexture("./Resources/StartMessage/inGame_startFlame.png");
+	startMessageBubble_->isSameTexSize = true;
+	startMessageBubble_->texScalar = 0.67f;
+	startMessageBubble_->pos.y = 194.0f;
+
+	startMessageEasingStart_.reset(new Easing{});
+	startMessageEasingEnd_.reset(new Easing{});
+	startMessageEasingDuration_ = { WindowFactory::GetInstance()->GetClientSize().x, 0.0f};
+	startMessageEasingDurationEnd_ = { 0.0f, -WindowFactory::GetInstance()->GetClientSize().x };
+	
+	if (stage_ == 0) {
+		startMessageDrawTime_ = std::chrono::milliseconds{ 1500 };
+	}
+	else {
+		startMessageDrawTime_ = std::chrono::milliseconds{ 750 };
+	}
+
+
+	isUpdate_ = false;
+
+	startMessageEasingStart_->Start(false, 0.7f, Easing::OutBack);
+
+	GameUpdate();
 }
 
 void GameScene::Finalize() {
 	bgm_->Stop();
+}
+
+void GameScene::StartMessageUpdate() {
+	// 右から左へ
+	if (startMessageEasingStart_->GetIsActive()) {
+		startMessage_->pos.x = startMessageEasingStart_->Get(startMessageEasingDuration_.first, startMessageEasingDuration_.second);
+		startMessageBubble_->pos.x = startMessageEasingStart_->Get(startMessageEasingDuration_.first, startMessageEasingDuration_.second);
+	}
+	else if (startMessageEasingEnd_->GetIsActive()) {
+		startMessage_->pos.x = startMessageEasingEnd_->Get(startMessageEasingDurationEnd_.first, startMessageEasingDurationEnd_.second);
+		startMessageBubble_->pos.x = startMessageEasingEnd_->Get(startMessageEasingDurationEnd_.first, startMessageEasingDurationEnd_.second);
+	}
+	else {
+		startMessage_->pos.x = startMessageEasingDurationEnd_.first;
+		startMessageBubble_->pos.x = startMessageEasingDurationEnd_.first;
+	}
+
+	if (!startMessageEasingStart_->GetIsActive() &&
+		startMessageDrawTime_ > std::chrono::duration_cast<std::chrono::milliseconds>(frameInfo_->GetThisFrameTime() - leftEasingCoolTimeStart_)
+		) 
+	{
+		startMessageEasingEnd_->Start(false, 0.7f, Easing::InBack);
+	}
+
+	if (startMessageEasingEnd_->ActiveExit()) {
+		isUpdate_ = true;
+		startTime_ = std::chrono::steady_clock::now();
+	}
+
+	// 
+	if (startMessageEasingStart_->ActiveExit()) {
+		leftEasingCoolTimeStart_ = frameInfo_->GetThisFrameTime();
+	}
+
+
+	startMessage_->Update();
+	startMessageBubble_->Update();
+	startMessageEasingStart_->Update();
+	startMessageEasingEnd_->Update();
+}
+
+void GameScene::GameUpdate() {
+	auto nowTime = frameInfo_->GetThisFrameTime();
+
+	CameraUpdate();
+
+#ifdef _DEBUG
+
+	preStage_ = stage_;
+	preMaxStageNum_ = kMaxStageNum_;
+	preEnemyNums_ = enemyNums_;
+	preScaffoldingNums_ = scaffoldingNums_;
+	preLayerNums_ = kLayerNums_;
+
+	ImGui::Begin("PlayScene");
+	ImGui::SliderInt("NowStage 0 = 1stage", &stage_, 0, kMaxStageNum_ - 1);
+	ImGui::End();
+
+	globalVariables_->Update();
+
+	//SetGlobalVariable();
+	Enemy::GlobalVariablesUpdate();
+	ShockWave::GlobalVariablesUpdate();
+	ShockWave::ApplyGlobalVariable();
+	Layer::GlobalVariablesUpdate();
+
+#endif // _DEBUG
+
+	ApplyGlobalVariable();
+
+	if (kMaxStageNum_ <= 0) {
+		kMaxStageNum_ = 1;
+	}
+
+	EnemyGeneration();
+	ScaffoldingGeneration();
+
+#ifdef _DEBUG
+
+	SetEnemyParametar();
+	SetScaffoldingParametar();
+	CreateLayer();
+	SetLayerParametar();
+
+#endif // _DEBUG
+
+	background_->Update();
+
+	player_->Update(layer_->GetHighestPosY(), camera2D_.get());
+
+	int i = 0;
+
+	for (std::unique_ptr<Enemy>& enemy : enemies_) {
+		if (enemyNums_[stage_][layer_->GetNowLayer()] == i) {
+			break;
+		}
+		enemy->Update(layer_.get(), layer_->GetHighestPosY(), camera2D_.get());
+		i++;
+	}
+	for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
+		shockWave->Update();
+	}
+
+	DeleteShockWave();
+
+	Collision();
+
+	ShakeUpdate();
+
+	layer_->Update(camera2D_.get());
+
+	if (layer_->GetClearFlag().OnEnter()) {
+		bgm_->Stop();
+		frameInfo_->SetGameSpeedScale(1.0f);
+		
+		auto result = new ResultScene{};
+		assert(result);
+		result->SetClearTime(std::chrono::milliseconds{ static_cast<uint32_t>(playTime_ * 1000.0f) });
+		result->SetStageNumber(stage_ + 1);
+		sceneManager_->SceneChange(result);
+	}
 }
 
 void GameScene::InitializeGlobalVariable() {
@@ -672,18 +823,25 @@ void GameScene::CreatShockWave(const Vector3& pos, float highest, float y) {
 	shockWaves_.push_back(std::make_unique<ShockWave>(pos, highest, y));
 
 	if (highest >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMiddle))) {
-		isShack_ = true;
-		shackTime_ = 0.7f;
-		shackMax_ = 30.0f;
-		shackCount_ = 0.0f;
-		shackPos_ = { 0.0f,0.0f,0.0f };
+		isShake_ = true;
+		shakeTime_ = 0.7f;
+		shakeMax_ = 30.0f;
+		shakeCount_ = 0.0f;
+		shakePos_ = { 0.0f,0.0f,0.0f };
 	}
 	else if (highest >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kSmall))) {
-		isShack_ = true;
-		shackTime_ = 0.4f;
-		shackMax_ = 18.0f;
-		shackCount_ = 0.0f;
-		shackPos_ = { 0.0f,0.0f,0.0f };
+		isShake_ = true;
+		shakeTime_ = 0.4f;
+		shakeMax_ = 18.0f;
+		shakeCount_ = 0.0f;
+		shakePos_ = { 0.0f,0.0f,0.0f };
+	}
+	else {
+		isShake_ = true;
+		shakeTime_ = 0.4f;
+		shakeMax_ = 9.0f;
+		shakeCount_ = 0.0f;
+		shakePos_ = { 0.0f,0.0f,0.0f };
 	}
 }
 
@@ -857,8 +1015,8 @@ void GameScene::CameraUpdate()
 	else {
 		camera2D_->pos.y = cameraLocalPos_.y + layer_->GetLastLayerPosY();
 	}
-	if (isShack_) {
-		camera2D_->pos += shackPos_;
+	if (isShake_) {
+		camera2D_->pos += shakePos_;
 	}
 	else {
 		camera2D_->pos.x = 0.0f;
@@ -867,114 +1025,40 @@ void GameScene::CameraUpdate()
 	camera2D_->Update();
 }
 
-void GameScene::ShackUpdate()
+void GameScene::ShakeUpdate()
 {
-	if (isShack_) {
+	if (isShake_) {
 
-		shackCount_ += FrameInfo::GetInstance()->GetDelta();
+		shakeCount_ += FrameInfo::GetInstance()->GetDelta();
 
-		float length = shackMax_ * (1.0f - shackCount_ / shackTime_);
+		float length = shakeMax_ * (1.0f - shakeCount_ / shakeTime_);
 
-		shackPos_.x = Lamb::Random(-length / 2.0f, length / 2.0f);
-		shackPos_.y = Lamb::Random(-length / 2.0f, length / 2.0f);
+		shakePos_.x = Lamb::Random(-length / 2.0f, length / 2.0f);
+		shakePos_.y = Lamb::Random(-length / 2.0f, length / 2.0f);
 
-		if (shackCount_ >= shackTime_) {
-			shackCount_ = shackTime_;
-			isShack_ = false;
-			shackPos_ = { 0.0f,0.0f,0.0f };
+		if (shakeCount_ >= shakeTime_) {
+			shakeCount_ = shakeTime_;
+			isShake_ = false;
+			shakePos_ = { 0.0f,0.0f,0.0f };
 		}
 	}
 
 }
 
 void GameScene::Update() {
-	auto nowTime = std::chrono::steady_clock::now();
+	auto nowTime = frameInfo_->GetThisFrameTime();
+	auto deltaTime = frameInfo_->GetDelta();
 
-	if (!pause_->isActive_) {
-		
-		CameraUpdate();
+	StartMessageUpdate();
 
-#ifdef _DEBUG
+	/*startMessage_->Debug("startMessage_");
+	startMessageBubble_->Debug("startMessageBubble_");
+	startMessage_->Update();
+	startMessageBubble_->Update();*/
 
-		preStage_ = stage_;
-		preMaxStageNum_ = kMaxStageNum_;
-		preEnemyNums_ = enemyNums_;
-		preScaffoldingNums_ = scaffoldingNums_;
-		preLayerNums_ = kLayerNums_;
-
-		ImGui::Begin("PlayScene");
-		ImGui::SliderInt("NowStage 0 = 1stage", &stage_, 0, kMaxStageNum_ - 1);
-		ImGui::End();
-
-		globalVariables_->Update();
-
-		//SetGlobalVariable();
-		Enemy::GlobalVariablesUpdate();
-		ShockWave::GlobalVariablesUpdate();
-		ShockWave::ApplyGlobalVariable();
-		Layer::GlobalVariablesUpdate();
-
-#endif // _DEBUG
-
-		ApplyGlobalVariable();
-
-		if (kMaxStageNum_ <= 0) {
-			kMaxStageNum_ = 1;
-		}
-
-		EnemyGeneration();
-		ScaffoldingGeneration();
-
-#ifdef _DEBUG
-
-		SetEnemyParametar();
-		SetScaffoldingParametar();
-		CreateLayer();
-		SetLayerParametar();
-
-#endif // _DEBUG
-
-		background_->Update();
-
-		player_->Update(layer_->GetHighestPosY(), camera2D_.get());
-
-		int i = 0;
-
-		for (std::unique_ptr<Enemy>& enemy : enemies_) {
-			if (enemyNums_[stage_][layer_->GetNowLayer()] == i) {
-				break;
-			}
-			enemy->Update(layer_.get(), layer_->GetHighestPosY(), camera2D_.get());
-			i++;
-		}
-		for (std::unique_ptr<ShockWave>& shockWave : shockWaves_) {
-			shockWave->Update();
-		}
-
-		DeleteShockWave();
-
-		Collision();
-
-		player_->ModelUpdate(camera2D_.get());
-
-		for (std::unique_ptr<Enemy>& enemy : enemies_) {
-			enemy->ModelUpdate(camera2D_.get());
-		}
-
-		ShackUpdate();
-
-		layer_->Update(camera2D_.get());
-
-		if (layer_->GetClearFlag().OnEnter()) {
-			bgm_->Stop();
-			playTime_ += std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
-
-			auto result = new ResultScene{};
-			assert(result);
-			result->SetClearTime(playTime_);
-			result->SetStageNumber(stage_ + 1);
-			sceneManager_->SceneChange(result);
-		}
+	if (!pause_->isActive_ && isUpdate_) {
+		playTime_ += deltaTime;
+		GameUpdate();
 	}
 
 	if (input_->GetGamepad()->GetButton(Gamepad::Button::A)) {
@@ -1040,7 +1124,11 @@ void GameScene::Update() {
 	puaseKeyHud_->Update();
 
 
-
+#ifndef _DEBUG
+	if (!WindowFactory::GetInstance()->IsThisWindowaActive()) {
+		pause_->isActive_ = true;
+	}
+#endif // _DEBUG
 
 
 	pause_->ActiveUpdate();
@@ -1052,7 +1140,6 @@ void GameScene::Update() {
 		pause_->isActive_ = !pause_->isActive_;
 		if (pause_->isActive_) {
 			bgm_->SetAudio(0.025f);
-			playTime_ += std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime_);
 		}
 		else {
 			bgm_->SetAudio(0.1f);
@@ -1118,5 +1205,14 @@ void GameScene::Draw() {
 		leftKeyHud_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 		puaseKeyHud_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
 	}
+
+	/*startMessageBubble_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	startMessage_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);*/
+
+	if (!isUpdate_) {
+		startMessageBubble_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+		startMessage_->Draw(camera_->GetViewOthographics(), Pipeline::Normal, false);
+	}
+
 	pause_->Draw();
 }

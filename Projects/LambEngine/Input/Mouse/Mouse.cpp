@@ -76,6 +76,11 @@ void Mouse::Input() {
 	wheel_ += static_cast<size_t>(mosueState_.lZ);
 }
 
+void Mouse::InputReset() {
+	mosueState_ = {};
+	preMosueState_ = {};
+}
+
 bool Mouse::Pushed(Mouse::Button button) {
 	if (!initalizeSucceeded_) {
 		return false;

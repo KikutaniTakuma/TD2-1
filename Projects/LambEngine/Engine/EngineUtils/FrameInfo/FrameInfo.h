@@ -2,6 +2,7 @@
 #include <chrono>
 #include <queue>
 #include "Drawers/StringOut/StringOut.h"
+#include <concepts>
 
 /// <summary>
 /// フレーム情報の管理(fps固定、デルタタイム、平均fps)
@@ -79,6 +80,11 @@ public:
 	/// </summary>
 	void Debug();
 
+	
+	void HitStop(uint32_t hitStopMilliSecond);
+
+
+
 /// <summary>
 /// getter
 /// </summary>
@@ -92,9 +98,9 @@ public:
 		if (isFixedDeltaTime_ || isDebugStopGame_) {
 			return static_cast<float>(1.0 / fpsLimit_);
 		}
-		return static_cast<float>(deltaTime_);
+		return static_cast<float>(deltaTime_) * GetGameSpeedScale();
 #else
-		return static_cast<float>(deltaTime_);
+		return static_cast<float>(deltaTime_) * GetGameSpeedScale();
 #endif
 	}
 
@@ -136,6 +142,10 @@ public:
 	/// <returns>リフレッシュレート</returns>
 	double GetMainMonitorFramerate() const;
 
+	bool GetIsHitStop() const {
+		return isHitStop_;
+	}
+
 
 /// <summary>
 /// セッター
@@ -145,12 +155,21 @@ public:
 	/// fpsの上限値を設定(メインモニターのリフレッシュレートを超えることはない)
 	/// </summary>
 	/// <param name="fpsLimit">fps上限値</param>
-	void SetFpsLimit(double fpsLimit);
+	template<std::floating_point T>
+	void SetFpsLimit(T fpsLimit) {
+		fpsLimit_ = std::clamp(static_cast<double>(fpsLimit), 10.0, maxFpsLimit_);
+
+		minTime_ = std::chrono::microseconds(uint64_t(1000000.0 / fpsLimit_));
+		minCheckTime_ = std::chrono::microseconds(uint64_t(1000000.0 / (fpsLimit_ + (5.0f * (fpsLimit_ / 60.0f)))));
+	}
 
 	/// <summary>
 	/// ゲームスピードのスケールを変更
 	/// </summary>
-	void SetGameSpeedScale(float gameSpeedSccale);
+	template<std::floating_point T>
+	void SetGameSpeedScale(T gameSpeedSccale) {
+		gameSpeedSccale_ = std::clamp(static_cast<double>(gameSpeedSccale), 0.0, 10.0);
+	}
 
 
 
@@ -185,6 +204,10 @@ private:
 
 	StringOut fpsStringOutPut_;
 	bool isDrawFps_;
+
+	std::chrono::steady_clock::time_point hitStopStartTime_;
+	std::chrono::milliseconds hitStopTime_;
+	bool isHitStop_;
 	
 
 #ifdef _DEBUG

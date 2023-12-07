@@ -143,6 +143,10 @@ private:
 
 	void CameraUpdate();
 
+	void StartMessageUpdate();
+
+	void GameUpdate();
+
 public:
 	// ステージ番号のセッター
 	void SetStageNumber(int32_t stage) {
@@ -150,7 +154,7 @@ public:
 		preStage_ = stage_;
 	}
 
-	void ShackUpdate();
+	void ShakeUpdate();
 
 private:
 
@@ -185,12 +189,12 @@ private:
 
 	std::unique_ptr<Camera> camera2D_;
 
-	Vector3 shackPos_;
+	Vector3 shakePos_;
 	Vector3 preShack_;
-	float shackMax_;
-	bool isShack_ = false;
-	float shackTime_;
-	float shackCount_;
+	float shakeMax_;
+	bool isShake_ = false;
+	float shakeTime_;
+	float shakeCount_;
 
 	Vector3 cameraLocalPos_;
 
@@ -216,7 +220,7 @@ private:
 	// 複数ステージのある層の数
 	std::vector<int> kLayerNums_;
 
-	// 今のステージ。０が1ステージ目
+	// 今のステージ。0が1ステージ目
 	int stage_;
 
 	int preStage_;
@@ -257,7 +261,7 @@ private:
 
 	// プレイ時間
 	std::chrono::steady_clock::time_point startTime_;
-	std::chrono::milliseconds playTime_;
+	float playTime_;
 
 	// 背景パーティクル
 	std::unique_ptr<Particle> backGroundParticle_;
@@ -266,7 +270,7 @@ private:
 	// ポーズ画面
 	std::unique_ptr<Pause> pause_;
 
-	Audio* bgm_;
+	class Audio* bgm_;
 
 	// hud
 	std::unique_ptr<Texture2D> aButtonHud_;
@@ -278,6 +282,16 @@ private:
 	std::unique_ptr<Texture2D> leftKeyHud_;
 	std::unique_ptr<Texture2D> puaseKeyHud_;
 
+	std::unique_ptr<Texture2D> startMessage_;
+	std::unique_ptr<Texture2D> startMessageBubble_;
+	// 目的表示のメッセージを
+	std::unique_ptr<Easing> startMessageEasingStart_;
+	std::unique_ptr<Easing> startMessageEasingEnd_;
+	std::pair<float, float> startMessageEasingDuration_;
+	std::pair<float, float> startMessageEasingDurationEnd_;
+	std::chrono::milliseconds startMessageDrawTime_;
+	std::chrono::steady_clock::time_point leftEasingCoolTimeStart_;
+	bool isUpdate_;
 
 	///
 	/// =============================================

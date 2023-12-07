@@ -20,6 +20,12 @@ void Gamepad::Input() {
     XInputGetState(0, &state_);
 }
 
+void Gamepad::InputReset() {
+	preButton_ = 0;
+	state_ = {  };
+	vibration_ = {  };
+}
+
 bool Gamepad::GetButton(Button type) {
     return (state_.Gamepad.wButtons >> static_cast<short>(type)) % 2 == 1;
 }

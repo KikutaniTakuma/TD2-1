@@ -767,7 +767,8 @@ void Particle::Update() {
 	if (currentSettingIndex_ >= settings_.size() || settings_.empty()) {
 		return;
 	}
-	auto nowTime = std::chrono::steady_clock::now();
+	auto nowTime = FrameInfo::GetInstance()->GetThisFrameTime();
+	double gameSpeedScale = FrameInfo::GetInstance()->GetGameSpeedScale();
 
 	if (settings_[currentSettingIndex_].isValid_) {
 		settings_[currentSettingIndex_].emitter_.pos_ = emitterPos;
@@ -789,7 +790,7 @@ void Particle::Update() {
 		auto freq = Lamb::Random(settings_[currentSettingIndex_].freq_.first, settings_[currentSettingIndex_].freq_.second);
 
 		// 頻度時間を超えてたら
-		if (duration > decltype(duration)(freq)) {
+		if (duration * gameSpeedScale > decltype(duration)(freq)) {
 			settings_[currentSettingIndex_].durationTime_ = nowTime;
 
 			// パーティクルを出す数ランダム
@@ -906,7 +907,7 @@ void Particle::Update() {
 		settings_[currentSettingIndex_].emitter_.validTime_ <
 		std::chrono::duration_cast<std::chrono::milliseconds>(
 			nowTime - settings_[currentSettingIndex_].startTime_
-		))
+		) * gameSpeedScale)
 	{
 		settings_[currentSettingIndex_].isValid_ = false;
 
