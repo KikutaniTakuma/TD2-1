@@ -1026,7 +1026,7 @@ void GameScene::CameraUpdate()
 		camera2D_->pos += shakePos_;
 	}
 	else {
-		camera2D_->pos.x = 0.0f;
+		camera2D_->pos.x = camera2D_->pos.x + (-camera2D_->pos.x) * 0.1f;
 	}
 
 	camera2D_->Update();
