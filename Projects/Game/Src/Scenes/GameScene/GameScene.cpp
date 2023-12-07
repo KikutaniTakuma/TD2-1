@@ -97,8 +97,6 @@ void GameScene::Initialize() {
 
 	ScaffoldingGeneration();
 
-	startTime_ = std::chrono::steady_clock::now();
-
 	backGroundParticle_->LoadSettingDirectory("backGroundParticle");
 	backGroundParticle_->ParticleStart();
 
@@ -198,6 +196,7 @@ void GameScene::StartMessageUpdate() {
 
 	if (startMessageEasingEnd_->ActiveExit()) {
 		isUpdate_ = true;
+		startTime_ = std::chrono::steady_clock::now();
 	}
 
 	// 
@@ -831,6 +830,13 @@ void GameScene::CreatShockWave(const Vector3& pos, float highest, float y) {
 		shackPos_ = { 0.0f,0.0f,0.0f };
 	}
 	else if (highest >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kSmall))) {
+		isShack_ = true;
+		shackTime_ = 0.4f;
+		shackMax_ = 18.0f;
+		shackCount_ = 0.0f;
+		shackPos_ = { 0.0f,0.0f,0.0f };
+	}
+	else {
 		isShack_ = true;
 		shackTime_ = 0.4f;
 		shackMax_ = 18.0f;
