@@ -45,6 +45,8 @@ GameScene::GameScene() :
 	preScaffoldingNums_ = scaffoldingNums_;
 	preLayerNums_ = kLayerNums_;
 
+	stageTimer_ = std::make_unique<StageTimer>();
+
 	globalVariables_ = std::make_unique<GlobalVariables>();
 
 	InitializeGlobalVariable();
@@ -165,6 +167,9 @@ void GameScene::Initialize() {
 
 	startMessageEasingStart_->Start(false, 0.7f, Easing::OutBack);
 
+	stageTimer_->SetPlayTime(&playTime_);
+	stageTimer_->Init();
+
 	GameUpdate();
 }
 
@@ -280,6 +285,8 @@ void GameScene::GameUpdate() {
 	ShakeUpdate();
 
 	layer_->Update(camera2D_.get());
+
+	stageTimer_->Update();
 
 	if (layer_->GetClearFlag().OnEnter()) {
 		bgm_->Stop();
@@ -1194,6 +1201,7 @@ void GameScene::Draw() {
 	}
 
 	layer_->Draw2DNear(camera2D_->GetViewOthographics());
+	stageTimer_->Draw2D(camera_->GetViewOthographics());
 
 	//player_->Draw2D(camera2D_->GetViewOthographics());
 
