@@ -277,7 +277,7 @@ void GameScene::GameUpdate() {
 
 	Collision();
 
-	ShackUpdate();
+	ShakeUpdate();
 
 	layer_->Update(camera2D_.get());
 
@@ -823,25 +823,25 @@ void GameScene::CreatShockWave(const Vector3& pos, float highest, float y) {
 	shockWaves_.push_back(std::make_unique<ShockWave>(pos, highest, y));
 
 	if (highest >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kMiddle))) {
-		isShack_ = true;
-		shackTime_ = 0.7f;
-		shackMax_ = 30.0f;
-		shackCount_ = 0.0f;
-		shackPos_ = { 0.0f,0.0f,0.0f };
+		isShake_ = true;
+		shakeTime_ = 0.7f;
+		shakeMax_ = 30.0f;
+		shakeCount_ = 0.0f;
+		shakePos_ = { 0.0f,0.0f,0.0f };
 	}
 	else if (highest >= ShockWave::GetHighCriteria(static_cast<int>(ShockWave::Size::kSmall))) {
-		isShack_ = true;
-		shackTime_ = 0.4f;
-		shackMax_ = 18.0f;
-		shackCount_ = 0.0f;
-		shackPos_ = { 0.0f,0.0f,0.0f };
+		isShake_ = true;
+		shakeTime_ = 0.4f;
+		shakeMax_ = 18.0f;
+		shakeCount_ = 0.0f;
+		shakePos_ = { 0.0f,0.0f,0.0f };
 	}
 	else {
-		isShack_ = true;
-		shackTime_ = 0.4f;
-		shackMax_ = 18.0f;
-		shackCount_ = 0.0f;
-		shackPos_ = { 0.0f,0.0f,0.0f };
+		isShake_ = true;
+		shakeTime_ = 0.4f;
+		shakeMax_ = 9.0f;
+		shakeCount_ = 0.0f;
+		shakePos_ = { 0.0f,0.0f,0.0f };
 	}
 }
 
@@ -1015,8 +1015,8 @@ void GameScene::CameraUpdate()
 	else {
 		camera2D_->pos.y = cameraLocalPos_.y + layer_->GetLastLayerPosY();
 	}
-	if (isShack_) {
-		camera2D_->pos += shackPos_;
+	if (isShake_) {
+		camera2D_->pos += shakePos_;
 	}
 	else {
 		camera2D_->pos.x = 0.0f;
@@ -1025,21 +1025,21 @@ void GameScene::CameraUpdate()
 	camera2D_->Update();
 }
 
-void GameScene::ShackUpdate()
+void GameScene::ShakeUpdate()
 {
-	if (isShack_) {
+	if (isShake_) {
 
-		shackCount_ += FrameInfo::GetInstance()->GetDelta();
+		shakeCount_ += FrameInfo::GetInstance()->GetDelta();
 
-		float length = shackMax_ * (1.0f - shackCount_ / shackTime_);
+		float length = shakeMax_ * (1.0f - shakeCount_ / shakeTime_);
 
-		shackPos_.x = Lamb::Random(-length / 2.0f, length / 2.0f);
-		shackPos_.y = Lamb::Random(-length / 2.0f, length / 2.0f);
+		shakePos_.x = Lamb::Random(-length / 2.0f, length / 2.0f);
+		shakePos_.y = Lamb::Random(-length / 2.0f, length / 2.0f);
 
-		if (shackCount_ >= shackTime_) {
-			shackCount_ = shackTime_;
-			isShack_ = false;
-			shackPos_ = { 0.0f,0.0f,0.0f };
+		if (shakeCount_ >= shakeTime_) {
+			shakeCount_ = shakeTime_;
+			isShake_ = false;
+			shakePos_ = { 0.0f,0.0f,0.0f };
 		}
 	}
 

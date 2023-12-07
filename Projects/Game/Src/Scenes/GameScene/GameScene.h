@@ -154,7 +154,7 @@ public:
 		preStage_ = stage_;
 	}
 
-	void ShackUpdate();
+	void ShakeUpdate();
 
 private:
 
@@ -189,12 +189,12 @@ private:
 
 	std::unique_ptr<Camera> camera2D_;
 
-	Vector3 shackPos_;
+	Vector3 shakePos_;
 	Vector3 preShack_;
-	float shackMax_;
-	bool isShack_ = false;
-	float shackTime_;
-	float shackCount_;
+	float shakeMax_;
+	bool isShake_ = false;
+	float shakeTime_;
+	float shakeCount_;
 
 	Vector3 cameraLocalPos_;
 
