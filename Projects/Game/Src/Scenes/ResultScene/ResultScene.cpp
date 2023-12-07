@@ -44,6 +44,8 @@ ResultScene::ResultScene():
 		std::chrono::milliseconds{61000-1},  // 1分
 		std::chrono::milliseconds{121000-1}  // 2分
 	};
+
+	playerScaleEase_.reset(new Easing{});
 }
 
 void ResultScene::Initialize() {
@@ -72,7 +74,6 @@ void ResultScene::Initialize() {
 	backGroundBlur_.reset(new PeraRender{});
 	grayPera_.reset(new PeraRender{});
 
-	playerScaleEase_.reset(new Easing{});
 	playerScaleGetStarEase_.reset(new Easing{});
 	playerScaleGetStarEase2_.reset(new Easing{});
 	playerSpecialEase_.reset(new Easing{});
