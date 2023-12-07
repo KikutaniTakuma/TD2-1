@@ -46,8 +46,8 @@
         ],
         "Enemy13Type": 0,
         "Enemy14IsHealer": 0,
-        "Enemy14MoveRadius": 0.0,
-        "Enemy14MoveVector": 0,
+        "Enemy14MoveRadius": 60.0,
+        "Enemy14MoveVector": 2,
         "Enemy14Pos": [
             -225.0,
             0.0,
@@ -55,8 +55,8 @@
         ],
         "Enemy14Type": 1,
         "Enemy15IsHealer": 0,
-        "Enemy15MoveRadius": 0.0,
-        "Enemy15MoveVector": 0,
+        "Enemy15MoveRadius": 60.0,
+        "Enemy15MoveVector": 1,
         "Enemy15Pos": [
             225.0,
             0.0,
