@@ -22,6 +22,8 @@ namespace Lamb {
 	/// <returns>成功したか否か</returns>
 	bool AddLog(const std::string& text);
 
+	void TextBox(const std::string& text, const std::string& boxName);
+
 	/// <summary>
 	/// デバッグ時にVSの出力にデバッグログを出す
 	/// </summary>

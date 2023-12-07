@@ -1,5 +1,6 @@
 #include "Utils/ExecutionLog/ExecutionLog.h"
 #include "Engine//EngineUtils/ErrorCheck/ErrorCheck.h"
+#include "Engine/Core/WindowFactory/WindowFactory.h"
 #include <fstream>
 #include <filesystem>
 #include <cassert>
@@ -35,6 +36,10 @@ namespace Lamb {
 		isOpned = true;
 
 		return true;
+	}
+
+	void TextBox(const std::string& text, const std::string& boxName) {
+		MessageBoxA(WindowFactory::GetInstance()->GetHwnd(), text.c_str(), boxName.c_str(), MB_OK | MB_ICONINFORMATION);
 	}
 
 	void DebugLog(const std::string& text) {

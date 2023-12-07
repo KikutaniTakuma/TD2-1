@@ -179,6 +179,11 @@ void TitleScene::Finalize() {
 void TitleScene::Update() {
 	auto nowTime = std::chrono::steady_clock::now();
 
+	if (input_->GetKey()->Pushed(DIK_R)) {
+		sceneManager_->isClearStage_ = {};
+		Lamb::TextBox("All clear flag reset succeeded", "TitleScene");
+	}
+
 	for (auto& i : backGround_) {
 		i->Update();
 	}
