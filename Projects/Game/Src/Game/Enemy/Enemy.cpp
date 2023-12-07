@@ -946,6 +946,13 @@ void Enemy::NormalUpdate(const float y, Layer* layer) {
 	if (firstMoveVector_ == 1 || firstMoveVector_ == 2) {
 		if (tex_->pos.x <= firstPos_.x - moveRadius_ || tex_->pos.x >= firstPos_.x + moveRadius_) {
 			moveVector_ *= -1;
+
+			if (tex_->pos.x <= firstPos_.x - moveRadius_) {
+				tex_->pos.x = firstPos_.x - moveRadius_ + 0.001f;
+			}
+			else {
+				tex_->pos.x = firstPos_.x + moveRadius_ - 0.001f;
+			}
 		}
 		else if (tex_->pos.x - tex_->scale.x <= -640 || tex_->pos.x + tex_->scale.x >= 640) {
 			moveVector_ *= -1;
