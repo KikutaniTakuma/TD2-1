@@ -1159,10 +1159,13 @@ void GameScene::Draw() {
 
 	//layer_->Draw2DFar(camera2D_->GetViewOthographics());
 
-	player_->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
+
 
 	layer_->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
 	layer_->ParticleDraw(camera2D_->GetViewOthographics());
+
+	player_->ParticleDraw(camera2D_->GetViewOthographics());
+	player_->Draw(camera2D_->GetViewProjection(), camera2D_->GetPos());
 
 	int i = 0;
 

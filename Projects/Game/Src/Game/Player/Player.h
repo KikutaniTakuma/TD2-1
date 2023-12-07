@@ -2,6 +2,7 @@
 
 #include "Utils/Math/Mat4x4.h"
 #include "Drawers/Texture2D/Texture2D.h"
+#include "Drawers/Particle/Particle.h"
 #include "Drawers/Model/Model.h"
 #include "Input/Input.h"
 #include "Utils/Easing/Easing.h"
@@ -54,6 +55,8 @@ public:
 	/// </summary>
 	/// <param name="viewProjection">カメラのマトリックス</param>
 	void Draw(const Mat4x4& viewProjection, const Vector3& cameraPos);
+
+	void ParticleDraw(const Mat4x4& viewProjection);
 
 	/// <summary>
 	/// 2DテクスチャのDraw
@@ -281,4 +284,6 @@ private:
 	std::pair<int32_t, int32_t> playerAnimationCoolTimeDuration_;
 	std::chrono::steady_clock::time_point playerAnimationCoolStartTime_;
 	bool isPlayerAnimationCoolTime_;
+
+	std::unique_ptr<Particle> backParticle_;
 };

@@ -67,6 +67,10 @@ Player::Player() {
 	};
 	isPlayerAnimationCoolTime_ = true;
 	playerAnimationCoolStartTime_ = playerAnimationStartTime_;
+
+	backParticle_.reset(new Particle{});
+	backParticle_->LoadSettingDirectory("player-effect");
+	backParticle_->ParticleStart();
 }
 
 void Player::SetGlobalVariable() {
@@ -262,6 +266,9 @@ void Player::Update(const float& y, const Camera* camera) {
 	}
 	jumpSE_->Debug("jumpSE_");
 	fallSE_->Debug("fallSE_");
+
+	backParticle_->emitterPos = tex_->pos;
+	backParticle_->Update();
 }
 
 void Player::NormalInitialize(const float& y) {
@@ -1174,6 +1181,10 @@ void Player::Draw(const Mat4x4& viewProjection, const Vector3& cameraPos) {
 	for (const std::unique_ptr<Model>& model : models_) {
 		model->Draw(viewProjection, cameraPos);
 	}
+}
+
+void Player::ParticleDraw(const Mat4x4& viewProjection) {
+	backParticle_->Draw(Vector3::kZero, viewProjection);
 }
 
 void Player::Draw2D(const Mat4x4& viewProjection) {
