@@ -888,6 +888,7 @@ void Player::Steped(Enemy* enemy)
 		}
 	}
 
+	tex_->Update();
 
 	Vector3 vector = enemy->GetTex()->pos - tex_->pos;
 
@@ -1085,6 +1086,8 @@ void Player::FallingCollision(Enemy* enemy)
 
 						}
 					}
+
+					tex_->Update();
 
 					Vector3 vector = tex_->pos - enemy->GetTex()->pos;
 
