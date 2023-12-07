@@ -10,6 +10,7 @@
 #include "AudioManager/AudioManager.h"
 #include "Utils/Random/Random.h"
 #include "Engine/Core/WindowFactory/WindowFactory.h"
+#include "Input/Gamepad/Gamepad.h"
 
 std::unique_ptr<GlobalVariables> Enemy::globalVariables_ = std::make_unique<GlobalVariables>();
 
@@ -1106,19 +1107,22 @@ void Enemy::DeathInitialize(Layer* layer) {
 	enemyDeathParticle_.emitterPos = tex_->pos;
 	explorsionSE_->Start(0.2f);
 	FrameInfo::GetInstance()->HitStop(150);
+	Gamepad::GetInstance()->Vibration(0.3f, 0.3f);
 }
 
 void Enemy::DeathUpdate() {
-
 	if (isHealer_) {
 		timeCount_ += FrameInfo::GetInstance()->GetDelta();
 
 		tex_->scale = Vector2::zero;
 
+		if (timeCount_ >= 1.0f) {
+			Gamepad::GetInstance()->Vibration(0.0f, 0.0f);
+		}
+
 		if (timeCount_ >= kHealerDeathTime_) {
 			statusRequest_ = Status::kGeneration;
 			tex_->scale = {};
-
 		}
 	}
 	else {
@@ -1126,10 +1130,13 @@ void Enemy::DeathUpdate() {
 
 		tex_->scale = Vector2::zero;
 
+		if (timeCount_ >= 1.0f) {
+			Gamepad::GetInstance()->Vibration(0.0f, 0.0f);
+		}
+
 		if (timeCount_ >= kDeathTime_) {
 			statusRequest_ = Status::kGeneration;
 			tex_->scale = {};
-
 		}
 	}
 }

@@ -291,6 +291,8 @@ void GameScene::GameUpdate() {
 	if (layer_->GetClearFlag().OnEnter()) {
 		bgm_->Stop();
 		frameInfo_->SetGameSpeedScale(1.0f);
+
+		Gamepad::GetInstance()->Vibration(0.0f, 0.0f);
 		
 		auto result = new ResultScene{};
 		assert(result);
