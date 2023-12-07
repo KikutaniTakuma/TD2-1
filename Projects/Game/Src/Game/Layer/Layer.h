@@ -158,6 +158,9 @@ private:
 	bool isChangeLayer_;
 
 	Lamb::Flg isClear_;
+	Lamb::Flg isClearStop_;
+	std::chrono::milliseconds clearUnitlTime_;
+	std::chrono::steady_clock::time_point startClearUnitlTime_;
 
 	std::chrono::milliseconds gamePlayTime_;
 	std::chrono::steady_clock::time_point playStartTime_;

@@ -283,6 +283,7 @@ void GameScene::GameUpdate() {
 
 	if (layer_->GetClearFlag().OnEnter()) {
 		bgm_->Stop();
+		frameInfo_->SetGameSpeedScale(1.0f);
 		
 		auto result = new ResultScene{};
 		assert(result);

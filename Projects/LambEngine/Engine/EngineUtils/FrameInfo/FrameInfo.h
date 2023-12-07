@@ -142,6 +142,10 @@ public:
 	/// <returns>リフレッシュレート</returns>
 	double GetMainMonitorFramerate() const;
 
+	bool GetIsHitStop() const {
+		return isHitStop_;
+	}
+
 
 /// <summary>
 /// セッター
@@ -164,7 +168,7 @@ public:
 	/// </summary>
 	template<std::floating_point T>
 	void SetGameSpeedScale(T gameSpeedSccale) {
-		gameSpeedSccale_ = std::clamp(gstatic_cast<double>(gameSpeedSccale), 0.0, 10.0);
+		gameSpeedSccale_ = std::clamp(static_cast<double>(gameSpeedSccale), 0.0, 10.0);
 	}
 
 
