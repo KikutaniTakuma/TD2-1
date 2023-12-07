@@ -125,6 +125,8 @@ public:
 
 	void CollisionPlayer(Player* player);
 
+	void ModelUpdate(const Camera* camera);
+
 private:
 
 	/// <summary>
@@ -191,8 +193,6 @@ private:
 	/// 層との当たり判定
 	/// </summary>
 	void Collision(const float& y);
-
-	void ModelUpdate(const Camera* camera);
 
 	void InitializeFirstMove(int move);
 
