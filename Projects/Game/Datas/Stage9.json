@@ -193,8 +193,8 @@
         "Enemy7MoveRadius": 0.0,
         "Enemy7MoveVector": 0,
         "Enemy7Pos": [
-            -75.0,
-            450.0,
+            -150.0,
+            470.0,
             0.0
         ],
         "Enemy7Type": 0,
@@ -202,8 +202,8 @@
         "Enemy8MoveRadius": 0.0,
         "Enemy8MoveVector": 0,
         "Enemy8Pos": [
-            75.0,
-            450.0,
+            150.0,
+            470.0,
             0.0
         ],
         "Enemy8Type": 0,
