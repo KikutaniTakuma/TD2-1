@@ -127,6 +127,8 @@ public:
 
 	void ModelUpdate(const Camera* camera);
 
+	
+
 private:
 
 	/// <summary>
@@ -206,7 +208,7 @@ private:
 	
 
 	// 落下スピード
-	static float kFallingSpeed_;
+	//static float kFallingSpeed_;
 
 	// グローバル変数
 	static std::unique_ptr<GlobalVariables> globalVariables_;
@@ -235,10 +237,24 @@ private:
 
 	static float kHealerDeathTime_;
 
-private:
+public:
+	// 落下スピード
+	static float kFallingSpeed_;
 
 	// Enemyのテクスチャ
 	std::unique_ptr<Texture2D> tex_;
+
+	// 速度
+	Vector3 velocity_;
+
+	float fallingSpeed_;
+
+	float rotateAddAngle_;
+
+private:
+
+	// Enemyのテクスチャ
+	//std::unique_ptr<Texture2D> tex_;
 
 	std::vector<std::unique_ptr<Model>> models_;
 
@@ -274,11 +290,11 @@ private:
 	std::optional<Status> statusRequest_ = std::nullopt;
 
 	// 速度
-	Vector3 velocity_;
+	//Vector3 velocity_;
 
-	float rotateAddAngle_;
+	//float rotateAddAngle_;
 
-	float fallingSpeed_;
+	//float fallingSpeed_;
 
 	float startRotate_;
 

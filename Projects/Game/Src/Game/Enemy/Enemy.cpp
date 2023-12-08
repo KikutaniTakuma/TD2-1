@@ -280,204 +280,638 @@ void Enemy::CollisionEnemy(Enemy* enemy)
 			isCollisionEnemy_ = true;
 			if (isCollisionEnemy_.OnEnter()) {
 
-				Vector3 beforePos = tex_->pos - velocity_;
-				Vector3 pos = tex_->pos;
-				bool isFirstX = false;
+				if (enemy->GetStatus() != Status::kFalling || (velocity_.y > 0 && enemy->velocity_.y < 0) || (velocity_.y < 0 && enemy->velocity_.y > 0)) {
+					Vector3 beforePos = tex_->pos - velocity_ * FrameInfo::GetInstance()->GetDelta();
+					Vector3 pos = tex_->pos;
+					bool isFirstX = false;
 
 
-				if (velocity_.x == 0.0f) {
-					if (velocity_.y <= 0) {
-						tex_->pos.y = enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
-					}
-					else {
-						tex_->pos.y = enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
-					}
-				}
-				else if (velocity_.y == 0.0f) {
-					if (velocity_.x <= 0) {
-						tex_->pos.x = enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
-					}
-					else {
-						tex_->pos.x = enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
-					}
-				}
-				else if (velocity_.x > 0) {
-					if (velocity_.y > 0) {
-						if (beforePos.x <= enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2) {
-							if (beforePos.y >= enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2) {
-								isFirstX = true;
-							}
-							else {
-								if (Vector2{ (enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2) - (beforePos.x + tex_->scale.x / 2),
-									(enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2) - (beforePos.y + tex_->scale.y / 2) }.Cross(
-										{ velocity_.x,velocity_.y }) > 0.0f) {
-									isFirstX = true;
-								}
-								else {
-									isFirstX = false;
-								}
-							}
-						}
-						else {
-							isFirstX = false;
-						}
-
-						if (isFirstX) {
-							tex_->pos.x = enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
-							float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
-							tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
-							//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+					if (velocity_.x == 0.0f) {
+						if (velocity_.y <= 0) {
+							tex_->pos.y = enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
 						}
 						else {
 							tex_->pos.y = enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
-							float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
-							tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
-							//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
 						}
 					}
-					else {
-						if (beforePos.x <= enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2) {
-							if (beforePos.y <= enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2) {
-								isFirstX = true;
-							}
-							else {
-								if (Vector2{ (enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2) - (beforePos.x + tex_->scale.x / 2),
-									(enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2) - (beforePos.y - tex_->scale.y / 2) }.Cross(
-										{ velocity_.x,velocity_.y }) > 0.0f) {
-									isFirstX = false;
-								}
-								else {
-									isFirstX = true;
-								}
-							}
+					else if (velocity_.y == 0.0f) {
+						if (velocity_.x <= 0) {
+							tex_->pos.x = enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
 						}
 						else {
-							isFirstX = false;
-						}
-
-						if (isFirstX) {
 							tex_->pos.x = enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
-							float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
-							tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
-							//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
 						}
-						else {
-							tex_->pos.y = enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
-							float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
-							tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
-							//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
-						}
-
 					}
-				}
-				else {
-					if (velocity_.y > 0) {
-						if (beforePos.x >= enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2) {
-							if (beforePos.y >= enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2) {
-								isFirstX = true;
-							}
-							else {
-								if (Vector2{ (enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2) - (beforePos.x - tex_->scale.x / 2),
-									(enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2) - (beforePos.y + tex_->scale.y / 2) }.Cross(
-										{ velocity_.x,velocity_.y }) < 0.0f) {
+					else if (velocity_.x > 0) {
+						if (velocity_.y > 0) {
+							if (beforePos.x <= enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2) {
+								if (beforePos.y >= enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2) {
 									isFirstX = true;
 								}
 								else {
-									isFirstX = false;
+									if (Vector2{ (enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2) - (beforePos.x + tex_->scale.x / 2),
+										(enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2) - (beforePos.y + tex_->scale.y / 2) }.Cross(
+											{ velocity_.x,velocity_.y }) > 0.0f) {
+										isFirstX = true;
+									}
+									else {
+										isFirstX = false;
+									}
 								}
+							}
+							else {
+								isFirstX = false;
+							}
+
+							if (isFirstX) {
+								tex_->pos.x = enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
+								float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+								tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+								//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+							}
+							else {
+								tex_->pos.y = enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
+								float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+								tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+								//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
 							}
 						}
 						else {
-							isFirstX = false;
-						}
+							if (beforePos.x <= enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2) {
+								if (beforePos.y <= enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2) {
+									isFirstX = true;
+								}
+								else {
+									if (Vector2{ (enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2) - (beforePos.x + tex_->scale.x / 2),
+										(enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2) - (beforePos.y - tex_->scale.y / 2) }.Cross(
+											{ velocity_.x,velocity_.y }) > 0.0f) {
+										isFirstX = false;
+									}
+									else {
+										isFirstX = true;
+									}
+								}
+							}
+							else {
+								isFirstX = false;
+							}
 
-						if (isFirstX) {
-							tex_->pos.x = enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
-							float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
-							tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
-							//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
-						}
-						else {
-							tex_->pos.y = enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
-							float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
-							tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
-							//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+							if (isFirstX) {
+								tex_->pos.x = enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
+								float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+								tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+								//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+							}
+							else {
+								tex_->pos.y = enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
+								float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+								tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+								//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+							}
+
 						}
 					}
 					else {
-						if (beforePos.x >= enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2) {
-							if (beforePos.y <= enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2) {
-								isFirstX = true;
-							}
-							else {
-								if (Vector2{ (enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2) - (beforePos.x - tex_->scale.x / 2),
-									(enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2) - (beforePos.y - tex_->scale.y / 2) }.Cross(
-										{ velocity_.x,velocity_.y }) < 0.0f) {
-									isFirstX = false;
-								}
-								else {
+						if (velocity_.y > 0) {
+							if (beforePos.x >= enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2) {
+								if (beforePos.y >= enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2) {
 									isFirstX = true;
 								}
+								else {
+									if (Vector2{ (enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2) - (beforePos.x - tex_->scale.x / 2),
+										(enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2) - (beforePos.y + tex_->scale.y / 2) }.Cross(
+											{ velocity_.x,velocity_.y }) < 0.0f) {
+										isFirstX = true;
+									}
+									else {
+										isFirstX = false;
+									}
+								}
+							}
+							else {
+								isFirstX = false;
+							}
+
+							if (isFirstX) {
+								tex_->pos.x = enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
+								float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+								tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+								//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+							}
+							else {
+								tex_->pos.y = enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
+								float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+								tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+								//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
 							}
 						}
 						else {
-							isFirstX = false;
+							if (beforePos.x >= enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2) {
+								if (beforePos.y <= enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2) {
+									isFirstX = true;
+								}
+								else {
+									if (Vector2{ (enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2) - (beforePos.x - tex_->scale.x / 2),
+										(enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2) - (beforePos.y - tex_->scale.y / 2) }.Cross(
+											{ velocity_.x,velocity_.y }) < 0.0f) {
+										isFirstX = false;
+									}
+									else {
+										isFirstX = true;
+									}
+								}
+							}
+							else {
+								isFirstX = false;
+							}
+
+							if (isFirstX) {
+								tex_->pos.x = enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
+								float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+								tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+								//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+							}
+							else {
+								tex_->pos.y = enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
+								float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+								tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+								//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+							}
+
+						}
+					}
+					tex_->Update();
+
+					Vector3 vector = tex_->pos - enemy->GetTex()->pos;
+
+					float speed = velocity_.Length() * kReboundCoefficient_;
+
+					if (vector.y <= 0 && velocity_.y <= 0) {
+						velocity_.x = vector.Normalize().x * speed;
+						velocity_.y = -vector.Normalize().y * speed;
+					}
+					else {
+						velocity_ = vector.Normalize() * speed;
+					}
+					velocity_.z = 0;
+
+					fallingSpeed_ = kFallingSpeed_;
+
+					if (velocity_.x == 0) {
+
+						velocity_.x = std::sinf(rotateAddAngle_) * Lamb::Random(2, 6);
+
+						/*if (std::fabsf(rotateAddAngle_) <= 0.5f) {
+							rotateAddAngle_ = rotateAddAngle_ *Lamb::Random(3, 6);
+						}
+						velocity_.x = -std::sinf(rotateAddAngle_) * velocity_.y;
+						velocity_.y = std::cosf(rotateAddAngle_) * velocity_.y;*/
+					}
+					else {
+
+						float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
+
+						if (angle >= std::numbers::pi_v<float> / 2) {
+							angle -= std::numbers::pi_v<float> / 2;
+						}
+						else if (angle <= -std::numbers::pi_v<float> / 2) {
+							angle += std::numbers::pi_v<float> / 2;
+						}
+						rotateAddAngle_ = angle * 6;
+					}
+
+					if (isFirstX) {
+						enemy->velocity_.x *= -kReboundCoefficient_;
+					}
+					else {
+						enemy->velocity_.y *= -kReboundCoefficient_;
+					}
+				}
+				else {
+					Vector3 a = tex_->pos - velocity_ * FrameInfo::GetInstance()->GetDelta();
+					Vector3 b = enemy->tex_->pos - enemy->velocity_ * FrameInfo::GetInstance()->GetDelta();
+
+					if ((velocity_.y < 0 && a.y < b.y) || (velocity_.y > 0 && a.y > b.y)) {
+						// enemyの処理にする
+
+						Vector3 beforePos = enemy->tex_->pos - velocity_ * FrameInfo::GetInstance()->GetDelta();
+						Vector3 pos = enemy->tex_->pos;
+						bool isFirstX = false;
+
+
+						if (enemy->velocity_.x == 0.0f) {
+							if (enemy->velocity_.y <= 0) {
+								enemy->tex_->pos.y = GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
+							}
+							else {
+								enemy->tex_->pos.y = GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
+							}
+						}
+						else if (enemy->velocity_.y == 0.0f) {
+							if (enemy->velocity_.x <= 0) {
+								enemy->tex_->pos.x = GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
+							}
+							else {
+								enemy->tex_->pos.x = GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
+							}
+						}
+						else if (enemy->velocity_.x > 0) {
+							if (enemy->velocity_.y > 0) {
+								if (beforePos.x <= GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2) {
+									if (beforePos.y >= GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2) {
+										isFirstX = true;
+									}
+									else {
+										if (Vector2{ (GetTex()->pos.x - GetTex()->scale.x / 2) - (beforePos.x + enemy->tex_->scale.x / 2),
+											(GetTex()->pos.y - GetTex()->scale.y / 2) - (beforePos.y + enemy->tex_->scale.y / 2) }.Cross(
+												{ enemy->velocity_.x, enemy->velocity_.y }) > 0.0f) {
+											isFirstX = true;
+										}
+										else {
+											isFirstX = false;
+										}
+									}
+								}
+								else {
+									isFirstX = false;
+								}
+
+								if (isFirstX) {
+									enemy->tex_->pos.x = GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
+									float t = (enemy->tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+									enemy->tex_->pos.x -= enemy->velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+								}
+								else {
+									enemy->tex_->pos.y = GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
+									float t = (enemy->tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+									enemy->tex_->pos.y -= enemy->velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+								}
+							}
+							else {
+								if (beforePos.x <= GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2) {
+									if (beforePos.y <= GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2) {
+										isFirstX = true;
+									}
+									else {
+										if (Vector2{ (GetTex()->pos.x - GetTex()->scale.x / 2) - (beforePos.x + enemy->tex_->scale.x / 2),
+											(GetTex()->pos.y + GetTex()->scale.y / 2) - (beforePos.y - enemy->tex_->scale.y / 2) }.Cross(
+												{ enemy->velocity_.x, enemy->velocity_.y }) > 0.0f) {
+											isFirstX = false;
+										}
+										else {
+											isFirstX = true;
+										}
+									}
+								}
+								else {
+									isFirstX = false;
+								}
+
+								if (isFirstX) {
+									enemy->tex_->pos.x = GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
+									float t = (enemy->tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+									enemy->tex_->pos.x -= enemy->velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+								}
+								else {
+									enemy->tex_->pos.y = GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
+									float t = (enemy->tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+									enemy->tex_->pos.y -= enemy->velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+								}
+
+							}
+						}
+						else {
+							if (enemy->velocity_.y > 0) {
+								if (beforePos.x >= GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2) {
+									if (beforePos.y >= GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2) {
+										isFirstX = true;
+									}
+									else {
+										if (Vector2{ (GetTex()->pos.x + GetTex()->scale.x / 2) - (beforePos.x - enemy->tex_->scale.x / 2),
+											(GetTex()->pos.y - GetTex()->scale.y / 2) - (beforePos.y + enemy->tex_->scale.y / 2) }.Cross(
+												{ enemy->velocity_.x, enemy->velocity_.y }) < 0.0f) {
+											isFirstX = true;
+										}
+										else {
+											isFirstX = false;
+										}
+									}
+								}
+								else {
+									isFirstX = false;
+								}
+
+								if (isFirstX) {
+									enemy->tex_->pos.x = GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
+									float t = (enemy->tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+									enemy->tex_->pos.x -= enemy->velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+								}
+								else {
+									enemy->tex_->pos.y = GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
+									float t = (enemy->tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+									enemy->tex_->pos.y -= enemy->velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+								}
+							}
+							else {
+								if (beforePos.x >= GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2) {
+									if (beforePos.y <= GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2) {
+										isFirstX = true;
+									}
+									else {
+										if (Vector2{ (GetTex()->pos.x + GetTex()->scale.x / 2) - (beforePos.x - enemy->tex_->scale.x / 2),
+											(GetTex()->pos.y + GetTex()->scale.y / 2) - (beforePos.y - enemy->tex_->scale.y / 2) }.Cross(
+												{ enemy->velocity_.x, enemy->velocity_.y }) < 0.0f) {
+											isFirstX = false;
+										}
+										else {
+											isFirstX = true;
+										}
+									}
+								}
+								else {
+									isFirstX = false;
+								}
+
+								if (isFirstX) {
+									enemy->tex_->pos.x = GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
+									float t = (enemy->tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+									enemy->tex_->pos.x -= enemy->velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+								}
+								else {
+									enemy->tex_->pos.y = GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
+									float t = (enemy->tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+									enemy->tex_->pos.y -= enemy->velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+								}
+
+							}
+						}
+						enemy->tex_->Update();
+
+						Vector3 vector = enemy->tex_->pos - GetTex()->pos;
+
+						float speed = enemy->velocity_.Length() * kReboundCoefficient_;
+
+						if (vector.y <= 0 && velocity_.y <= 0) {
+							 enemy->velocity_.x = vector.Normalize().x * speed;
+							 enemy->velocity_.y = -vector.Normalize().y * speed;
+						}
+						else {
+							velocity_ = vector.Normalize() * speed;
+						}
+						enemy->velocity_.z = 0;
+
+						enemy->fallingSpeed_ = kFallingSpeed_;
+
+						if (enemy->velocity_.x == 0) {
+
+							enemy->velocity_.x = std::sinf(enemy->rotateAddAngle_) * Lamb::Random(2, 6);
+
+							/*if (std::fabsf(rotateAddAngle_) <= 0.5f) {
+								rotateAddAngle_ = rotateAddAngle_ *Lamb::Random(3, 6);
+							}
+							velocity_.x = -std::sinf(rotateAddAngle_) * velocity_.y;
+							velocity_.y = std::cosf(rotateAddAngle_) * velocity_.y;*/
+						}
+						else {
+
+							float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
+
+							if (angle >= std::numbers::pi_v<float> / 2) {
+								angle -= std::numbers::pi_v<float> / 2;
+							}
+							else if (angle <= -std::numbers::pi_v<float> / 2) {
+								angle += std::numbers::pi_v<float> / 2;
+							}
+							enemy->rotateAddAngle_ = angle * 6;
 						}
 
 						if (isFirstX) {
-							tex_->pos.x = enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
-							float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
-							tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
-							//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+							velocity_.x *= -kReboundCoefficient_;
 						}
 						else {
-							tex_->pos.y = enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
-							float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
-							tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
-							//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+							velocity_.y *= -kReboundCoefficient_;
 						}
 
+
 					}
-				}
-				tex_->Update();
+					else {
+						Vector3 beforePos = tex_->pos - velocity_ * FrameInfo::GetInstance()->GetDelta();
+						Vector3 pos = tex_->pos;
+						bool isFirstX = false;
 
-				Vector3 vector = tex_->pos - enemy->GetTex()->pos;
 
-				float speed = velocity_.Length() * kReboundCoefficient_;
+						if (velocity_.x == 0.0f) {
+							if (velocity_.y <= 0) {
+								tex_->pos.y = enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
+							}
+							else {
+								tex_->pos.y = enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
+							}
+						}
+						else if (velocity_.y == 0.0f) {
+							if (velocity_.x <= 0) {
+								tex_->pos.x = enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
+							}
+							else {
+								tex_->pos.x = enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
+							}
+						}
+						else if (velocity_.x > 0) {
+							if (velocity_.y > 0) {
+								if (beforePos.x <= enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2) {
+									if (beforePos.y >= enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2) {
+										isFirstX = true;
+									}
+									else {
+										if (Vector2{ (enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2) - (beforePos.x + tex_->scale.x / 2),
+											(enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2) - (beforePos.y + tex_->scale.y / 2) }.Cross(
+												{ velocity_.x,velocity_.y }) > 0.0f) {
+											isFirstX = true;
+										}
+										else {
+											isFirstX = false;
+										}
+									}
+								}
+								else {
+									isFirstX = false;
+								}
 
-				if (vector.y <= 0 && velocity_.y <= 0) {
-					velocity_.x = vector.Normalize().x * speed;
-					velocity_.y = -vector.Normalize().y * speed;
-				}
-				else {
-					velocity_ = vector.Normalize() * speed;
-				}
-				velocity_.z = 0;
+								if (isFirstX) {
+									tex_->pos.x = enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
+									float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+									tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+								}
+								else {
+									tex_->pos.y = enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
+									float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+									tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+								}
+							}
+							else {
+								if (beforePos.x <= enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2) {
+									if (beforePos.y <= enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2) {
+										isFirstX = true;
+									}
+									else {
+										if (Vector2{ (enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2) - (beforePos.x + tex_->scale.x / 2),
+											(enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2) - (beforePos.y - tex_->scale.y / 2) }.Cross(
+												{ velocity_.x,velocity_.y }) > 0.0f) {
+											isFirstX = false;
+										}
+										else {
+											isFirstX = true;
+										}
+									}
+								}
+								else {
+									isFirstX = false;
+								}
 
-				fallingSpeed_ = kFallingSpeed_;
+								if (isFirstX) {
+									tex_->pos.x = enemy->GetTex()->pos.x - enemy->GetTex()->scale.x / 2 - tex_->scale.x / 2 - 0.001f;
+									float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+									tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+								}
+								else {
+									tex_->pos.y = enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
+									float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+									tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+								}
 
-				if (velocity_.x == 0) {
+							}
+						}
+						else {
+							if (velocity_.y > 0) {
+								if (beforePos.x >= enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2) {
+									if (beforePos.y >= enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2) {
+										isFirstX = true;
+									}
+									else {
+										if (Vector2{ (enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2) - (beforePos.x - tex_->scale.x / 2),
+											(enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2) - (beforePos.y + tex_->scale.y / 2) }.Cross(
+												{ velocity_.x,velocity_.y }) < 0.0f) {
+											isFirstX = true;
+										}
+										else {
+											isFirstX = false;
+										}
+									}
+								}
+								else {
+									isFirstX = false;
+								}
 
-					velocity_.x = std::sinf(rotateAddAngle_) *Lamb::Random(2, 6);
+								if (isFirstX) {
+									tex_->pos.x = enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
+									float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+									tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+								}
+								else {
+									tex_->pos.y = enemy->GetTex()->pos.y - enemy->GetTex()->scale.y / 2 - tex_->scale.y / 2 - 0.001f;
+									float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+									tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+								}
+							}
+							else {
+								if (beforePos.x >= enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2) {
+									if (beforePos.y <= enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2) {
+										isFirstX = true;
+									}
+									else {
+										if (Vector2{ (enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2) - (beforePos.x - tex_->scale.x / 2),
+											(enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2) - (beforePos.y - tex_->scale.y / 2) }.Cross(
+												{ velocity_.x,velocity_.y }) < 0.0f) {
+											isFirstX = false;
+										}
+										else {
+											isFirstX = true;
+										}
+									}
+								}
+								else {
+									isFirstX = false;
+								}
 
-					/*if (std::fabsf(rotateAddAngle_) <= 0.5f) {
-						rotateAddAngle_ = rotateAddAngle_ *Lamb::Random(3, 6);
+								if (isFirstX) {
+									tex_->pos.x = enemy->GetTex()->pos.x + enemy->GetTex()->scale.x / 2 + tex_->scale.x / 2 + 0.001f;
+									float t = (tex_->pos.x - beforePos.x) / (pos.x - beforePos.x);
+									tex_->pos.x -= velocity_.x * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.y = beforePos.y + t * velocity_.y * FrameInfo::GetInstance()->GetDelta();
+								}
+								else {
+									tex_->pos.y = enemy->GetTex()->pos.y + enemy->GetTex()->scale.y / 2 + tex_->scale.y / 2 + 0.001f;
+									float t = (tex_->pos.y - beforePos.y) / (pos.y - beforePos.y);
+									tex_->pos.y -= velocity_.y * (1.0f - t) * FrameInfo::GetInstance()->GetDelta() * kReboundCoefficient_;
+									//tex_->pos.x = beforePos.x + t * velocity_.x * FrameInfo::GetInstance()->GetDelta();
+								}
+
+							}
+						}
+						tex_->Update();
+
+						Vector3 vector = tex_->pos - enemy->GetTex()->pos;
+
+						float speed = velocity_.Length() * kReboundCoefficient_;
+
+						if (vector.y <= 0 && velocity_.y <= 0) {
+							velocity_.x = vector.Normalize().x * speed;
+							velocity_.y = -vector.Normalize().y * speed;
+						}
+						else {
+							velocity_ = vector.Normalize() * speed;
+						}
+						velocity_.z = 0;
+
+						fallingSpeed_ = kFallingSpeed_;
+
+						if (velocity_.x == 0) {
+
+							velocity_.x = std::sinf(rotateAddAngle_) * Lamb::Random(2, 6);
+
+							/*if (std::fabsf(rotateAddAngle_) <= 0.5f) {
+								rotateAddAngle_ = rotateAddAngle_ *Lamb::Random(3, 6);
+							}
+							velocity_.x = -std::sinf(rotateAddAngle_) * velocity_.y;
+							velocity_.y = std::cosf(rotateAddAngle_) * velocity_.y;*/
+						}
+						else {
+
+							float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
+
+							if (angle >= std::numbers::pi_v<float> / 2) {
+								angle -= std::numbers::pi_v<float> / 2;
+							}
+							else if (angle <= -std::numbers::pi_v<float> / 2) {
+								angle += std::numbers::pi_v<float> / 2;
+							}
+							rotateAddAngle_ = angle * 6;
+						}
+
+						if (isFirstX) {
+							enemy->velocity_.x *= -kReboundCoefficient_;
+						}
+						else {
+							enemy->velocity_.y *= -kReboundCoefficient_;
+						}
 					}
-					velocity_.x = -std::sinf(rotateAddAngle_) * velocity_.y;
-					velocity_.y = std::cosf(rotateAddAngle_) * velocity_.y;*/
-				}
-				else {
 
-					float angle = std::numbers::pi_v<float> / 2 - std::atan2f(vector.y, vector.x);
-
-					if (angle >= std::numbers::pi_v<float> / 2) {
-						angle -= std::numbers::pi_v<float> / 2;
-					}
-					else if (angle <= -std::numbers::pi_v<float> / 2) {
-						angle += std::numbers::pi_v<float> / 2;
-					}
-					rotateAddAngle_ = angle * 6;
 				}
+				
 				isCollisionLayer_ = false;
 			}
 		}
