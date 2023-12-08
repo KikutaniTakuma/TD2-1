@@ -1016,12 +1016,24 @@ void GameScene::CameraUpdate()
 		else {
 			camera2D_->pos.y = camera2D_->pos.y + (y - camera2D_->pos.y) * 0.05f;
 		}*/
-	if (cameraLocalPos_.y + layer_->GetLastLayerPosY() <= player_->GetTex()->pos.y) {
-		camera2D_->pos.y = player_->GetTex()->pos.y;
+
+	if (player_->GetStatus() != Player::Status::kFalling) {
+		if (cameraLocalPos_.y + layer_->GetLastLayerPosY() <= player_->GetTex()->pos.y) {
+			camera2D_->pos.y = player_->GetTex()->pos.y;
+		}
+		else {
+			camera2D_->pos.y = cameraLocalPos_.y + layer_->GetLastLayerPosY();
+		}
 	}
 	else {
-		camera2D_->pos.y = cameraLocalPos_.y + layer_->GetLastLayerPosY();
+		if (cameraLocalPos_.y + layer_->GetLastLayerPosY() <= player_->GetTex()->pos.y) {
+			camera2D_->pos.y = camera2D_->pos.y + (player_->GetTex()->pos.y - camera2D_->pos.y) * 0.1f;
+		}
+		else {
+			camera2D_->pos.y = camera2D_->pos.y + (cameraLocalPos_.y + layer_->GetLastLayerPosY() - camera2D_->pos.y) * 0.1f;
+		}
 	}
+
 	if (isShake_) {
 		camera2D_->pos += shakePos_;
 	}
